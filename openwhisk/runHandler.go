@@ -12,26 +12,17 @@ type Params struct {
 	Value json.RawMessage `json:"value"`
 }
 
-// ErrResponse is the response when there are errors
-type ErrResponse struct {
-	Error string `json:"error"`
-}
-
-func sendError(w http.ResponseWriter, code int, cause string) {
-	fmt.Println("action error:", cause)
-	errResponse := ErrResponse{Error: cause}
-	b, err := json.Marshal(errResponse)
-	if err != nil {
-		fmt.Println("error marshalling error response:", err)
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	w.Write(b)
+func activationMessage() {
+	fmt.Println("XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX")
+	fmt.Println("XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX")
 }
 
 func runHandler(w http.ResponseWriter, r *http.Request) {
 
-	// reading the request
+	// send the activation message at the end
+	defer activationMessage()
+
+	// parse the request
 	params := Params{}
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
@@ -48,9 +39,10 @@ func runHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// execute our action
-	response, err := Action(params.Value)
+	response, err := theAction(params.Value)
 	if err != nil {
-		sendError(w, http.StatusBadRequest, fmt.Sprintf("Error: %v", err))
+		sendError(w, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return
 	}
 
 	// encode the response
