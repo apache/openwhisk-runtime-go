@@ -2,7 +2,75 @@
 
 This is a (work in progress) runtime for OpenWhisk for GO with replacement of the executable instead of executing them.
 
-# Preparation
+# Background
+
+## How Go Action are currently implemented
+
+Currently, Go actions in OpenWhisk are implemented using the generic docker support. 
+
+There is a python based server, listening for `/init` and `/run` requests. The `/init` will collect an executable and place in the current folder, while the `/run` will invoke the executable with `popen`, feeding the input and returning the output as log, and the last line as the result as a serialized json.
+
+The problem is that spawning a new process for each request sound like a revival of the CGI.  It is certainly not the most efficient implementation.  Basically everyone moved from CGI executing processes to servers listening for requests since many many years ago.
+
+Just for comparison, AWS Lambda supports go implementing a server, listening and serving requests. 
+
+## Why?
+
+The problem here is Python and Node are dynamic scripting languages, while Go is a compiled language.
+
+Node and Python runtimes are both  servers, they receive the code of the function, “eval" the code and then execute it for serving requests. 
+
+Go, generating an executable, cannot afford to do that. We cannot “eval” precompiled code. But it is also inefficient to spawn a new process for each function invocation. 
+
+The solution here is to exec only once, when the runtime receive the executable of the function, at the `/init` time. 
+
+Then you should replace the main executable and  serve the `/run` requests directly in the replaced executable. Of course this means that the replaced executable should be able to serve the /init requests too. All of this should go in a library
+
+# How the new support work
+
+Support for Go will look like the following:
+
+```
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+
+	"github.com/sciabarracom/openwhisk-runtime-go/openwhisk"
+)
+
+func hello(event json.RawMessage) (json.RawMessage, error) {
+	// input and output
+	var input struct{ Name string }
+	var output struct {
+		Greetings string `json:"greetings"`
+	}
+	// read the input event
+	json.Unmarshal(event, &input)
+	if input.Name != "" {
+		// handle the event
+		output.Greetings = "Hello, " + input.Name
+		fmt.Println(output.Greetings)
+		return json.Marshal(output)
+	}
+	return nil, fmt.Errorf("no name specified")
+}
+
+func main() {
+	openwhisk.Start(ciao)
+}
+```
+
+The magic of serving `/init` and `/run` will be inside the library.
+
+The `Start` function will start a web server listening for two requests.
+
+Posts to `/run` will invoke some json decoding  and then invoke the function.
+
+Posts to `/init` will receive an executable, place somewhere `action` and then execute to it (expecting of course the server itself is implemented using the same library).  
+
+# Testing the current implementation
 
 First, let's prepare the replacements:
 
