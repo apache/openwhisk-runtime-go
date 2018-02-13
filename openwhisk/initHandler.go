@@ -58,7 +58,11 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 
 	// answer OK
 	w.Header().Set("Content-Type", "text/plain")
-	w.Write([]byte("OK"))
+	w.Header().Set("Content-Length", "3")
+	w.Write([]byte("OK\n"))
+	if f, ok := w.(http.Flusher); ok {
+		f.Flush()
+	}
 
 	// I've seen things you people wouldn't believe.
 	// Attack ships on fire off the shoulder of Orion.

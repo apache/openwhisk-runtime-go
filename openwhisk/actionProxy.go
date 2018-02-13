@@ -2,6 +2,7 @@ package openwhisk
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -23,6 +24,7 @@ func Start(action func(json.RawMessage) (json.RawMessage, error)) {
 	http.HandleFunc("/run", runHandler)
 
 	// start
+	fmt.Println("Start!")
 	theServer.Addr = ":8080"
 	log.Fatal(theServer.ListenAndServe())
 }
