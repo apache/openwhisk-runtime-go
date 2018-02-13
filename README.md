@@ -1,20 +1,20 @@
 # openwhisk-runtime-go
 
-This is a (work in progress) runtime for OpenWhisk for GO with replacement of the executable instead of executing them.
+This is a (work in progress) OpenWhisk runtime for  Golang,  with replacement of the executable as the main server, instead of just invoking a process for each request.
 
 # Background
 
-## How Go Action are currently implemented
+## How Go actions are currently implemented
 
-Currently, Go actions in OpenWhisk are implemented using the generic docker support. 
+Currently, Go actions in OpenWhisk are implemented using the generic Docker support. 
 
 There is a python based server, listening for `/init` and `/run` requests. The `/init` will collect an executable and place in the current folder, while the `/run` will invoke the executable with `popen`, feeding the input and returning the output as log, and the last line as the result as a serialized json.
 
 The problem is that spawning a new process for each request sound like a revival of the CGI.  It is certainly not the most efficient implementation.  Basically everyone moved from CGI executing processes to servers listening for requests since many many years ago.
 
-Just for comparison, AWS Lambda supports go implementing a server, listening and serving requests. 
+Just for comparison, AWS Lambda supports Go implementing a server, listening and serving requests. 
 
-## Why?
+## Why the exec?
 
 The problem here is Python and Node are dynamic scripting languages, while Go is a compiled language.
 
@@ -26,9 +26,9 @@ The solution here is to exec only once, when the runtime receive the executable 
 
 Then you should replace the main executable and  serve the `/run` requests directly in the replaced executable. Of course this means that the replaced executable should be able to serve the /init requests too. All of this should go in a library
 
-# How the new support work
+# How the new support works
 
-Support for Go will look like the following:
+The new support for Go will look like the following:
 
 ```
 package main
@@ -58,13 +58,13 @@ func hello(event json.RawMessage) (json.RawMessage, error) {
 }
 
 func main() {
-	openwhisk.Start(ciao)
+	openwhisk.Start(hello)
 }
 ```
 
-The magic of serving `/init` and `/run` will be inside the library.
+The magic of serving `/init` and `/run` will live inside the library.
 
-The `Start` function will start a web server listening for two requests.
+The `Start` function will start a web server listening for  the two requests of the proxy.
 
 Posts to `/run` will invoke some json decoding  and then invoke the function.
 
@@ -101,14 +101,21 @@ Now post the `hello` handler and run it:
 
 ```
 $ curl -XPOST http://localhost:8080/init -d @hello.json
+OK
 $ curl -XPOST http://localhost:8080/run -d '{"value":{"name":"Mike"}}'
+{"greetings":"Hello, Mike"}
 ```
 
-Now post the `ciao` handler and run it:
+As you can see, the function changed and now it implements the "hello" handler.
+
+But the replaced server is still able to run init so let's do it again, replacing with the "ciao" handler.
+
 
 ```
 $ curl -XPOST http://localhost:8080/init -d @ciao.json
+OK
 $ curl -XPOST http://localhost:8080/run -d '{"value":{"name":"Mike"}}'
+{"saluti":"Ciao, Mike"}
 ```
 
 
