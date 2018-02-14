@@ -2,6 +2,8 @@
 
 This is a (work in progress) OpenWhisk runtime for  Golang,  with replacement of the executable as the main server, instead of just invoking a process for each request.
 
+![demo](./demo.png)
+
 # Background
 
 ## How Go actions are currently implemented
