@@ -1,0 +1,2 @@
+FROM sciabarracom/openwhisk-exec
+ADD exec /proxy
