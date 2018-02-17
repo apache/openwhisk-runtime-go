@@ -1,3 +1,5 @@
 .vscode/
 action
 *.log
+exec
+exec.json
