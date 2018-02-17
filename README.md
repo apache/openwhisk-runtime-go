@@ -88,7 +88,7 @@ Now, start the server:
 go run ../main/exec.go
 ```
 
-# You can now test the hello functions
+## You can now test the hello functions
 
 Default behaviour (no executable)
 
@@ -124,10 +124,14 @@ Results of the benchmark running 100 theads with 100 requests are pretty eloquen
 
 Also the size of the images is significant:
 
-| sciabarracom/openwhisk-hello   latest              43425039e090        2 hours ago         16.7MB |
-| sciabarracom/openwhisk-exec    latest              ba516ca87a68        2 hours ago         10.4MB |
-| openwhisk/dockerskeleton       latest              25d1878c2f31        4 months ago        109MB  |
-| openwhisk/python3action        latest              e7346758b201        4 months ago        289MB  |
+
+| sciabarracom/openwhisk-hello   |latest              |   16.7MB |
+| sciabarracom/openwhisk-exec    |latest              |   10.4MB |
+| openwhisk/dockerskeleton       |latest              |   109MB  |
+| openwhisk/python3action        |latest              |   289MB  |
+
+
+The `openwhisk-exec` is the images with only the proxy, while the `openwhisk-hello` also includes the `hello` action built from the `hello_orig.go` source.
 
 Below there is the description of how to setup the test enviroment if someone wants to repeat the tests...
 
