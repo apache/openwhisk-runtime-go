@@ -1,0 +1,4 @@
+Label,# Samples,Average,Median,90% Line,95% Line,99% Line,Min,Max,Error %,Throughput,KB/sec
+Python+System,10000,673,686,766,797,853,10,1180,0.00%,144.7,19.2
+GoServer,10000,2,2,3,6,15,1,78,0.10%,144.7,22.1
+TOTAL,20000,338,49,742,766,829,1,1180,0.05%,289.4,41.3
