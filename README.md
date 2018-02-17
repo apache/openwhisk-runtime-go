@@ -78,10 +78,8 @@ First, let's prepare the replacements:
 
 ```
 cd test
-go build -o hello ../main/hello.go
-go build -o ciao ../main/ciao.go
+go build -o hello ../main/hello_exec.go
 echo '{"value":{"binary":true,"code":"'$(base64 hello)'"}}' >hello.json
-echo '{"value":{"binary":true,"code":"'$(base64 ciao)'"}}' >ciao.json
 ```
 
 Now, start the server:
@@ -108,17 +106,73 @@ $ curl -XPOST http://localhost:8080/run -d '{"value":{"name":"Mike"}}'
 {"greetings":"Hello, Mike"}
 ```
 
-As you can see, the function changed and now it implements the "hello" handler.
+# Benchmarking
 
-But the replaced server is still able to run init so let's do it again, replacing with the "ciao" handler.
+There is now a benchmark to compare the performances of the current Docker skeleton with the Go server I developed.
 
+The benchmark is currently just one, run by JMeter against 2 instances, one with the Docker skeleton and another with the Go server.
+
+Tests were run only on OSX currently and Docker for Mac.
+
+Results of the benchmark running 100 theads with 100 requests are pretty eloquent...
+
+|     Label     | # Samples | Average | Median | 90% Line | 95% Line | 99% Line | Min | Max  |
+|---------------|-----------|---------|--------|----------|----------|----------|-----|------|
+| Python+System |     10000 |     673 |    686 |      766 |      797 |      853 |  10 | 1180 |
+| GoServer      |     10000 |       2 |      2 |        3 |        6 |       15 |   1 |   78 |
+
+
+Also the size of the images is significant:
+
+| sciabarracom/openwhisk-hello   latest              43425039e090        2 hours ago         16.7MB |
+| sciabarracom/openwhisk-exec    latest              ba516ca87a68        2 hours ago         10.4MB |
+| openwhisk/dockerskeleton       latest              25d1878c2f31        4 months ago        109MB  |
+| openwhisk/python3action        latest              e7346758b201        4 months ago        289MB  |
+
+Below there is the description of how to setup the test enviroment if someone wants to repeat the tests...
+
+## Start the Dockerskeleton 
+
+First start the Docker skeleton
 
 ```
-$ curl -XPOST http://localhost:8080/init -d @ciao.json
-OK
-$ curl -XPOST http://localhost:8080/run -d '{"value":{"name":"Mike"}}'
-{"saluti":"Ciao, Mike"}
+docker run -p 8080:8080 -ti openwhisk/dockerskeleton
 ```
+
+Then, in another terminal build an example, publish and test it.
+
+The example is taken from here: [hello_orig.go](https://www.ibm.com/blogs/bluemix/2017/01/docker-bluemix-openwhisk/).
+
+You can do it easily with a few scripts I provided.
+
+```
+bin/build.sh main/hello_orig.go
+bin/init.sh zip/hello_orig.zip
+bin/run.sh '{"name": "Test"}'
+```
+
+## Start the server
+
+Here, to make a fair comparison you need to build a docker and place the Go executable in it.
+
+```
+cd docker
+GOOS=linux GOARCH=amd64 go build -o proxy ../main/exec.go
+docker build -t sciabarracom/openwhisk-exec .
+docker run -ti -p 8081:8080 sciabarracom/openwhisk-exec
+```
+
+Note it is listening on a different port, 8081
+
+You can now publish a replacement exec:
+
+```
+GOOS=linux GOARCH=amd64 go build -o exec main/hello_exec.go
+PORT=8081 bin/init.sh exec
+PORT=8081 bin/run.sh
+```
+
+You are ready to run the test. Install JMeter and load the file benchmark/HelloStress.jmx
 
 
 
