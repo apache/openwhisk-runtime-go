@@ -1,4 +1,5 @@
 .vscode/
+hack
 action
 *.log
 exec
