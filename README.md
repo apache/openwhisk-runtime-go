@@ -125,6 +125,7 @@ Results of the benchmark running 100 theads with 100 requests are pretty eloquen
 Also the size of the images is significant:
 
 
+
 | sciabarracom/openwhisk-hello   |latest              |   16.7MB |
 | sciabarracom/openwhisk-exec    |latest              |   10.4MB |
 | openwhisk/dockerskeleton       |latest              |   109MB  |
