@@ -3,6 +3,7 @@ package hello
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 )
 
 // Hello receive an event in format
@@ -22,7 +23,7 @@ func Hello(event json.RawMessage) (json.RawMessage, error) {
 	if input.Name != "" {
 		// handle the event
 		output.Greetings = "Hello, " + input.Name
-		fmt.Println(output.Greetings)
+		log.Println(output.Greetings)
 		return json.Marshal(output)
 	}
 	return nil, fmt.Errorf("no name specified")

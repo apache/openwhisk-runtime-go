@@ -2,6 +2,8 @@ package openwhisk
 
 import (
 	"bufio"
+	"fmt"
+	"log"
 	"os/exec"
 )
 
@@ -42,9 +44,20 @@ func (proc *PipeExec) scan() string {
 }
 
 func service(proc *PipeExec, ch chan string) {
+	log.Println("started service")
 	for {
-		proc.print(<-ch)
-		ch <- proc.scan()
+		in := <-ch
+		log.Printf("recv: %s\n", in)
+		if in == "" {
+			// TODO: test this
+			proc.cmd.Process.Kill()
+			fmt.Println("terminated")
+			break
+		}
+		proc.print(in)
+		out := proc.scan()
+		log.Printf("sent: %s\n", out)
+		ch <- out
 	}
 }
 
