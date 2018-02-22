@@ -4,13 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
-	"os/exec"
 )
-
-// theChannel is the channel communicating with the action
-var theChannel chan string
 
 // Params are the parameteres sent to the action
 type Params struct {
@@ -38,20 +33,6 @@ func sendError(w http.ResponseWriter, code int, cause string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(b)
-}
-
-func startActionIfExists() {
-	// terminate current action
-	if theChannel != nil {
-		log.Println("terminating old action")
-		theChannel <- ""
-	}
-	// start a new action service
-	_, err := exec.LookPath("./action")
-	if err == nil {
-		log.Println("starting new action")
-		theChannel = StartService("./action")
-	}
 }
 
 func runHandler(w http.ResponseWriter, r *http.Request) {

@@ -34,9 +34,6 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//request.Value.Code = fmt.Sprintf("%d", len(request.Value.Code))
-	//fmt.Printf("init: req %v", request)
-
 	// check if it is a binary
 	if !request.Value.Binary {
 		sendError(w, http.StatusBadRequest, "Source requests not (yet) supported")
@@ -49,12 +46,16 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 		sendError(w, http.StatusBadRequest, "cannot decode the request")
 		return
 	}
-	err = ioutil.WriteFile("./action", decoded, 0755)
+
+	// stop the current running action, if any
+	stopAction()
+
+	// extract the replacement
+	err = extractAction(&decoded)
 	if err != nil {
 		sendError(w, http.StatusBadRequest, "cannot write the file")
 		return
 	}
-	fmt.Println("init: file written")
 
 	// answer OK
 	w.Header().Set("Content-Type", "text/plain")
@@ -65,5 +66,5 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// start the action as a goroutine
-	startActionIfExists()
+	startAction()
 }

@@ -1,5 +1,6 @@
-# openwhisk-runtime-go
+OUTDATED README - currently actions are implemented with a pipe - will update soon.
 
+# openwhisk-runtime-go
 This is a (work in progress) OpenWhisk runtime for  Golang,  with replacement of the executable as the main server, instead of just invoking a process for each request.
 
 ![demo](./demo.png)
