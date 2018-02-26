@@ -11,7 +11,6 @@ func ExampleHello() {
 	data, _ := hello.Hello(name)
 	fmt.Printf("%s", data)
 	// Output:
-	// Hello, Mike
 	// {"greetings":"Hello, Mike"}
 }
 

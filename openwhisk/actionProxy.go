@@ -1,10 +1,8 @@
 package openwhisk
 
 import (
-	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"os/exec"
 )
 
@@ -29,13 +27,6 @@ func startAction() {
 		log.Println("starting new action")
 		theChannel = StartService("./action/exec")
 	}
-}
-
-// extractAction accept a byte array write it to a file
-func extractAction(buf *[]byte) error {
-	os.MkdirAll("./action", 0755)
-	log.Println("Extract Action, assuming a binary")
-	return ioutil.WriteFile("./action/exec", *buf, 0755)
 }
 
 // Start creates a proxy to execute actions

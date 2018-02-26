@@ -2,5 +2,4 @@
 hack
 action
 *.log
-exec
-exec.json
+*.zip.json
