@@ -43,7 +43,8 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 	// write the base64 encoded file
 	decoded, err := base64.StdEncoding.DecodeString(request.Value.Code)
 	if err != nil {
-		sendError(w, http.StatusBadRequest, "cannot decode the request")
+		//fmt.Println(request.Value.Code)
+		sendError(w, http.StatusBadRequest, "cannot decode the request: "+err.Error())
 		return
 	}
 
