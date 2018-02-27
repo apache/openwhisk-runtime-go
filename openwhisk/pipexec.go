@@ -2,7 +2,6 @@ package openwhisk
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os/exec"
 )
@@ -51,7 +50,7 @@ func service(proc *PipeExec, ch chan string) {
 		if in == "" {
 			// TODO: test this
 			proc.cmd.Process.Kill()
-			fmt.Println("terminated")
+			log.Println("terminated")
 			break
 		}
 		proc.print(in)
