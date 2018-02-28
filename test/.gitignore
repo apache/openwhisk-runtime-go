@@ -1,5 +1,3 @@
-action
-ciao
-ciao.json
-hello
-hello.json
+action/
+*.json
+*.err

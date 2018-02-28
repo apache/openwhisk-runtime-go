@@ -49,12 +49,14 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// stop the current running action, if any
-	stopAction()
 
-	// extract the replacement
+	// extract the replacement, stopping and then starting the action
+	stopAction()
 	err = extractAction(&decoded)
+	startAction()
+
 	if err != nil {
-		sendError(w, http.StatusBadRequest, "cannot write the file")
+		sendError(w, http.StatusBadRequest, "cannot write the file: "+err.Error())
 		return
 	}
 
@@ -66,6 +68,4 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 		f.Flush()
 	}
 
-	// start the action as a goroutine
-	startAction()
 }

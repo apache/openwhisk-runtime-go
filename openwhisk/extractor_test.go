@@ -63,3 +63,9 @@ func TestExtractActionTest_zip(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestHigherDir(t *testing.T) {
+	assert.Equal(t, higherDir("./_test"), 0)
+	assert.Equal(t, higherDir("./_test/first"), 3)
+	assert.Equal(t, higherDir("./_test/second"), 17)
+}

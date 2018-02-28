@@ -9,12 +9,11 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/h2non/filetype"
 )
 
-// blatantly copied from StackOverflow, with some changes
-// https://stackoverflow.com/questions/20357223/easy-way-to-unzip-file-with-golang
 func unzip(src []byte, dest string) error {
 	reader := bytes.NewReader(src)
 	r, err := zip.NewReader(reader, int64(len(src)))
@@ -65,12 +64,35 @@ func unzip(src []byte, dest string) error {
 	return nil
 }
 
+// higherDir will find the highest numeric name a sub directory has
+// 0 if no numeric dir names found
+func higherDir(dir string) int {
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return 0
+	}
+	max := 0
+	for _, file := range files {
+		n, err := strconv.Atoi(file.Name())
+		if err == nil {
+			if n > max {
+				max = n
+			}
+		}
+	}
+	return max
+}
+
+var currentDir = higherDir("./action")
+
 // extractAction accept a byte array write it to a file
 func extractAction(buf *[]byte) error {
 	if buf == nil || len(*buf) == 0 {
 		return fmt.Errorf("no file")
 	}
-	os.MkdirAll("./action", 0755)
+	currentDir++
+	newDir := fmt.Sprintf("./action/%d", currentDir)
+	os.MkdirAll(newDir, 0755)
 	kind, err := filetype.Match(*buf)
 	if err != nil {
 		return err
@@ -78,11 +100,11 @@ func extractAction(buf *[]byte) error {
 	log.Println(kind)
 	if kind.Extension == "elf" {
 		log.Println("Extract Action, assuming a binary")
-		return ioutil.WriteFile("./action/exec", *buf, 0755)
+		return ioutil.WriteFile(newDir+"/exec", *buf, 0755)
 	}
 	if kind.Extension == "zip" {
 		log.Println("Extract Action, assuming a zip")
-		unzip(*buf, "./action")
+		return unzip(*buf, newDir)
 	}
 	return fmt.Errorf("unknown filetype %s", kind)
 }

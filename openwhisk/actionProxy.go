@@ -1,6 +1,7 @@
 package openwhisk
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os/exec"
@@ -22,10 +23,11 @@ func stopAction() {
 
 func startAction() {
 	// start a new action service
-	_, err := exec.LookPath("./action/exec")
+	executable := fmt.Sprintf("./action/%d/exec", higherDir("./action"))
+	_, err := exec.LookPath(executable)
 	if err == nil {
-		log.Println("starting new action")
-		theChannel = StartService("./action/exec")
+		log.Printf("starting %s", executable)
+		theChannel = StartService(executable)
 	}
 }
 
@@ -35,6 +37,8 @@ func Start() {
 	http.HandleFunc("/init", initHandler)
 	// handle execution
 	http.HandleFunc("/run", runHandler)
+	// start action if there
+	startAction()
 	// start
 	log.Println("Start!")
 	theServer.Addr = ":8080"

@@ -1,5 +1,5 @@
-go build -o hello ../main/hello.go
-go build -o ciao ../main/ciao.go
-echo '{"value":{"binary":true,"code":"'$(base64 hello)'"}}' >hello.json
-echo '{"value":{"binary":true,"code":"'$(base64 ciao)'"}}' >ciao.json
+#!/bin/bash
+bin/build.sh ../main/hello_greeting.go 
+bin/build.sh ../main/hello_message.go 
+rm -Rvf action
 go run ../main/exec.go
