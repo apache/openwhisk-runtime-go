@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 )
 
@@ -23,11 +24,24 @@ func stopAction() {
 
 func startAction() {
 	// start a new action service
-	executable := fmt.Sprintf("./action/%d/exec", higherDir("./action"))
+	highestDir := highestDir("./action")
+	if highestDir == 0 {
+		log.Println("no start dir")
+		return
+	}
+	executable := fmt.Sprintf("./action/%d/exec", highestDir)
 	_, err := exec.LookPath(executable)
 	if err == nil {
 		log.Printf("starting %s", executable)
-		theChannel = StartService(executable)
+		ch := StartService(executable)
+		if ch == nil {
+			log.Printf("cannot start this! deleting")
+			exeDir := fmt.Sprintf("./action/%d/", highestDir)
+			os.RemoveAll(exeDir)
+			startAction()
+			return
+		}
+		theChannel = ch
 	}
 }
 

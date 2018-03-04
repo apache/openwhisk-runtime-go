@@ -20,6 +20,7 @@ func main() {
 		return
 	}
 	// read loop
+	fmt.Println(`{"openwhisk":1}`)
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		event, err := reader.ReadBytes('\n')

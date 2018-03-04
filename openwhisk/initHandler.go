@@ -18,7 +18,7 @@ type initRequest struct {
 func initHandler(w http.ResponseWriter, r *http.Request) {
 
 	// read body of the request
-	fmt.Println("init: reading")
+	//log.Println("init: reading")
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
@@ -26,7 +26,7 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// decode request parameters
-	fmt.Println("init: decoding")
+	//log.Println("init: decoding")
 	var request initRequest
 	err = json.Unmarshal(body, &request)
 	if err != nil {
@@ -35,27 +35,24 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check if it is a binary
-	if !request.Value.Binary {
-		sendError(w, http.StatusBadRequest, "Source requests not (yet) supported")
-		return
+	if request.Value.Binary {
+		decoded, err := base64.StdEncoding.DecodeString(request.Value.Code)
+		if err != nil {
+			sendError(w, http.StatusBadRequest, "cannot decode the request: "+err.Error())
+			return
+		}
+		// extract the replacement, stopping and then starting the action
+		err = extractAction(&decoded, false)
+	} else {
+		buf := []byte(request.Value.Code)
+		err = extractAction(&buf, true)
 	}
 
 	// write the base64 encoded file
-	decoded, err := base64.StdEncoding.DecodeString(request.Value.Code)
-	if err != nil {
-		//fmt.Println(request.Value.Code)
-		sendError(w, http.StatusBadRequest, "cannot decode the request: "+err.Error())
-		return
-	}
-
-	// stop the current running action, if any
-
-	// extract the replacement, stopping and then starting the action
-	stopAction()
-	err = extractAction(&decoded)
-	startAction()
-
-	if err != nil {
+	if err == nil {
+		stopAction()
+		startAction()
+	} else {
 		sendError(w, http.StatusBadRequest, "cannot write the file: "+err.Error())
 		return
 	}

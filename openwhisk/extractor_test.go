@@ -28,13 +28,19 @@ func TestExtractActionTest_exec(t *testing.T) {
 	// cleanup
 	assert.Nil(t, os.RemoveAll("./action"))
 	file, _ := ioutil.ReadFile("_test/exec")
-	extractAction(&file)
-	_, err := os.Stat("./action/exec")
-	assert.Nil(t, err)
+	extractAction(&file, false)
+	assert.Nil(t, exists("./action", "exec"))
 }
 
-func detect(filename string) string {
-	file, _ := ioutil.ReadFile(filename)
+func exists(dir, filename string) error {
+	path := fmt.Sprintf("%s/%d/%s", dir, highestDir(dir), filename)
+	_, err := os.Stat(path)
+	return err
+}
+
+func detect(dir, filename string) string {
+	path := fmt.Sprintf("%s/%d/%s", dir, highestDir(dir), filename)
+	file, _ := ioutil.ReadFile(path)
 	kind, _ := filetype.Match(file)
 	return kind.Extension
 }
@@ -44,8 +50,8 @@ func TestExtractActionTest_exe(t *testing.T) {
 	assert.Nil(t, os.RemoveAll("./action"))
 	// match  exe
 	file, _ := ioutil.ReadFile("_test/exec")
-	extractAction(&file)
-	assert.Equal(t, detect("./action/exec"), "elf")
+	extractAction(&file, false)
+	assert.Equal(t, detect("./action", "exec"), "elf")
 }
 
 func TestExtractActionTest_zip(t *testing.T) {
@@ -54,18 +60,20 @@ func TestExtractActionTest_zip(t *testing.T) {
 	assert.Nil(t, os.RemoveAll("./action"))
 	// match  exe
 	file, _ := ioutil.ReadFile("_test/exec.zip")
-	extractAction(&file)
-	assert.Equal(t, detect("./action/exec"), "elf")
-	if _, err := os.Stat("./action/etc"); err != nil {
-		t.Fail()
-	}
-	if _, err := os.Stat("./action/dir/etc"); err != nil {
-		t.Fail()
-	}
+	extractAction(&file, false)
+	assert.Equal(t, detect("./action", "exec"), "elf")
+	assert.Nil(t, exists("./action", "etc"))
+	assert.Nil(t, exists("./action", "dir/etc"))
 }
 
-func TestHigherDir(t *testing.T) {
-	assert.Equal(t, higherDir("./_test"), 0)
-	assert.Equal(t, higherDir("./_test/first"), 3)
-	assert.Equal(t, higherDir("./_test/second"), 17)
+func TestExtractAction_script(t *testing.T) {
+	buf := []byte("#!/bin/sh\necho ok")
+	assert.NotNil(t, extractAction(&buf, false))
+	assert.Nil(t, extractAction(&buf, true))
+}
+
+func TestHighestDir(t *testing.T) {
+	assert.Equal(t, highestDir("./_test"), 0)
+	assert.Equal(t, highestDir("./_test/first"), 3)
+	assert.Equal(t, highestDir("./_test/second"), 17)
 }

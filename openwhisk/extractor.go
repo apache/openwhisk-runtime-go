@@ -66,7 +66,7 @@ func unzip(src []byte, dest string) error {
 
 // higherDir will find the highest numeric name a sub directory has
 // 0 if no numeric dir names found
-func higherDir(dir string) int {
+func highestDir(dir string) int {
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return 0
@@ -83,10 +83,10 @@ func higherDir(dir string) int {
 	return max
 }
 
-var currentDir = higherDir("./action")
+var currentDir = highestDir("./action")
 
 // extractAction accept a byte array write it to a file
-func extractAction(buf *[]byte) error {
+func extractAction(buf *[]byte, isScript bool) error {
 	if buf == nil || len(*buf) == 0 {
 		return fmt.Errorf("no file")
 	}
@@ -97,14 +97,13 @@ func extractAction(buf *[]byte) error {
 	if err != nil {
 		return err
 	}
-	log.Println(kind)
-	if kind.Extension == "elf" {
-		log.Println("Extract Action, assuming a binary")
-		return ioutil.WriteFile(newDir+"/exec", *buf, 0755)
-	}
 	if kind.Extension == "zip" {
 		log.Println("Extract Action, assuming a zip")
 		return unzip(*buf, newDir)
+	}
+	if kind.Extension == "elf" || isScript {
+		log.Println("Extract Action, assuming a binary")
+		return ioutil.WriteFile(newDir+"/exec", *buf, 0755)
 	}
 	return fmt.Errorf("unknown filetype %s", kind)
 }

@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"strings"
 )
 
 // Params are the parameteres sent to the action
@@ -33,6 +35,7 @@ func sendError(w http.ResponseWriter, code int, cause string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(b)
+	w.Write([]byte("\n"))
 }
 
 func runHandler(w http.ResponseWriter, r *http.Request) {
@@ -71,6 +74,10 @@ func runHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// return the response
+	if !strings.HasSuffix(response, "\n") {
+		response = response + "\n"
+	}
+	log.Print(response)
 	w.Header().Set("Content-Type", "application/json")
 	numBytesWritten, err := w.Write([]byte(response))
 	if err != nil {

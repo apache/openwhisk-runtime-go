@@ -27,6 +27,7 @@ func parseJson(str: String) -> JSON {
 if CommandLine.arguments.count >= 2 {
     printJson(json: hello(json: parseJson(str: CommandLine.arguments[1])))
 } else {
+    printJson(["openwhisk", 1])
     while let input = readLine() {
         printJson(json: hello(json: parseJson(str: input)))
     }
