@@ -2,4 +2,4 @@
 DEFAULT='{"name": "Mike"}'
 JSON=${1:-$DEFAULT}
 DATA='{"value":'$JSON'}'
-curl -XPOST http://localhost:${PORT:-8080}/run -d "$DATA"
+curl -XPOST http://localhost:${PORT:-8080}/run -d "$DATA" 2>/dev/null

@@ -29,7 +29,6 @@ func NewPipeExec(command string, args ...string) (proc *PipeExec) {
 	proc = &PipeExec{cmd, scanner, printer, nil}
 	proc.err = proc.cmd.Start()
 	proc.handshake()
-	log.Println(proc.err)
 	return
 }
 

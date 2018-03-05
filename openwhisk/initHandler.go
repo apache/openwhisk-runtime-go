@@ -36,7 +36,8 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 
 	// check if it is a binary
 	if request.Value.Binary {
-		decoded, err := base64.StdEncoding.DecodeString(request.Value.Code)
+		var decoded []byte
+		decoded, err = base64.StdEncoding.DecodeString(request.Value.Code)
 		if err != nil {
 			sendError(w, http.StatusBadRequest, "cannot decode the request: "+err.Error())
 			return
@@ -47,13 +48,15 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 		buf := []byte(request.Value.Code)
 		err = extractAction(&buf, true)
 	}
-
-	// write the base64 encoded file
-	if err == nil {
-		stopAction()
-		startAction()
-	} else {
-		sendError(w, http.StatusBadRequest, "cannot write the file: "+err.Error())
+	if err != nil {
+		sendError(w, http.StatusBadRequest, "invalid action: "+err.Error())
+		return
+	}
+	// stop and start
+	stopAction()
+	err = startAction()
+	if err != nil {
+		sendError(w, http.StatusBadRequest, "cannot start action: "+err.Error())
 		return
 	}
 

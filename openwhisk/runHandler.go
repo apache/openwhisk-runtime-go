@@ -25,13 +25,11 @@ type ErrResponse struct {
 }
 
 func sendError(w http.ResponseWriter, code int, cause string) {
-	fmt.Println(cause)
 	errResponse := ErrResponse{Error: cause}
 	b, err := json.Marshal(errResponse)
 	if err != nil {
 		fmt.Println("error marshalling error response:", err)
 	}
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(b)

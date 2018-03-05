@@ -1,28 +1,24 @@
-no action
   $ export T=$TESTDIR
+
+no action
+
   $ $T/bin/run.sh 
   {"error":"no action defined yet"}
 
-TODO push wrong stuff
+  $ $T/bin/init.sh $T/test.t
+  {"error":"invalid action:* (glob)
 
-push a binary
+  $ $T/bin/init.sh $T/bin/empty
+  {"error":"cannot start action: cannot start action, deleted"}
 
-  $ $T/bin/init.sh $T/bin/hello_greeting
+  $ $T/bin/init.sh $T/bin/hi
+  {"error":"cannot start action: cannot start action, deleted"}
+
+  $ $T/bin/run.sh 
+  {"error":"no action defined yet"}
+
+  $ $T/bin/init.sh $T/bin/hello_message
   OK
+
   $ $T/bin/run.sh 
-  {"greetings":"Hello, Mike"}
-
-push a zip
-
-  $ $T/bin/init.sh $T/zip/hello_message.zip
-  OK
-  $ $T/bin/run.sh 
-  {"message":"Hello, Mike!"}
-
-push a non binary
-  
-  $ $T/bin/init.sh $T/test.t 
-  {"error":"cannot write the file: no file"}
-  $ $T/bin/run.sh 
-  {"message":"Hello, Mike!"}
-
+  {"error":"no action defined yet"}

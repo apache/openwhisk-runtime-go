@@ -102,8 +102,13 @@ func extractAction(buf *[]byte, isScript bool) error {
 		return unzip(*buf, newDir)
 	}
 	if kind.Extension == "elf" || isScript {
-		log.Println("Extract Action, assuming a binary")
+		if isScript {
+			log.Println("Extract Action, assuming a script")
+		} else {
+			log.Println("Extract Action, assuming a binary")
+		}
 		return ioutil.WriteFile(newDir+"/exec", *buf, 0755)
 	}
+	log.Println("No valid action found")
 	return fmt.Errorf("unknown filetype %s", kind)
 }
