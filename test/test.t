@@ -7,10 +7,10 @@
   {"error":"invalid action:* (glob)
 
   $ $T/bin/init.sh $T/bin/empty
-  {"error":"cannot start action: cannot start action, deleted"}
+  {"error":"cannot start action: sent invalid action"}
 
   $ $T/bin/init.sh $T/bin/hi
-  {"error":"cannot start action: cannot start action, deleted"}
+  {"error":"cannot start action: sent invalid action"}
 
   $ $T/bin/run.sh 
   {"error":"no action defined yet"}
@@ -46,10 +46,10 @@
   {"greetings":"Hello, Mike"}
 
   $ $T/bin/init.sh $T/bin/empty
-  {"error":"cannot start action: cannot start action, deleted"}
+  {"error":"cannot start action: sent invalid action"}
 
-$ $T/bin/run.sh 
-{"greetings":"Hello, Mike"}
+  $ $T/bin/run.sh 
+  {"greetings":"Hello, Mike"}
 
-$ $T/bin/init.sh $T/bin/hi
-{"error":"cannot start action: cannot start action, deleted"}
+  $ $T/bin/init.sh $T/bin/hi
+  {"error":"cannot start action: sent invalid action"}

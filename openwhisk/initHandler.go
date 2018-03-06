@@ -53,7 +53,7 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// stop and start
-	reStartAction()
+	err = reStartAction()
 	if err != nil {
 		sendError(w, http.StatusBadRequest, "cannot start action: "+err.Error())
 		return

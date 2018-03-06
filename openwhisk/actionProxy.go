@@ -19,19 +19,22 @@ func stopAction() {
 	if theChannel != nil {
 		log.Println("terminating old action")
 		theChannel <- ""
+		theChannel = nil
 	}
 }
 
-func reStartAction() {
+func reStartAction() error {
 	// stop action if any
 	stopAction()
+
 	// find the action if any
 	highestDir := highestDir("./action")
 	if highestDir == 0 {
 		log.Println("no action dir")
 		theChannel = nil
-		return
+		return fmt.Errorf("no valid actions available")
 	}
+
 	// try to launch the action
 	executable := fmt.Sprintf("./action/%d/exec", highestDir)
 	_, err := exec.LookPath(executable)
@@ -41,13 +44,15 @@ func reStartAction() {
 		ch := StartService(executable)
 		if ch != nil {
 			theChannel = ch
-			return
+			return nil
 		}
 	}
+
 	// cannot start, removing the action and retry
 	exeDir := fmt.Sprintf("./action/%d/", highestDir)
 	os.RemoveAll(exeDir)
 	reStartAction()
+	return fmt.Errorf("sent invalid action")
 }
 
 // Start creates a proxy to execute actions

@@ -3,6 +3,6 @@ echo '{"openwhisk":1}'
 while true
 do read line
    hello="Hello, $(echo $line | jq -r .name)"
-   echo '{"greetings":"'$hello'"}'
+   echo '{"hello":"'$hello'"}'
 done
 

@@ -59,7 +59,7 @@ func (proc *PipeExec) handshake() {
 	if proc.scannner.Scan() {
 		buf := proc.scannner.Bytes()
 		proc.err = json.Unmarshal(buf, &welcome)
-		if proc.err == nil && welcome.OpenWhisk < 1 {
+		if proc.err != nil || welcome.OpenWhisk < 1 {
 			proc.err = fmt.Errorf("failed handshake: %s", string(buf))
 		}
 	} else {
