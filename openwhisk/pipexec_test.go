@@ -70,7 +70,7 @@ func ExampleStartService_exit() {
 }
 
 func ExampleStartService_true() {
-	ch := StartService("pwd")
+	ch := StartService("/bin/pwd")
 	fmt.Println(ch)
 	// Output:
 	// <nil>

@@ -1,7 +1,5 @@
   $ export T=$TESTDIR
 
-no action
-
   $ $T/bin/run.sh 
   {"error":"no action defined yet"}
 
@@ -21,4 +19,37 @@ no action
   OK
 
   $ $T/bin/run.sh 
-  {"error":"no action defined yet"}
+  {"message":"Hello, Mike!"}
+
+  $ $T/bin/init.sh $T/bin/hello_greeting
+  OK
+
+  $ $T/bin/run.sh 
+  {"greetings":"Hello, Mike"}
+
+  $ $T/bin/init.sh $T/zip/hello_message.zip
+  OK
+
+  $ $T/bin/run.sh 
+  {"message":"Hello, Mike!"}
+
+  $ $T/bin/init.sh $T/zip/hello_greeting.zip
+  OK
+
+  $ $T/bin/run.sh 
+  {"greetings":"Hello, Mike"}
+
+  $ $T/bin/init.sh $T/test.t
+  {"error":"invalid action:* (glob)
+
+  $ $T/bin/run.sh 
+  {"greetings":"Hello, Mike"}
+
+  $ $T/bin/init.sh $T/bin/empty
+  {"error":"cannot start action: cannot start action, deleted"}
+
+$ $T/bin/run.sh 
+{"greetings":"Hello, Mike"}
+
+$ $T/bin/init.sh $T/bin/hi
+{"error":"cannot start action: cannot start action, deleted"}
