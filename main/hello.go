@@ -17,5 +17,7 @@ func main() {
 	}
 	msg := map[string]string{"msg": ("Hello, " + name + "!")}
 	res, _ := json.Marshal(msg)
+        fmt.Printf("name=%s\n", name)
 	fmt.Println(string(res))
+
 }

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 )
 
@@ -14,6 +15,7 @@ func hello(arg string) string {
 	if !ok {
 		name = "Stranger"
 	}
+	log.Printf("name=%s\n", name)
 	msg := map[string]string{"message": ("Hello, " + name + "!")}
 	res, _ := json.Marshal(msg)
 	return string(res)
