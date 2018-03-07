@@ -15,6 +15,7 @@ type PipeExec struct {
 	cmd      *exec.Cmd
 	scannner *bufio.Scanner
 	printer  *bufio.Writer
+	logger   *bufio.Scanner
 	err      error
 }
 
@@ -22,11 +23,14 @@ type PipeExec struct {
 // You can then start it getting a communcation channel
 func NewPipeExec(command string, args ...string) (proc *PipeExec) {
 	cmd := exec.Command(command, args...)
-	in, _ := cmd.StdinPipe()
-	out, _ := cmd.StdoutPipe()
-	scanner := bufio.NewScanner(out)
-	printer := bufio.NewWriter(in)
-	proc = &PipeExec{cmd, scanner, printer, nil}
+	stdin, _ := cmd.StdinPipe()
+	stdout, _ := cmd.StdoutPipe()
+	stderr, _ := cmd.StderrPipe()
+	scanner := bufio.NewScanner(stdout)
+	printer := bufio.NewWriter(stdin)
+	logger := bufio.NewScanner(stderr)
+
+	proc = &PipeExec{cmd, scanner, printer, logger, nil}
 	proc.err = proc.cmd.Start()
 	if proc.err == nil {
 		proc.handshake()
@@ -67,22 +71,36 @@ func (proc *PipeExec) handshake() {
 	}
 }
 
+func logger(proc *PipeExec) {
+	log.Println("started logger")
+	// scanner read stderr continuosly
+	// it will exit when the underlying process terminate
+	for proc.logger.Scan() {
+		fmt.Println(proc.logger.Text())
+	}
+	log.Println("exited logger")
+}
+
 func service(proc *PipeExec, ch chan string) {
 	log.Println("started service")
 	for {
 		in, ok := <-ch
 		if !ok || in == "" {
 			proc.cmd.Process.Kill()
-			log.Println("terminated")
+			if ok {
+				log.Println("terminated upon request")
+			} else {
+				log.Println("terminated: cannot read channel")
+			}
 			break
 		}
-		log.Printf("recv: %s\n", in)
+		//log.Printf("recv: %s\n", in)
 		proc.print(in)
 		out := proc.scan()
 		if out == "" {
 			break
 		}
-		log.Printf("sent: %s\n", out)
+		//log.Printf("sent: %s\n", out)
 		ch <- out
 	}
 	close(ch)
@@ -95,7 +113,11 @@ func StartService(command string, args ...string) chan string {
 		log.Print(pipe.err)
 		return nil
 	}
+	// create channer
 	ch := make(chan string)
+	// read-write loop
 	go service(pipe, ch)
+	// stderr to stdout
+	go logger(pipe)
 	return ch
 }
