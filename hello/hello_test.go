@@ -2,28 +2,26 @@ package hello
 
 import (
 	"fmt"
-
-	"github.com/sciabarracom/openwhisk-runtime-go/hello"
 )
 
 func ExampleHello() {
 	name := []byte(`{ "name": "Mike"}`)
-	data, _ := hello.Hello(name)
+	data, _ := Hello(name)
 	fmt.Printf("%s", data)
 	// Output:
 	// {"greetings":"Hello, Mike"}
 }
 
-func ExampleHelloNoName() {
+func ExampleHello_noName() {
 	name := []byte(`{ "noname": "Mike"}`)
-	_, err := hello.Hello(name)
+	_, err := Hello(name)
 	fmt.Print(err)
 	// Output:
 	// no name specified
 }
-func ExampleHelloBadJson() {
+func ExampleHello_badJson() {
 	name := []byte(`{{`)
-	_, err := hello.Hello(name)
+	_, err := Hello(name)
 	fmt.Print(err)
 	// Output:
 	// no name specified
