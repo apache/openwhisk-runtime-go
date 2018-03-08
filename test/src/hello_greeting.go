@@ -14,44 +14,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/sciabarracom/openwhisk-runtime-go/hello"
 )
 
-func hello(arg string) string {
-	var obj map[string]interface{}
-	json.Unmarshal([]byte(arg), &obj)
-	name, ok := obj["name"].(string)
-	if !ok {
-		name = "Stranger"
-	}
-	log.Printf("name=%s\n", name)
-	msg := map[string]string{"message": ("Hello, " + name + "!")}
-	res, _ := json.Marshal(msg)
-	return string(res)
-}
-
 func main() {
-	// native actions receive one argument, the JSON object as a string
+	log.SetFlags(0)
+	log.SetPrefix("hello_greeting: ")
+	// handle command line argument
 	if len(os.Args) > 1 {
-		fmt.Println(hello(os.Args[1]))
+		result, err := hello.Hello([]byte(os.Args[1]))
+		if err == nil {
+			fmt.Println(string(result))
+			return
+		}
+		fmt.Printf("{ error: %q}\n", err.Error())
 		return
 	}
 	// read loop
 	fmt.Println(`{"openwhisk":1}`)
 	reader := bufio.NewReader(os.Stdin)
 	for {
-		event, err := reader.ReadString('\n')
+		event, err := reader.ReadBytes('\n')
 		if err != nil {
 			break
 		}
-		fmt.Println(hello(event))
+		result, err := hello.Hello(event)
+		if err != nil {
+			fmt.Printf("{ error: %q}\n", err.Error())
+			continue
+		}
+		fmt.Println(string(result))
 	}
 }

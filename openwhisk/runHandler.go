@@ -23,6 +23,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"runtime"
 	"strings"
 )
 
@@ -32,6 +33,9 @@ type Params struct {
 }
 
 func activationMessage() {
+	// let's schedule other go routines first...
+	runtime.Gosched()
+	// print the final message
 	fmt.Println("XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX")
 	fmt.Println("XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX")
 }
@@ -54,9 +58,6 @@ func sendError(w http.ResponseWriter, code int, cause string) {
 }
 
 func runHandler(w http.ResponseWriter, r *http.Request) {
-
-	// send the activation message at the end
-	defer activationMessage()
 
 	// parse the request
 	params := Params{}
@@ -95,12 +96,20 @@ func runHandler(w http.ResponseWriter, r *http.Request) {
 	log.Print(response)
 	w.Header().Set("Content-Type", "application/json")
 	numBytesWritten, err := w.Write([]byte(response))
+
+	// flush output
+	if f, ok := w.(http.Flusher); ok {
+		f.Flush()
+	}
+
+	// send the activation message at the end
+	activationMessage()
+
+	// diagnostic when writing problems
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, fmt.Sprintf("Error writing response: %v", err))
 		return
 	}
-
-	// diagnostic when writing problems
 	if numBytesWritten != len(response) {
 		sendError(w, http.StatusInternalServerError, fmt.Sprintf("Only wrote %d of %d bytes to response", numBytesWritten, len(response)))
 		return

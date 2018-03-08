@@ -1,8 +1,8 @@
 #!/bin/bash
-bin/build.sh ../main/hello.go 
-bin/build.sh ../main/hello_greeting.go 
-bin/build.sh ../main/hello_message.go 
-bin/build.sh ../main/empty.go
-bin/build.sh ../main/hi.go
+bin/build.sh src/hello.go 
+bin/build.sh src/hello_greeting.go 
+bin/build.sh src/hello_message.go 
+bin/build.sh src/empty.go
+bin/build.sh src/hi.go
 rm -Rvf action
-go run ../main/exec.go
+go run ../main/proxy.go #-debug
