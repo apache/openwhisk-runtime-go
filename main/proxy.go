@@ -24,9 +24,10 @@ import (
 	"github.com/sciabarracom/openwhisk-runtime-go/openwhisk"
 )
 
+// disable stderr except when debugging
+var debug = flag.Bool("debug", false, "enable debug output")
+
 func main() {
-	// disable stderr except when debugging
-	debug := flag.Bool("debug", false, "enable debug output")
 	flag.Parse()
 	if !*debug {
 		log.SetOutput(ioutil.Discard)

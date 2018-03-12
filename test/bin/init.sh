@@ -1,9 +1,10 @@
 #!/bin/bash
 FILE=${1:?file}
 JSON=/tmp/json$$
-if file -i $FILE | grep shellscript >/dev/null
-then echo '{"value":{"code":'$(cat $FILE | jq -R -s .)'}}' >$JSON
+if file -i $FILE | grep text/ >/dev/null
+then echo '{"value":{"main":"main","code":'$(cat $FILE | jq -R -s .)'}}' >$JSON
 else echo '{"value":{"binary":true,"code":"'$(base64 -w 0 $FILE)'"}}' >$JSON
 fi
-curl -XPOST http://localhost:${PORT:-8080}/init -d @$JSON 2>/dev/null
+#cat $JSON | jq .
+curl -H "Content-Type: application/json" -XPOST -w "\n%{http_code}\n"  http://localhost:${PORT:-8080}/init -d @$JSON 2>/dev/null
 rm $JSON

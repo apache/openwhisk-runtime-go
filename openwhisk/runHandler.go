@@ -54,7 +54,7 @@ func sendError(w http.ResponseWriter, code int, cause string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(b)
-	w.Write([]byte("\n"))
+	//w.Write([]byte("\n"))
 }
 
 func runHandler(w http.ResponseWriter, r *http.Request) {

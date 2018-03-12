@@ -43,11 +43,10 @@ func main() {
 	log.SetFlags(0)
 	// native actions receive one argument, the JSON object as a string
 	if len(os.Args) > 1 {
-		fmt.Println(hello(os.Args[1]))
+		fmt.Print(hello(os.Args[1]))
 		return
 	}
 	// read loop
-	fmt.Println(`{"openwhisk":1}`)
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		event, err := reader.ReadString('\n')

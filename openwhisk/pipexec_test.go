@@ -17,7 +17,10 @@
 
 package openwhisk
 
-import "fmt"
+import (
+	"fmt"
+	"os/exec"
+)
 
 func ExampleNewPipeExec() {
 	bc := NewPipeExec("_test/bc.sh")
@@ -36,7 +39,7 @@ func ExampleNewPipeExec_failed() {
 	proc = NewPipeExec("pwd")
 	fmt.Println(proc.err == nil)
 	// Output:
-	// no handshake
+	// command exited
 	// false
 }
 
@@ -90,5 +93,39 @@ func ExampleStartService_true() {
 	ch := StartService("/bin/pwd")
 	fmt.Println(ch)
 	// Output:
+	// <nil>
+}
+
+func Example_startAndCheck() {
+	// err
+	cmd := exec.Command("/does/not/exists")
+	cmd.StdinPipe()
+	cmd.StdoutPipe()
+	fmt.Println(startAndCheck(cmd))
+	// immediate exit
+	cmd = exec.Command("/bin/true")
+	cmd.StdinPipe()
+	cmd.StdoutPipe()
+	fmt.Println(startAndCheck(cmd))
+	// immediate exit with output
+	cmd = exec.Command("/bin/pwd")
+	cmd.StdinPipe()
+	cmd.StdoutPipe()
+	fmt.Println(startAndCheck(cmd))
+	// unwanted banner
+	cmd = exec.Command("/usr/bin/bc")
+	cmd.StdinPipe()
+	cmd.StderrPipe()
+	fmt.Println(startAndCheck(cmd))
+	// pipe loop
+	cmd = exec.Command("/bin/cat")
+	cmd.StdinPipe()
+	cmd.StderrPipe()
+	fmt.Println(startAndCheck(cmd))
+	// Output:
+	// fork/exec /does/not/exists: no such file or directory
+	// command exited
+	// command exited
+	// <nil>
 	// <nil>
 }

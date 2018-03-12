@@ -39,7 +39,6 @@ func main() {
 		return
 	}
 	// read loop
-	fmt.Println(`{"openwhisk":1}`)
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		event, err := reader.ReadBytes('\n')
@@ -51,6 +50,6 @@ func main() {
 			fmt.Printf("{ error: %q}\n", err.Error())
 			continue
 		}
-		fmt.Println(string(result))
+		fmt.Print(string(result))
 	}
 }

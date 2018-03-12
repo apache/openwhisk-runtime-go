@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
+	"time"
 )
 
 // PipeExec is a container of a child process
@@ -46,12 +47,8 @@ func NewPipeExec(command string, args ...string) (proc *PipeExec) {
 	scanner := bufio.NewScanner(stdout)
 	printer := bufio.NewWriter(stdin)
 	logger := bufio.NewScanner(stderr)
-
 	proc = &PipeExec{cmd, scanner, printer, logger, nil}
-	proc.err = proc.cmd.Start()
-	if proc.err == nil {
-		proc.handshake()
-	}
+	proc.err = startAndCheck(proc.cmd)
 	return
 }
 
@@ -59,6 +56,23 @@ func NewPipeExec(command string, args ...string) (proc *PipeExec) {
 func (proc *PipeExec) print(input string) {
 	proc.printer.WriteString(input + "\n")
 	proc.printer.Flush()
+}
+
+// startAndCheck
+func startAndCheck(cmd *exec.Cmd) error {
+	//fmt.Println(cmd.Path)
+	err := cmd.Start()
+	if err != nil {
+		return err
+	}
+	ch := make(chan error)
+	go func() { ch <- cmd.Wait() }()
+	select {
+	case <-ch:
+		return fmt.Errorf("command exited")
+	case <-time.After(100 * time.Millisecond):
+		return nil
+	}
 }
 
 // scan from the child process
