@@ -50,6 +50,6 @@ func main() {
 			fmt.Printf("{ error: %q}\n", err.Error())
 			continue
 		}
-		fmt.Print(string(result))
+		fmt.Println(string(result))
 	}
 }

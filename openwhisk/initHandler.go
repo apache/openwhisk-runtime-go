@@ -78,8 +78,8 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 
 	// answer OK
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Content-Length", "11")
-	w.Write([]byte("{\"ok\":true}"))
+	w.Header().Set("Content-Length", "12")
+	w.Write([]byte("{\"ok\":true}\n"))
 	if f, ok := w.(http.Flusher); ok {
 		f.Flush()
 	}

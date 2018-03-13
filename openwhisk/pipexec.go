@@ -144,7 +144,7 @@ func StartService(command string, args ...string) chan string {
 		log.Print(pipe.err)
 		return nil
 	}
-	// create channer
+	// create channel
 	ch := make(chan string)
 	// read-write loop
 	go service(pipe, ch)
