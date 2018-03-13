@@ -18,7 +18,6 @@
 
   $ $T/bin/run.sh 
   {"error":"no action defined yet"}
-  400
 
   $ $T/bin/init.sh $T/bin/hello_message
   {"ok":true}
@@ -36,10 +35,11 @@
 
   $ $T/bin/init.sh $T/zip/hello_message.zip
   {"ok":true}
+  200
 
   $ $T/bin/run.sh 
   {"message":"Hello, Mike!"}
-  
+
   $ $T/bin/init.sh $T/zip/hello_greeting.zip
   {"ok":true}
   200
