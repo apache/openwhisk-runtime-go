@@ -31,12 +31,20 @@ var theServer http.Server
 // theChannel is the channel communicating with the action
 var theChannel chan string
 
+// theChannel is the channel communicating to flush the logs
+var theLogger chan bool
+
 func stopAction() {
 	// terminate current action
 	if theChannel != nil {
 		log.Println("terminating old action")
 		theChannel <- ""
 		theChannel = nil
+	}
+	// terminate the logger
+	if theLogger != nil {
+		theLogger <- false
+		theLogger = nil
 	}
 }
 
@@ -49,6 +57,7 @@ func reStartAction() error {
 	if highestDir == 0 {
 		log.Println("no action dir")
 		theChannel = nil
+		theLogger = nil
 		return fmt.Errorf("no valid actions available")
 	}
 
@@ -58,9 +67,10 @@ func reStartAction() error {
 	// try to start the action
 	if err == nil {
 		log.Printf("starting %s", executable)
-		ch := StartService(executable)
+		ch, chl := StartService(executable)
 		if ch != nil {
 			theChannel = ch
+			theLogger = chl
 			return nil
 		}
 	}

@@ -1,8 +1,12 @@
   $ export T=$TESTDIR
-  $ $T/build.sh >/dev/null
 
   $ $T/bin/run.sh 
   {"error":"no action defined yet"}
+
+  $ $T/bin/init.sh xxx $T/bin/empty.json
+  {"ok":true}
+  200
+  [1]
 
   $ $T/bin/init.sh $T/test.t
   {"error":"cannot start action:* (glob)
@@ -64,5 +68,3 @@
   $ $T/bin/init.sh $T/bin/hi
   {"error":"cannot start action: sent invalid action"}
   400
-
-  $ docker kill $(cat $T/last.id) >/dev/null

@@ -23,21 +23,12 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"runtime"
 	"strings"
 )
 
 // Params are the parameteres sent to the action
 type Params struct {
 	Value json.RawMessage `json:"value"`
-}
-
-func activationMessage() {
-	// let's schedule other go routines first...
-	runtime.Gosched()
-	// print the final message
-	fmt.Println("XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX")
-	fmt.Println("XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX")
 }
 
 // ErrResponse is the response when there are errors
@@ -84,6 +75,9 @@ func runHandler(w http.ResponseWriter, r *http.Request) {
 	// execute the action
 	theChannel <- string(params.Value)
 	response := <-theChannel
+	// flush the logs sending the activation message at the end
+	theLogger <- true
+	// check response
 	if response == "" {
 		sendError(w, http.StatusBadRequest, fmt.Sprintf("%v", err))
 		return
@@ -101,9 +95,6 @@ func runHandler(w http.ResponseWriter, r *http.Request) {
 	if f, ok := w.(http.Flusher); ok {
 		f.Flush()
 	}
-
-	// send the activation message at the end
-	activationMessage()
 
 	// diagnostic when writing problems
 	if err != nil {

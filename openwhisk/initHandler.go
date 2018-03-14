@@ -27,8 +27,8 @@ import (
 
 type initRequest struct {
 	Value struct {
-		Code   string
-		Binary bool `json:",omitempty"`
+		Code   string `json:",omitempty"`
+		Binary bool   `json:",omitempty"`
 	}
 }
 
@@ -46,34 +46,38 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 	//log.Println("init: decoding")
 	var request initRequest
 	err = json.Unmarshal(body, &request)
+
 	if err != nil {
 		sendError(w, http.StatusBadRequest, fmt.Sprintf("Error unmarshaling request: %v", err))
 		return
 	}
 
-	// check if it is a binary
-	if request.Value.Binary {
-		var decoded []byte
-		decoded, err = base64.StdEncoding.DecodeString(request.Value.Code)
+	if request.Value.Code != "" {
+		// check if it is a binary
+		if request.Value.Binary {
+			var decoded []byte
+			decoded, err = base64.StdEncoding.DecodeString(request.Value.Code)
+			if err != nil {
+				sendError(w, http.StatusBadRequest, "cannot decode the request: "+err.Error())
+				return
+			}
+			// extract the replacement, stopping and then starting the action
+			err = extractAction(&decoded, false)
+		} else {
+			buf := []byte(request.Value.Code)
+			err = extractAction(&buf, true)
+		}
 		if err != nil {
-			sendError(w, http.StatusBadRequest, "cannot decode the request: "+err.Error())
+			sendError(w, http.StatusBadRequest, "invalid action: "+err.Error())
 			return
 		}
-		// extract the replacement, stopping and then starting the action
-		err = extractAction(&decoded, false)
-	} else {
-		buf := []byte(request.Value.Code)
-		err = extractAction(&buf, true)
-	}
-	if err != nil {
-		sendError(w, http.StatusBadRequest, "invalid action: "+err.Error())
-		return
-	}
-	// stop and start
-	err = reStartAction()
-	if err != nil {
-		sendError(w, http.StatusBadRequest, "cannot start action: "+err.Error())
-		return
+
+		// stop and start
+		err = reStartAction()
+		if err != nil {
+			sendError(w, http.StatusBadRequest, "cannot start action: "+err.Error())
+			return
+		}
 	}
 
 	// answer OK
@@ -83,5 +87,4 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 	if f, ok := w.(http.Flusher); ok {
 		f.Flush()
 	}
-
 }

@@ -21,7 +21,7 @@ import (
 	"io/ioutil"
 	"log"
 
-	"github.com/sciabarracom/openwhisk-runtime-go/openwhisk"
+	"github.com/sciabarracom/incubator-openwhisk-runtime-go/openwhisk"
 )
 
 // disable stderr except when debugging

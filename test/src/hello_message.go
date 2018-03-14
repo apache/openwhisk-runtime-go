@@ -18,41 +18,26 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
+
+	"github.com/sciabarracom/incubator-openwhisk-client-go/whisk"
 )
 
-func hello(arg string) string {
+func hello(event json.RawMessage) (json.RawMessage, error) {
 	var obj map[string]interface{}
-	json.Unmarshal([]byte(arg), &obj)
+	json.Unmarshal(event, &obj)
 	name, ok := obj["name"].(string)
 	if !ok {
 		name = "Stranger"
 	}
 	log.Printf("name=%s\n", name)
 	msg := map[string]string{"message": ("Hello, " + name + "!")}
-	res, _ := json.Marshal(msg)
-	return string(res)
+	return json.Marshal(msg)
 }
 
 func main() {
 	log.SetPrefix("hello_message: ")
-	log.SetFlags(0)
-	// native actions receive one argument, the JSON object as a string
-	if len(os.Args) > 1 {
-		fmt.Print(hello(os.Args[1]))
-		return
-	}
-	// read loop
-	reader := bufio.NewReader(os.Stdin)
-	for {
-		event, err := reader.ReadString('\n')
-		if err != nil {
-			break
-		}
-		fmt.Println(hello(event))
-	}
+	whisk.StartWithArgs(hello, os.Args[1:])
 }

@@ -17,39 +17,14 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
 	"log"
 	"os"
 
-	"github.com/sciabarracom/openwhisk-runtime-go/hello"
+	"github.com/sciabarracom/incubator-openwhisk-client-go/whisk"
+	"github.com/sciabarracom/incubator-openwhisk-runtime-go/hello"
 )
 
 func main() {
-	log.SetFlags(0)
 	log.SetPrefix("hello_greeting: ")
-	// handle command line argument
-	if len(os.Args) > 1 {
-		result, err := hello.Hello([]byte(os.Args[1]))
-		if err == nil {
-			fmt.Println(string(result))
-			return
-		}
-		fmt.Printf("{ error: %q}\n", err.Error())
-		return
-	}
-	// read loop
-	reader := bufio.NewReader(os.Stdin)
-	for {
-		event, err := reader.ReadBytes('\n')
-		if err != nil {
-			break
-		}
-		result, err := hello.Hello(event)
-		if err != nil {
-			fmt.Printf("{ error: %q}\n", err.Error())
-			continue
-		}
-		fmt.Println(string(result))
-	}
+	whisk.StartWithArgs(hello.Hello, os.Args[1:])
 }

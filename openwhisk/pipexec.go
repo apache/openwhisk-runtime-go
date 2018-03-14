@@ -19,10 +19,12 @@ package openwhisk
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"os"
 	"os/exec"
+	"runtime"
 	"time"
 )
 
@@ -33,21 +35,23 @@ type PipeExec struct {
 	cmd      *exec.Cmd
 	scannner *bufio.Scanner
 	printer  *bufio.Writer
-	logger   *bufio.Scanner
+	stdout   io.Reader
+	stderr   io.Reader
 	err      error
 }
 
 // NewPipeExec creates a child subprocess using the provided command line.
-// You can then start it getting a communcation channel
+// You can then start it getting a communication channel
 func NewPipeExec(command string, args ...string) (proc *PipeExec) {
 	cmd := exec.Command(command, args...)
 	stdin, _ := cmd.StdinPipe()
 	stdout, _ := cmd.StdoutPipe()
 	stderr, _ := cmd.StderrPipe()
-	scanner := bufio.NewScanner(stdout)
+	pipeOut, pipeIn, _ := os.Pipe()
+	cmd.ExtraFiles = []*os.File{pipeIn}
+	scanner := bufio.NewScanner(pipeOut)
 	printer := bufio.NewWriter(stdin)
-	logger := bufio.NewScanner(stderr)
-	proc = &PipeExec{cmd, scanner, printer, logger, nil}
+	proc = &PipeExec{cmd, scanner, printer, stdout, stderr, nil}
 	proc.err = startAndCheck(proc.cmd)
 	return
 }
@@ -70,7 +74,7 @@ func startAndCheck(cmd *exec.Cmd) error {
 	select {
 	case <-ch:
 		return fmt.Errorf("command exited")
-	case <-time.After(100 * time.Millisecond):
+	case <-time.After(1 * time.Millisecond):
 		return nil
 	}
 }
@@ -84,32 +88,6 @@ func (proc *PipeExec) scan() string {
 		proc.err = proc.scannner.Err()
 	}
 	return ""
-}
-
-// handshake - leave the error in proc.err
-func (proc *PipeExec) handshake() {
-	var welcome struct {
-		OpenWhisk int
-	}
-	if proc.scannner.Scan() {
-		buf := proc.scannner.Bytes()
-		proc.err = json.Unmarshal(buf, &welcome)
-		if proc.err != nil || welcome.OpenWhisk < 1 {
-			proc.err = fmt.Errorf("failed handshake: %s", string(buf))
-		}
-	} else {
-		proc.err = fmt.Errorf("no handshake")
-	}
-}
-
-func logger(proc *PipeExec) {
-	log.Println("started logger")
-	// scanner read stderr continuosly
-	// it will exit when the underlying process terminate
-	for proc.logger.Scan() {
-		fmt.Println(proc.logger.Text())
-	}
-	log.Println("exited logger")
 }
 
 func service(proc *PipeExec, ch chan string) {
@@ -137,18 +115,63 @@ func service(proc *PipeExec, ch chan string) {
 	close(ch)
 }
 
+func collect(ch chan string, reader io.Reader) {
+	scan := bufio.NewScanner(reader)
+	for scan.Scan() {
+		ch <- scan.Text()
+	}
+}
+
+func logger(proc *PipeExec, chl chan bool) {
+
+	// poll stdout and stderr
+	chOut := make(chan string)
+	go collect(chOut, proc.stdout)
+	chErr := make(chan string)
+	go collect(chErr, proc.stderr)
+
+	// wait for the signal
+	for <-chl {
+		// flush stdout
+		runtime.Gosched()
+		for loop := true; loop; {
+			select {
+			case buf := <-chOut:
+				fmt.Println(buf)
+			default:
+				loop = false
+			}
+		}
+		fmt.Println("XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX")
+
+		// flush stderr
+		runtime.Gosched()
+		for loop := true; loop; {
+			select {
+			case buf := <-chErr:
+				fmt.Println(buf)
+			default:
+				loop = false
+			}
+		}
+		fmt.Println("XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX")
+	}
+	close(chl)
+}
+
 // StartService will start a go routine executing a service
-func StartService(command string, args ...string) chan string {
+func StartService(command string, args ...string) (chan string, chan bool) {
 	pipe := NewPipeExec(command, args...)
 	if pipe.err != nil {
 		log.Print(pipe.err)
-		return nil
+		return nil, nil
 	}
 	// create channel
 	ch := make(chan string)
+	chl := make(chan bool)
+
 	// read-write loop
 	go service(pipe, ch)
-	// stderr to stdout
-	go logger(pipe)
-	return ch
+	go logger(pipe, chl)
+	return ch, chl
 }
