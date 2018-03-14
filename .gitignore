@@ -1,0 +1,8 @@
+.vscode/
+vendor/
+hack
+action
+*.log
+*.zip.json
+.gogradle/
+.gradle/

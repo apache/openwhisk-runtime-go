@@ -1,0 +1,2 @@
+#!/bin/bash
+bc -q
