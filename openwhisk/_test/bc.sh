@@ -1,2 +1,3 @@
 #!/bin/bash
-bc -q
+bc -q >&3
+

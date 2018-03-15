@@ -95,6 +95,7 @@ func service(proc *PipeExec, ch chan string) {
 	for {
 		in, ok := <-ch
 		if !ok || in == "" {
+			log.Println("read failed")
 			proc.cmd.Process.Kill()
 			if ok {
 				log.Println("terminated upon request")

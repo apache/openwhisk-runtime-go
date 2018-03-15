@@ -17,7 +17,7 @@ subprojects {
 }
 
 golang {
-  packagePath = 'github.com/sciabarracom/openwhisk-runtime-go'
+  packagePath = 'github.com/sciabarracom/incubator-openwhisk-runtime-go'
 }
 
 
