@@ -75,3 +75,19 @@
   $ $T/bin/init.sh $T/bin/hi
   {"error":"cannot start action: command exited"}
   400
+
+  $ $T/bin/init.sh $T/etc/hello.sh
+  {"ok":true}
+  200
+
+  $ $T/bin/run.sh
+  {"hello":"Hello, Mike"}
+  200
+
+  $ $T/bin/run.sh '{"name": ""}'
+  {"error":"command exited"}
+  400
+
+  $ $T/bin/run.sh
+  {"error":"no action defined yet"}
+  400

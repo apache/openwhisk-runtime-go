@@ -84,14 +84,16 @@ func runHandler(w http.ResponseWriter, r *http.Request) {
 		exited = true
 	}
 
-	// flush the logs sending the activation message at the end
-	theExecutor.log <- true
 	// check for early termination
 	if exited {
 		theExecutor = nil
-		sendError(w, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		sendError(w, http.StatusBadRequest, fmt.Sprintf("command exited"))
 		return
 	}
+
+	// flush the logs sending the activation message at the end
+	theExecutor.log <- true
+
 	// check response
 	if response == "" {
 		sendError(w, http.StatusBadRequest, fmt.Sprintf("%v", err))
