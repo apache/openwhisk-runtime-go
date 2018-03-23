@@ -29,13 +29,23 @@ type initRequest struct {
 	Value struct {
 		Code   string `json:",omitempty"`
 		Binary bool   `json:",omitempty"`
+	} `json:",omitempty"`
+}
+
+func sendOK(w http.ResponseWriter) {
+	// answer OK
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Length", "12")
+	w.Write([]byte("{\"ok\":true}\n"))
+	if f, ok := w.(http.Flusher); ok {
+		f.Flush()
 	}
 }
 
 func initHandler(w http.ResponseWriter, r *http.Request) {
 
 	// read body of the request
-	//log.Println("init: reading")
+	// log.Println("init: reading")
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
@@ -52,39 +62,35 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if request.Value.Code != "" {
-		// check if it is a binary
-		if request.Value.Binary {
-			var decoded []byte
-			decoded, err = base64.StdEncoding.DecodeString(request.Value.Code)
-			if err != nil {
-				sendError(w, http.StatusBadRequest, "cannot decode the request: "+err.Error())
-				return
-			}
-			// extract the replacement, stopping and then starting the action
-			err = extractAction(&decoded, false)
-		} else {
-			buf := []byte(request.Value.Code)
-			err = extractAction(&buf, true)
-		}
-		if err != nil {
-			sendError(w, http.StatusBadRequest, "invalid action: "+err.Error())
-			return
-		}
-
-		// stop and start
-		err = reStartAction()
-		if err != nil {
-			sendError(w, http.StatusBadRequest, "cannot start action: "+err.Error())
-			return
-		}
+	if request.Value.Code == "" {
+		sendOK(w)
+		return
 	}
 
-	// answer OK
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Content-Length", "12")
-	w.Write([]byte("{\"ok\":true}\n"))
-	if f, ok := w.(http.Flusher); ok {
-		f.Flush()
+	// check if it is a binary
+	if request.Value.Binary {
+		var decoded []byte
+		decoded, err = base64.StdEncoding.DecodeString(request.Value.Code)
+		if err != nil {
+			sendError(w, http.StatusBadRequest, "cannot decode the request: "+err.Error())
+			return
+		}
+		// extract the replacement, stopping and then starting the action
+		err = extractAction(&decoded, false)
+	} else {
+		buf := []byte(request.Value.Code)
+		err = extractAction(&buf, true)
 	}
+	if err != nil {
+		sendError(w, http.StatusBadRequest, "invalid action: "+err.Error())
+		return
+	}
+
+	// stop and start
+	err = StartLatestAction()
+	if err != nil {
+		sendError(w, http.StatusBadRequest, "cannot start action: "+err.Error())
+		return
+	}
+	sendOK(w)
 }

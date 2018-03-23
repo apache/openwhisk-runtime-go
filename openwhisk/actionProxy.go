@@ -22,64 +22,52 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
 )
 
 // theServer is the current server
 var theServer http.Server
 
 // theChannel is the channel communicating with the action
-var theChannel chan string
+var theExecutor *Executor
 
-// theChannel is the channel communicating to flush the logs
-var theLogger chan bool
-
-func stopAction() {
-	// terminate current action
-	if theChannel != nil {
-		log.Println("terminating old action")
-		theChannel <- ""
-		theChannel = nil
-	}
-	// terminate the logger
-	if theLogger != nil {
-		theLogger <- false
-		theLogger = nil
-	}
-}
-
-func reStartAction() error {
-	// stop action if any
-	stopAction()
+// StartLatestAction tries to start
+// the more recently uplodaded
+// action if valid, otherwise remove it
+// and fallback to the previous, if any
+func StartLatestAction() error {
 
 	// find the action if any
 	highestDir := highestDir("./action")
 	if highestDir == 0 {
-		log.Println("no action dir")
-		theChannel = nil
-		theLogger = nil
+		log.Println("no action found")
+		theExecutor = nil
 		return fmt.Errorf("no valid actions available")
 	}
 
+	// save the current executor
+	curExecutor := theExecutor
+
 	// try to launch the action
 	executable := fmt.Sprintf("./action/%d/exec", highestDir)
-	_, err := exec.LookPath(executable)
-	// try to start the action
+	newExecutor := NewExecutor(executable)
+	log.Printf("starting %s", executable)
+	err := newExecutor.Start()
 	if err == nil {
-		log.Printf("starting %s", executable)
-		ch, chl := StartService(executable)
-		if ch != nil {
-			theChannel = ch
-			theLogger = chl
-			return nil
+		theExecutor = newExecutor
+		if curExecutor != nil {
+			log.Println("stopping old executor")
+			curExecutor.Stop()
 		}
+		return nil
 	}
 
-	// cannot start, removing the action and retry
+	// cannot start, removing the action
+	// and leaving the current executor running
+
 	exeDir := fmt.Sprintf("./action/%d/", highestDir)
+	log.Printf("removing the failed action in %s", exeDir)
 	os.RemoveAll(exeDir)
-	reStartAction()
-	return fmt.Errorf("sent invalid action")
+	return err
 }
 
 // Start creates a proxy to execute actions
@@ -88,8 +76,7 @@ func Start() {
 	http.HandleFunc("/init", initHandler)
 	// handle execution
 	http.HandleFunc("/run", runHandler)
-	// start action if there
-	reStartAction()
+
 	// start
 	log.Println("Started!")
 	theServer.Addr = ":8080"

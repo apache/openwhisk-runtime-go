@@ -25,16 +25,19 @@ func ExampleNewExecutor_failed() {
 	proc := NewExecutor("true")
 	err := proc.Start()
 	fmt.Println(err)
+	proc.Stop()
 	proc = NewExecutor("/bin/pwd")
 	err = proc.Start()
 	fmt.Println(err)
+	proc.Stop()
 	proc = NewExecutor("donotexist")
 	err = proc.Start()
 	fmt.Println(err)
+	proc.Stop()
 	proc = NewExecutor("/etc/passwd")
 	err = proc.Start()
 	fmt.Println(err)
-
+	proc.Stop()
 	// Output:
 	// command exited
 	// command exited
@@ -59,6 +62,7 @@ func ExampleNewExecutor_bc() {
 		fmt.Println("exit")
 	}
 	time.Sleep(100 * time.Millisecond)
+	proc.Stop()
 	// Output:
 	// <nil>
 	// 4
@@ -75,10 +79,43 @@ func ExampleNewExecutor_hello() {
 	fmt.Println(<-proc.io)
 	proc.log <- true
 	time.Sleep(100 * time.Millisecond)
+	proc.Stop()
+	time.Sleep(100 * time.Millisecond)
+	_, ok := <-proc.io
+	fmt.Printf("io %v\n", ok)
 	// Unordered output:
 	// <nil>
 	// {"hello": "Mike"}
 	// msg=hello Mike
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
+	// io false
+}
+
+func ExampleNewExecutor_term() {
+	proc := NewExecutor("_test/hello.sh")
+	err := proc.Start()
+	fmt.Println(err)
+	proc.io <- `{"name":"*"}`
+	var exited bool
+	select {
+	case <-proc.io:
+		exited = false
+	case <-proc.exit:
+		exited = true
+	}
+	proc.log <- true
+	fmt.Printf("exit %v\n", exited)
+	time.Sleep(100 * time.Millisecond)
+	proc.Stop()
+	time.Sleep(100 * time.Millisecond)
+	_, ok := <-proc.io
+	fmt.Printf("io %v\n", ok)
+	// Unordered output:
+	// <nil>
+	// exit true
+	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
+	// Goodbye!
+	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
+	// io false
 }

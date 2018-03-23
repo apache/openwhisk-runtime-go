@@ -89,17 +89,6 @@ func _collect(ch chan string, scan *bufio.Scanner) {
 	}
 }
 
-// Close will kill the process
-// and cleanup the channels
-func (proc *Executor) Close() {
-	if proc._cmd != nil {
-		proc._cmd.Process.Kill()
-	}
-	close(proc.io)
-	close(proc.exit)
-	close(proc.log)
-}
-
 // loop over the command executing
 // returning when the command exits
 func (proc *Executor) run() {
@@ -166,7 +155,6 @@ func (proc *Executor) service() {
 		in := <-proc.io
 		if in == "" {
 			log.Println("terminated upon request")
-			proc.Close()
 			break
 		}
 		// input/output with the process
@@ -201,4 +189,20 @@ func (proc *Executor) Start() error {
 		go proc.logger()
 	}
 	return nil
+}
+
+// Stop will kill the process
+// and close the channels
+func (proc *Executor) Stop() {
+	log.Println("stopping")
+	if proc._cmd != nil {
+		proc.log <- false
+		proc.io <- ""
+		proc._cmd.Process.Kill()
+		<-proc.exit
+		proc._cmd = nil
+	}
+	close(proc.io)
+	close(proc.exit)
+	close(proc.log)
 }

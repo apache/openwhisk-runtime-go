@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package main
 
 import (
@@ -25,7 +24,7 @@ import (
 	"github.com/sciabarracom/incubator-openwhisk-client-go/whisk"
 )
 
-func hello(event json.RawMessage) (json.RawMessage, error) {
+func sayHello(event json.RawMessage) (json.RawMessage, error) {
 	var obj map[string]interface{}
 	json.Unmarshal(event, &obj)
 	name, ok := obj["name"].(string)
@@ -39,5 +38,5 @@ func hello(event json.RawMessage) (json.RawMessage, error) {
 
 func main() {
 	log.SetPrefix("hello_message: ")
-	whisk.StartWithArgs(hello, os.Args[1:])
+	whisk.StartWithArgs(sayHello, os.Args[1:])
 }

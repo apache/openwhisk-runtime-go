@@ -1,8 +1,6 @@
-.vscode/
-vendor/
-hack
-action
-*.log
-*.zip.json
 .gogradle/
 .gradle/
+.vscode/
+action/
+*.log
+*.zip.json

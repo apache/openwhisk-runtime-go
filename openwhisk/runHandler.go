@@ -67,16 +67,31 @@ func runHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check if you have an action
-	if theChannel == nil {
+	if theExecutor == nil {
 		sendError(w, http.StatusBadRequest, fmt.Sprintf("no action defined yet"))
 		return
 	}
 
 	// execute the action
-	theChannel <- string(params.Value)
-	response := <-theChannel
+	// and check for early termination
+	theExecutor.io <- string(params.Value)
+	var response string
+	var exited bool
+	select {
+	case response = <-theExecutor.io:
+		exited = false
+	case err = <-theExecutor.exit:
+		exited = true
+	}
+
 	// flush the logs sending the activation message at the end
-	theLogger <- true
+	theExecutor.log <- true
+	// check for early termination
+	if exited {
+		theExecutor = nil
+		sendError(w, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return
+	}
 	// check response
 	if response == "" {
 		sendError(w, http.StatusBadRequest, fmt.Sprintf("%v", err))
