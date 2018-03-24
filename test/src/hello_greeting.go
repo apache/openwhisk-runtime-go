@@ -17,20 +17,14 @@
 package main
 
 import (
-	"flag"
-	"io/ioutil"
 	"log"
+	"os"
 
-	"github.com/sciabarracom/incubator-openwhisk-runtime-go/openwhisk"
+	"github.com/apache/incubator-openwhisk-client-go/whisk"
+	"github.com/sciabarracom/incubator-openwhisk-runtime-go/test/src/hello"
 )
 
-// disable stderr except when debugging
-var debug = flag.Bool("debug", false, "enable debug output")
-
 func main() {
-	flag.Parse()
-	if !*debug {
-		log.SetOutput(ioutil.Discard)
-	}
-	openwhisk.Start()
+	log.SetPrefix("hello_greeting: ")
+	whisk.StartWithArgs(hello.Hello, os.Args[1:])
 }

@@ -14,23 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package main
 
-import (
-	"flag"
-	"io/ioutil"
-	"log"
-
-	"github.com/sciabarracom/incubator-openwhisk-runtime-go/openwhisk"
-)
-
-// disable stderr except when debugging
-var debug = flag.Bool("debug", false, "enable debug output")
+import "fmt"
 
 func main() {
-	flag.Parse()
-	if !*debug {
-		log.SetOutput(ioutil.Discard)
-	}
-	openwhisk.Start()
+	fmt.Println("hi")
 }
