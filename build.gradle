@@ -27,5 +27,5 @@ build.dependsOn vendor
 
 build {
   targetPlatform = ['linux-amd64']
-  go 'build -o docker/proxy main/proxy.go'
+  go 'build -o core/proxy main/proxy.go'
 }

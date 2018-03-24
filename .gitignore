@@ -2,5 +2,8 @@
 .gradle/
 .vscode/
 action/
+vendor/
 *.log
 *.zip.json
+core/proxy
+core/*/proxy

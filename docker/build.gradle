@@ -1,3 +1,0 @@
-ext.dockerImageName = 'action-golang-v1.9'
-apply from: '../gradle/docker.gradle'
-distDocker.dependsOn ':build'
