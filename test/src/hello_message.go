@@ -17,20 +17,26 @@
 package main
 
 import (
-	"flag"
-	"io/ioutil"
+	"encoding/json"
 	"log"
+	"os"
 
-	"github.com/sciabarracom/incubator-openwhisk-runtime-go/openwhisk"
+	"github.com/apache/incubator-openwhisk-client-go/whisk"
 )
 
-// disable stderr except when debugging
-var debug = flag.Bool("debug", false, "enable debug output")
+func sayHello(event json.RawMessage) (json.RawMessage, error) {
+	var obj map[string]interface{}
+	json.Unmarshal(event, &obj)
+	name, ok := obj["name"].(string)
+	if !ok {
+		name = "Stranger"
+	}
+	log.Printf("name=%s\n", name)
+	msg := map[string]string{"message": ("Hello, " + name + "!")}
+	return json.Marshal(msg)
+}
 
 func main() {
-	flag.Parse()
-	if !*debug {
-		log.SetOutput(ioutil.Discard)
-	}
-	openwhisk.Start()
+	log.SetPrefix("hello_message: ")
+	whisk.StartWithArgs(sayHello, os.Args[1:])
 }
