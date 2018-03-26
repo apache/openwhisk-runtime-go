@@ -32,16 +32,15 @@ import (
 func sys(cli string) {
 	cmd := exec.Command(cli)
 	out, err := cmd.CombinedOutput()
-	if err == nil {
-		fmt.Printf(">>>%s\n%s<<<\n", cli, string(out))
-	} else {
-		fmt.Println("KO")
+	if err != nil {
 		log.Print(err)
+	} else {
+		fmt.Print(string(out))
 	}
 }
 
 func TestExtractActionTest_exec(t *testing.T) {
-	//sys("pwd")
+	sys("_test/build.sh")
 	// cleanup
 	assert.Nil(t, os.RemoveAll("./action"))
 	file, _ := ioutil.ReadFile("_test/exec")
@@ -62,7 +61,7 @@ func detect(dir, filename string) string {
 	return kind.Extension
 }
 func TestExtractActionTest_exe(t *testing.T) {
-	//sys("pwd")
+	sys("_test/build.sh")
 	// cleanup
 	assert.Nil(t, os.RemoveAll("./action"))
 	// match  exe
@@ -72,7 +71,7 @@ func TestExtractActionTest_exe(t *testing.T) {
 }
 
 func TestExtractActionTest_zip(t *testing.T) {
-	//sys("pwd")
+	sys("_test/build.sh")
 	// cleanup
 	assert.Nil(t, os.RemoveAll("./action"))
 	// match  exe
