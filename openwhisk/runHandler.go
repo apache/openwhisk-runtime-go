@@ -40,7 +40,8 @@ func sendError(w http.ResponseWriter, code int, cause string) {
 	errResponse := ErrResponse{Error: cause}
 	b, err := json.Marshal(errResponse)
 	if err != nil {
-		fmt.Println("error marshalling error response:", err)
+		b = []byte("error marshalling error response")
+		fmt.Println(b, err)
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
