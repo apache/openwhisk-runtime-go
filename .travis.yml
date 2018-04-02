@@ -1,0 +1,96 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more contributor
+# license agreements.  See the NOTICE file distributed with this work for additional
+# information regarding copyright ownership.  The ASF licenses this file to you
+# under the Apache License, Version 2.0 (the # "License"); you may not use this
+# file except in compliance with the License.  You may obtain a copy of the License
+# at:
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed
+# under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+# CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations under the License.
+#
+
+sudo: required
+language: java   # Use java to ensure runtime is available for Gradle
+services:
+- docker
+
+# notifications:
+#   email: false
+#   webhooks:
+#     urls:
+#       # travis2slack webhook to enable DMs on openwhisk-team.slack.com to PR authors with TravisCI results
+#       secure: "jdR0XQRu6kOtEfQ/iq9ZP6L8o/sSvhbXlLF5wa8C/pZzj4Ur7MdQvguslsxVUrzYjQkL8qNViS2sN/i12gpxZjY+pp2bzbi/3/Y3n+BltZ4cQka4QQE9tQa2YxFfLOgEU1f/UdHwySAd4QkO+ChGosHLV61AHN5wOXxEgyZo1XIz3AOWlClt5dEGesGv6rDDX9rEGD2wJcXke6dM2yrLMAspR9PraAljfQ/PAj4oFetXrhkj1ZxgptcgDKFIcQTbrXuDCyQJdGHXxU3lklRp5juhCek2Wvul3ZVZDFQSeCaPhUZfR3cBHrbiQyqGN6rXPweCLyYDRpJOE1HRBl9H3A1V0d708m4MSAmkurJCfoV+rOJQYTIhkqt3SqSRMlSxPXJk8nuMdz/TKuAjv7jVEgiODcEb2wgyffZBBEB5BNyoAMp0kenplfjXCHhyyDXOmdkZ3phJ+OPyeEdX+iXmdu3wz+eCjtQoYdSqdw74/OyX8L3NfWYwPGFHvEKixNrVU4lV5fV2GAw624AlW1J3LaIdi8S51YYSlqXKT13zaRGyZ3k98UOdy3DZS49Ju2q10F4HAAAGP4hro42M3/WXgHTnF/Mk0i3X41YZwmdVap7lm3DhFrZZdJOjpjKBAhwPmQy439mTsxmE2Dv4Qa3eOJiRS9hW1HHDUsbbMCB7tKk="
+
+before_install:
+  #  Use GPG encryption because it reduces the number of secrets that must be
+  #  managed across repositories.  When forking a repository as a core
+  #  contributor, contact maintainer to have a newly-encrypted GPG passphrase
+  #  communicated.
+  #
+  #  Note: ${TRAVIS_REPO_SLUG%/*} is repository owner.
+- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
+    for i in ./tools/travis/tls/${TRAVIS_REPO_SLUG%/*}/*/*.pem.gpg; do
+      echo "${multiarch_encryption_pwd}" | gpg --passphrase-fd 0 "$i";
+    done && cp -R ./tools/travis/tls/${TRAVIS_REPO_SLUG%/*} ./tls;
+  fi
+- "./tools/travis/setup.sh"
+
+install: true
+script:
+- "./tools/travis/build.sh && ./tools/travis/deploy.sh && ./tools/travis/test.sh"
+
+deploy:
+  #  Git Tags are in the form "dockertag@imagename"
+- provider: script
+  skip_cleanup: true
+  script:
+    ./gradlew --console=plain :core:golangProxy:putManifestList
+      -PdockerImagePrefix=openwhisk
+      -PdockerImageTag=${TRAVIS_TAG%@*}
+  on:
+    tags: true
+    all_branches: true
+    condition: "${TRAVIS_TAG%@*} = golang"
+
+env:
+  global:
+  #  --- begin: DOCKER_REGISTRY (defaults to docker.io)
+  #      + for jonpspri/incubator-openwhisk-runtime-go
+  - secure: "VJ4efIotPs+ls5BbcezUUzkHMe6wWwnyzz4tyQ/8mqDfVE/Cun78rI12mgCQ1rbupizVRQVAOWLyxnJf/0MWLhoxOA+DJj2ReEoYoKzP3A79So6Lng34g6YcOmTdOY8+5ptUQ5iIjB62C12YVvl8MjDtESzEB49bydRpu2kqiDPJM6Jpt1Mp4pqiK8XznriwVuYUnJULZb7xnkQhdVUpYeG2+K82ETeLNbAj0Af5v/f/rcj5wiTxqdsdtV/K/0L9OCfQyGE/MHw2eIu4XFrN4VUZarU+Dr74+6Zmv8NzcxSQ3xZA7XqkB22llsZ4r8FDlyb6IseAB5GtmjIaK0gkSizJNLMyOaFvg3zSYzpmqCtK2hy0Tuv9xcXlC0DEJPD7nR6GtaNroLRaXyIyeK3Y6edFJ1MGa+DE53a4sexo20ECX33GWSOdjzG0TfwluUrk6W2ujdS8n5AW85GtRvBZuMcmvegGdcTLz89np4hoCzzYtYaiMMmmzFSfxXjvxgdscKN+YLhDfZ6lhsYGVQHW0TqNqTChoa+8xj3uJx0hvD6xpH36iIrgiebwHayS6ln2GvI6zLVBFjFZAISzYp7Zcf7Afhxhe0i3hlPmOG75Tufkt8qP8rbOvc4G8W4SwmmfNLu6HgwIvj1bc3c0mAS+hcGpUnCb0hqiI198/xcDnxE="
+  #  ---
+
+  #  --- begin: DOCKER_USER and DOCKER_PASSWORD
+  #      + for apache/incubator-openwhisk-runtime-go
+  #- secure:  TODO
+  #- secure:  TODO
+  #      + for jonpspri/incubator-openwhisk-runtime-go
+  - secure: "YMbcjzTxD6u5F1Pw4ebEUkJoZSY2oYyZz9z1Y0Pxuu75jq8P0ScT9Ikk0qk/ZEXfjyZi6n7TRwRucSZVnlYXs/P6Jx0GbZS+NVPZqoV4tT6Rwcl85anQkK0gl59ZmfxbMXhH8w3O+j9O92hgK89U+dkhZHlT+xhXy2kZWNMMUEnBMyqeKd1xxQDPiDvDu2ZTB9sIzW7GPWJLg+Gnytl9kDcB8QssryJudl7qerJp4eCNMckLjDHkJUdinCfezl8uCigbVPGIXM8d6N0aKwmA9nOGLd8Wgs7iZ7FKQIZI4c1YHjF+h9IpAPl8erJVEG0Ue5AucZx0y47UZ1gssnZJ3skpDDfGGBuX4H3HGG96xFyg9nPa3WWdCWjO6ZrTKBGCBRQOifo49uuQwC4jOY5/mbbqkcscfAMsBds1z/YLXQ1ME4c9jGkbSistSsEfcP9ZeDSA0SuhflnXKdclyDQKZkTh+6CxjMhdQ2ItmS4HxDE3Xm24351JWWFVCFBDryp8THOvx/qNjiD2XUHeEtYhz17BWE9XrzK8OP8hwCvQCq20sop+Www+SM9BGCrkZPSMFlJA9JWonXFCf79Ymv4FNyeTdBabfyJKv3mZJjFzeL/MzTFXIMU0sTMRCSgVa1tcPtX7i+db3De1krnqG7ENnZWFGmPbxQAkGbX01IvmeuE="
+  - secure: "Cq1661xORhoPmHzV9660Q77K/GPbACuDB52DwPOYBG7iIm8mRMcUwjsl/l+j137/Q9r/yIAPSjD2cZpCBiR/dTjVvJNCV/zGmnmMzf7oMyVrd0B1kNGz+wLrTSKDb5puIKOa6v6/sBc3g6q7ORv557Wm/mt7+60w+SEq2/P/6lI1OWBF0TpDYom+Xtb/MKoOT29IbC7nECXb+sQnUMquXM6++pdbW4Q0gMwQFCD2tLuqb482j7kuw4oFuj+DXY5upoVktf6ditVkyO91RF+jNuQDLCV31YSna0m6CvdUFavUm5sDiQ4mR8CN+KJYwdf5BWTmLbV5SpMlWA+aQxinalDoxcSU+pnNw6vcIbq52iayD5tIRzb+eTOfQFoL0+MCvW4jyQQHGQJAkGMr/INaMUmYYF3e8q+nfZZS8ir56o0PrZ0PkykGKIe4uR/ZtGSjIqYx2L3KJYhvC5AB27rySIwH5t20S1dg5CYJMcOrKTLaDEkEuz3m8mAHX+mJdAPAKBYFJIpBrnyK0V1P5pxeC9cnywpacT5HHGrqEk00gdYDKc1yGnhMwHvT1k6C/4ykNZFsexBNAtCohjHs4YSEGyV9ie654Y4SPHR8eqvVqE+V/nkksnGmu51/BoCYn4uMdcb0DmFiWsSIVX1FGamh85/EIaSsXxdhIjY/nLFZxV4="
+  #  ---
+
+  #  --- BEGIN: DOCKER_EMAIL
+  #      + for apache/incubator-openwhisk-runtime-go
+  - secure: "kA79TX/M2xDJkPbogr1IZUuJtR34/A3TztchFgZOI6YeGu52uv30J0PMNE6MPSRGEeOdLVz6CHSPirmK54WpHcsOlZshvl4JZ9B7Pvy3dhASrFrMuf72ozjw5hF1Uj9KjzpPcO4KsUO3FEBffU/5lWQ7Ao7jQRK5ycMMogZOBMPmpGT59nn7T6sBJZpjtfBKaqBzW1K48mjCrGMK+ay0z6sHdTxMw6iRlX/pv63+vZ8z58W7H43Ob2V/vySa8suQQHV0NKS+RRHEbXjR2h4rn8KTBfCTSjCw9yS+fvImehQ9dfUnvdklUB8HyQ7DXVNVWj3ZMOJPx3MtsihV2mINV4VNkA8YQXj1O+uF+ey4zza3N1hXcMF0/PBIq0l5ZO0y13K/A9B+8Fw+zar3bvSetmFux9pN8YtPL/bonZoa/4ua1mX1pCFXaFjjmIYjw5iVcjBaSbDxhMrdwIM618o/4lKN3BsS4GNa0b2PRUNa+yL35pq2QxGIi/2m1dTwecKDCqfvvlpNYV/1krjW093Pxf9LAWf18ib0p5Vd8votlKjbRXuOx+hGrjTsKpXcWLBKlX+EL/zLZd46DvZewv7l/OqbXPpjBJ23P36B9HAiljl1m4V175CvMrXSwvB6tG0e4cYf/D/Fe0lBLEfZOB3J0MLR5c246HJZ4XOZeOhrhMA="
+  #      + for jonpspri/incubator-openwhisk-runtime-go
+  - secure: "CO+789Ygi4xkdkaIp34p73/PpfyJeII4tnP2GbVFNVdx56AzyCyOtEnQnrRJlDmZYUASyNvtUSlf/7iH+XiytYSI/6FOHGGtbMFc2NDox8xSt5tDOqS2pg7sXlFdZYQ60T8a+VXmvSivfk1O6WlvUAoeugbMw7ftXj8Y2U46HYvgE8Od2yLzy5FshpdGXAE+nU4ZgLAEjIw52vCGps2RCwTe3hj43kPxnXgDw+70n6iJed72od+IdTgA4H/AyaUhDvtdxzo4FbdpBrHA0ZOoXmsO+ouoO+u8E1UdayCzfJIEOFtms//b8Ioy5gJ2LhXsH3OmmYxS21c/DjETLx8FtaeKAuKdFIRa3rznj9A5eB2KxKL4t8TlS7qdfzv3g8/0YnvVsUmaxcunAWWR/RJAbmOFPu/edMQ4GULs+aK1Mhk1jqhiZoJeTr25dPHsbRyGxuQUnIMCN41IhlbecwL7803XQuZMJWiw3b/XvN2qgz5jrNQK4FVjevIqXgLtSXk+F5ALBLHj7dqMpMFeIF1szIfCnbQYp84ttt1WJf+63Bc/zKufpnmoM2m/yI4IZdGETHPTL6YrCQhGmCxhm0JOCgmcMRTRLQ1I81gKAU81QQ9PoQvlbjYmaD4q6EjmEYh4/Xz6gUM7CJJqWo906y6hiAWCkfgEtHVVunsyiP/MJ7I="
+  #  ---
+
+  #  --- BEGIN: The secure entry immediately below is where the GPG passphrase is encrypted by Travis
+  #      + for apache/incubator-openwhisk-runtime-go
+  - secure: "p3hwojt6Vct0KWH8hu5JPQsSsgJalT0OPkzbJOX1SJ8JPHPlGgA5rPpFzQJ0gwFDWueZFuqaoMw29gAo6CJdnvvh3lxxaKWirixCkgY5A2WVMg0xjJDl5eLhfCRYUx3VA8aUXzjm7KLxnYD8iFqCfxVoff2LnH/U9yjZrjO+/GWPhoeXhgGiqaCqE8HCT1RjoQLyU1xa43H5EMrJTU8cTLPZx66+vOdXM5tVQoyvJ0rluzGk3u+DHuhy61yF3/4Ky9pl71n0EKCHDH+8qFp0rH13QfqmI0jHjqXNKUcgXa9XQOPM7dnt/v92viLRhL/PH1mcITD2q1sul/twxI+j93X18LP16ev4MgRjxAMPgHmJZX4afEKr+Yf0dbV7glVnLr5BrA2Tavtq4nPKpfkq4jIRTKGdmd6HMAoC/jyCDryrXvQbAK7h5GXhhLzF8qCKz/KS7fPUePBcbfeBAyzw+Y2KDqg012JGLDBTLM7/MIQ2GTCLpfIMBwG4DlYu3bGqYS6KCPyw8+bLDi3EDS5DDELM/Iu/hau+Y5c+4CvAf+uoh2Bv+yjO7nA80pE+WfbtlAglhibv1dWArhfdJ3AWCdougv7EI/cP05fU7BgVniKk3IUEYp6aeQOerRX3vgrxDLz8PTkd+WewEOXn/8IJ5JWDXFefauknSlxQrKkYhbQ="
+  #      + for jonpspri/incubator-openwhisk-runtime-go
+  - secure: "WeNpc7rddW3PncdiyHdj3nDvCvWJAyKn2wYMaGI3NecIIwhKSJehJ7kjbJs+O0KMYemn6LSn2h1MvwfK7vmSaqgAZtWwJgDul1xEFUjbbWsCCfeBNljpFmmGSo54ldcwNn3ao5YxhKpMP++5LP2phiz9xMJ9Whtm08MbDkpuKbmBKWGIoVJOOzMdngPjH7Pht01jxY8hsR1kQJSGZCV5kLeTTLq9orAn+7WMmnVb6fLDRv9nWLheZhtDObO6JDDUaZSFWz64yuyHxr3XscUriGMKuGYXuSQ1w4hJsZuSommE+9JFCt+D9f/CwxqGhFPtIrW47YurPvJ/jl96o1F6vxMHbN5rbmegQsHyzdIZ+Aq4T/A41AsarbXnRdhh7RVIxPXZHqw4pWb+UCZnCpV4bOGRW9KKLdq10eksyPVZ7HSK4D8fokrNtNupaS1xfFYh8LMAoNiKEOfQlVWOaZxM+Wv/OlqMmc0wxZjnkDQfIluP5IJ6Sv1D2IUP8llz1nVCRNaXTveLRs893hNmSRFqP5AJiJzQ2ZQtOAC+x5GzwX/6c88ptUZqpOyHQVUqUjdrQabJdZ05KXA6BZPQSoeutFkQaVO6I1TLu+w+Ux4sZoLqQT9W5944T+C5M8HCjzczKeSX8PIGb2Pnb72OVXAvzjK/6p4woD8eeFtxy1qZd38="
+  #  ---
+
+  #  --- BEGIN: The 'golang_local_json' variable configures docker engines
+  #             to use for multi-architecture builds.
+  #      + for apache/incubator-openwhisk-runtime-go
+  - secure: "cako+gLVqeN6LFGapPyA2r3lSqO9GUQlMNQnhsUG9AZYbPgkRnbo69zwWrBGBQk7SpsGCZcCtRL/9FyoZlDPL0Q6WilTSx3Mar9O/bMDAzIYAs3Rq+340hpRJRlm0IerHuaRVMh56qr311y/uUS46J8iFgKLaTsBB4/siR8MTogum0nn7KUVgMNMq7Cz66U1JRtVUK+nfMpzucslvD4FnTAgDTgPdnR1QLLbDjP1o6YGYmnR73rTOWWFoCjX6vC/AwGNhfkVMtgkVxBcD/E2oMzWOCKlzG0js6VlL2mYJormZEddJ0djxwiBUaHXxsnsmFJwp1g0LmdrbMzYQjL8kyyZwWmsOFh93OrZJqxL+0C/9RjQ17+phjqJVxKOLb8rJIqLzsrYfr4o2ShmfDV1Wo8aJpGoHDD5XwEMYwKZmIP9LzkyTMz/S2QXprXKL+Cu15gBgXYnD/F32avSGn/312AUOdY6aXiozMQ6EfJIeIXUZiDzgOf9BKVBfXLiQ4cmLUnezz+v4dw8Yoz38zRuQ95TSwAzRhsQSoK2ihVeiUj2/xlRSWMRJ4lNoQjRFgzO1lXpqKvpyZAg5o3JC9OIIR6ddGPz9GVz2BIDogeLHlSHqzyRJNNq/GEA095j3QWvYReKExSLouZcN1VTm616MgX4nDQsj8mCE8uA4meflxA="
+  #      + for jonpspri/incubator-openwhisk-runtime-go
+  - secure: "KGHWGFw1+yrSpKoBSKZ7gg5RLpczQWm/990pGFXQbI1GNktj4l63Fu4Iqs+LsriaxGFrrwhzxt5BcLW+gCuNQhhptJa7YbceKRUk0iuuW2YfBk+2gxG0fvZ7w3CKNxaXDI8k7qJ24TTsgQF//4MJsePcPchK+BHlAdwQjfzLn5rLz64w2ilruPEZcUPU0rUC+r2ohFFkncmyilmWWjiFFxdtPLr7wcgDewFcSwikzybxERBnkUDmce8WzBGqB1g2abyNicae9xeBKC+hBJEMnBTJQNnq6RhDtybDJybo4zsDAC6J0m29ywKNEyual7rZ+uIYqkVeWTvYV+UkqEvCW7cHrKbFSzWt3mtsRdzgfdaknk4zemiLA2OUkfUzoDOCXE+E2OJ383kNLf7SVcnDtv0uu3OnzkbvBUGQ/sbK9PWXQrk2BdnKPsFsnFe35ChwZO5gKpRhk5++BeU7j/miROw1C58PGuEbqvd8KA5MrIkbhxbGLgvTXLlJnDYAJtWHxdhZ/BW8Pjfbd5aEqpggiLukIaoJpoXxo66p9vCEjHGNqFLFu+09+mUlfr6Iv0vPcnLwPtcAcDPrzgVB9GDoR94tO4E7mT3XELxVLGP7k2hk2td5uLn5cHgcP0zAz0/zO5GM4BvH3AYbVmkujvnBjB29PUlwWs1WKTA19pZ7lgQ="
+  #  ---

@@ -1,4 +1,55 @@
 core/proxy
-.gradle/
 .gogradle/
 
+# Whisk
+nginx.conf
+whisk.properties
+default.props
+
+.ant-targets-build.xml
+/results/
+/logs/
+/config/custom-config.xml
+results
+*.retry
+
+# Eclipse
+bin/
+**/.project
+.settings/
+.classpath
+.cache-main
+.cache-tests
+
+# Linux
+*~
+*.swp
+
+# Mac
+.DS_Store
+
+# Gradle
+.gradle
+build/
+!/tools/build/
+
+# Python
+.ipynb_checkpoints/
+*.pyc
+
+# NodeJS
+node_modules
+
+# Vagrant
+.vagrant*
+
+# IntelliJ
+.idea
+*.class
+*.iml
+out/
+
+# Some places where secrets are kept...
+docker-local.json
+*.pem
+/tls
