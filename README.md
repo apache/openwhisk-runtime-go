@@ -2,9 +2,5 @@
 
 This is an  OpenWhisk runtime for  Golang.
 
-Local development
-
-`./gradle :docker:distDocker`
-
-This will produce the image `whisk/golang`
+Check [test documentation](./test/README.md) for testing.
 
