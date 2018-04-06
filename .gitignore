@@ -1,5 +1,10 @@
-core/proxy
+.gradle/
 .gogradle/
+vendor/
+core/proxy
+openwhisk/_test/exec
+openwhisk/_test/exec.zip
+openwhisk/action/
 
 # Whisk
 nginx.conf
