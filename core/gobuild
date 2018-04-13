@@ -1,0 +1,40 @@
+#!/bin/bash
+if test -z "$1"
+then echo "usage: file-or-dir [main]" ; exit 1
+fi
+exec="${2:-main}"
+# absolute path of taget dir or file
+target="$(readlink -f $1)"
+# prepare a compilation dir
+compiledir="$(mktemp -d)"
+mkdir -p "$compiledir/src/action" "$compiledir/src/main" 
+# capitalized main function name
+main="$(tr '[:lower:]' '[:upper:]' <<< ${exec:0:1})${exec:1}"
+# preparing for compilation
+if test -d "$target"
+# copy all the files unzipped
+then cp -rf "$target"/* "$compiledir/src/"
+     dest="$target/$exec"
+# if we have a single file action, copy it
+else cp "$target" "$compiledir/src/action/action.go"
+     dest="$target"
+fi 
+# prepare the main
+cat <<EOF >$compiledir/src/main/main.go
+package main
+
+import (
+	"os"
+	"action"
+
+	"github.com/apache/incubator-openwhisk-client-go/whisk"
+)
+
+func main() {
+	whisk.StartWithArgs(action.$main, os.Args[1:])
+}
+EOF
+# build it
+cd "$compiledir"
+GOPATH="$GOPATH:$compiledir" go build -i action
+GOPATH="$GOPATH:$compiledir" go build -o "$dest" main

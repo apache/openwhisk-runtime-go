@@ -14,30 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package main
+
+package action
 
 import (
-	"flag"
-	"io/ioutil"
-	"log"
-	"os"
-
-	"github.com/sciabarracom/incubator-openwhisk-runtime-go/openwhisk"
+	"encoding/json"
+	"fmt"
 )
 
-// disable stderr except when debugging
-var debug = flag.Bool("debug", false, "enable debug output")
-
-var compiler = flag.String("compiler", os.Getenv("COMPILER"), "define the compiler on the command line")
-
-func main() {
-	flag.Parse()
-
-	if !*debug {
-		// hide log unless you are debugging
-		log.SetOutput(ioutil.Discard)
+func Main(event json.RawMessage) (json.RawMessage, error) {
+	var obj map[string]interface{}
+	json.Unmarshal(event, &obj)
+	name, ok := obj["name"].(string)
+	if !ok {
+		name = "Stranger"
 	}
-	// start the balls rolling
-	ap := openwhisk.NewActionProxy("./action", *compiler, os.Stdout, !*debug)
-	ap.Start(8080)
+	fmt.Printf("name=%s\n", name)
+	msg := map[string]string{"message": ("Hello, " + name + "!")}
+	return json.Marshal(msg)
 }

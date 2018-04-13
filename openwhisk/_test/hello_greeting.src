@@ -17,27 +17,14 @@
 package main
 
 import (
-	"flag"
-	"io/ioutil"
-	"log"
+	//"log"
 	"os"
 
-	"github.com/sciabarracom/incubator-openwhisk-runtime-go/openwhisk"
+	"github.com/apache/incubator-openwhisk-client-go/whisk"
+	"github.com/sciabarracom/incubator-openwhisk-runtime-go/openwhisk/_test/action"
 )
 
-// disable stderr except when debugging
-var debug = flag.Bool("debug", false, "enable debug output")
-
-var compiler = flag.String("compiler", os.Getenv("COMPILER"), "define the compiler on the command line")
-
 func main() {
-	flag.Parse()
-
-	if !*debug {
-		// hide log unless you are debugging
-		log.SetOutput(ioutil.Discard)
-	}
-	// start the balls rolling
-	ap := openwhisk.NewActionProxy("./action", *compiler, os.Stdout, !*debug)
-	ap.Start(8080)
+	//log.SetPrefix("hello_greeting: ")
+	whisk.StartWithArgs(action.Hello, os.Args[1:])
 }
