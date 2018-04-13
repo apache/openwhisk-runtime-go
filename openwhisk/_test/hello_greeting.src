@@ -17,26 +17,14 @@
 package main
 
 import (
-	"encoding/json"
-	"log"
+	//"log"
 	"os"
 
 	"github.com/apache/incubator-openwhisk-client-go/whisk"
+	"github.com/sciabarracom/incubator-openwhisk-runtime-go/openwhisk/_test/action"
 )
 
-func sayHello(event json.RawMessage) (json.RawMessage, error) {
-	var obj map[string]interface{}
-	json.Unmarshal(event, &obj)
-	name, ok := obj["name"].(string)
-	if !ok {
-		name = "Stranger"
-	}
-	log.Printf("name=%s\n", name)
-	msg := map[string]string{"message": ("Hello, " + name + "!")}
-	return json.Marshal(msg)
-}
-
 func main() {
-	log.SetPrefix("hello_message: ")
-	whisk.StartWithArgs(sayHello, os.Args[1:])
+	//log.SetPrefix("hello_greeting: ")
+	whisk.StartWithArgs(action.Hello, os.Args[1:])
 }

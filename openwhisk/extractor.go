@@ -100,32 +100,25 @@ func highestDir(dir string) int {
 	return max
 }
 
-var currentDir = highestDir("./action")
-
-// extractAction accept a byte array write it to a file
-func extractAction(buf *[]byte, isScript bool) error {
+// ExtractAction accept a byte array and write it to a file
+// it handles zip files extracting the content
+// it stores in a new directory under ./action/XXX whee x is incremented every time
+// it returns the file if a file or the directory if it was a zip file
+func (ap *ActionProxy) ExtractAction(buf *[]byte, main string) (string, error) {
 	if buf == nil || len(*buf) == 0 {
-		return fmt.Errorf("no file")
+		return "", fmt.Errorf("no file")
 	}
-	currentDir++
-	newDir := fmt.Sprintf("./action/%d", currentDir)
+	ap.currentDir++
+	newDir := fmt.Sprintf("%s/%d", ap.baseDir, ap.currentDir)
 	os.MkdirAll(newDir, 0755)
 	kind, err := filetype.Match(*buf)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if kind.Extension == "zip" {
 		log.Println("Extract Action, assuming a zip")
-		return unzip(*buf, newDir)
+		return newDir, unzip(*buf, newDir)
 	}
-	if kind.Extension == "elf" || isScript {
-		if isScript {
-			log.Println("Extract Action, assuming a script")
-		} else {
-			log.Println("Extract Action, assuming a binary")
-		}
-		return ioutil.WriteFile(newDir+"/exec", *buf, 0755)
-	}
-	log.Println("No valid action found")
-	return fmt.Errorf("unknown filetype %s", kind)
+	file := newDir + "/" + main
+	return file, ioutil.WriteFile(file, *buf, 0755)
 }

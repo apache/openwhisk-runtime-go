@@ -1,4 +1,4 @@
-package hello
+package action
 
 import (
 	"fmt"
@@ -9,6 +9,7 @@ func ExampleHello() {
 	data, _ := Hello(name)
 	fmt.Printf("%s", data)
 	// Output:
+	// Hello, Mike
 	// {"greetings":"Hello, Mike"}
 }
 

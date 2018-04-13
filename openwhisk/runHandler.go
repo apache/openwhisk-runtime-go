@@ -49,7 +49,7 @@ func sendError(w http.ResponseWriter, code int, cause string) {
 	w.Write([]byte("\n"))
 }
 
-func runHandler(w http.ResponseWriter, r *http.Request) {
+func (ap *ActionProxy) runHandler(w http.ResponseWriter, r *http.Request) {
 
 	// parse the request
 	params := Params{}
@@ -68,32 +68,32 @@ func runHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check if you have an action
-	if theExecutor == nil {
+	if ap.theExecutor == nil {
 		sendError(w, http.StatusBadRequest, fmt.Sprintf("no action defined yet"))
 		return
 	}
 
 	// execute the action
 	// and check for early termination
-	theExecutor.io <- string(params.Value)
+	ap.theExecutor.io <- string(params.Value)
 	var response string
 	var exited bool
 	select {
-	case response = <-theExecutor.io:
+	case response = <-ap.theExecutor.io:
 		exited = false
-	case err = <-theExecutor.exit:
+	case err = <-ap.theExecutor.exit:
 		exited = true
 	}
 
 	// check for early termination
 	if exited {
-		theExecutor = nil
+		ap.theExecutor = nil
 		sendError(w, http.StatusBadRequest, fmt.Sprintf("command exited"))
 		return
 	}
 
 	// flush the logs sending the activation message at the end
-	theExecutor.log <- true
+	ap.theExecutor.log <- true
 
 	// check response
 	if response == "" {

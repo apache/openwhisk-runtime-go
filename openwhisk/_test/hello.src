@@ -14,17 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package main
+
+package action
 
 import (
-	"log"
-	"os"
-
-	"github.com/apache/incubator-openwhisk-client-go/whisk"
-	"github.com/sciabarracom/incubator-openwhisk-runtime-go/test/src/hello"
+	"encoding/json"
+	"fmt"
 )
 
-func main() {
-	log.SetPrefix("hello_greeting: ")
-	whisk.StartWithArgs(hello.Hello, os.Args[1:])
+func Main(event json.RawMessage) (json.RawMessage, error) {
+	var obj map[string]interface{}
+	json.Unmarshal(event, &obj)
+	name, ok := obj["name"].(string)
+	if !ok {
+		name = "Stranger"
+	}
+	fmt.Printf("name=%s\n", name)
+	msg := map[string]string{"message": ("Hello, " + name + "!")}
+	return json.Marshal(msg)
 }
