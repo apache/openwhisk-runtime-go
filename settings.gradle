@@ -1,3 +1,6 @@
+include 'core:actionloop'
+include 'core:actionloop-golang'
+
 rootProject.name = 'runtime-golang'
 
 gradle.ext.openwhisk = [

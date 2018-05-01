@@ -18,23 +18,25 @@ package openwhisk
 
 import (
 	"fmt"
+	"io/ioutil"
 	"time"
 )
 
 func ExampleNewExecutor_failed() {
-	proc := NewExecutor("true")
+	log, _ := ioutil.TempFile("", "log")
+	proc := NewExecutor(log, "true")
 	err := proc.Start()
 	fmt.Println(err)
 	proc.Stop()
-	proc = NewExecutor("/bin/pwd")
+	proc = NewExecutor(log, "/bin/pwd")
 	err = proc.Start()
 	fmt.Println(err)
 	proc.Stop()
-	proc = NewExecutor("donotexist")
+	proc = NewExecutor(log, "donotexist")
 	err = proc.Start()
 	fmt.Println(err)
 	proc.Stop()
-	proc = NewExecutor("/etc/passwd")
+	proc = NewExecutor(log, "/etc/passwd")
 	err = proc.Start()
 	fmt.Println(err)
 	proc.Stop()
@@ -46,7 +48,8 @@ func ExampleNewExecutor_failed() {
 }
 
 func ExampleNewExecutor_bc() {
-	proc := NewExecutor("_test/bc.sh")
+	log, _ := ioutil.TempFile("", "log")
+	proc := NewExecutor(log, "_test/bc.sh")
 	err := proc.Start()
 	fmt.Println(err)
 	//proc.log <- true
@@ -63,6 +66,7 @@ func ExampleNewExecutor_bc() {
 	}
 	time.Sleep(100 * time.Millisecond)
 	proc.Stop()
+	dump(log)
 	// Output:
 	// <nil>
 	// 4
@@ -72,7 +76,8 @@ func ExampleNewExecutor_bc() {
 }
 
 func ExampleNewExecutor_hello() {
-	proc := NewExecutor("_test/hello.sh")
+	log, _ := ioutil.TempFile("", "log")
+	proc := NewExecutor(log, "_test/hello.sh")
 	err := proc.Start()
 	fmt.Println(err)
 	proc.io <- `{"name":"Mike"}`
@@ -83,6 +88,7 @@ func ExampleNewExecutor_hello() {
 	time.Sleep(100 * time.Millisecond)
 	_, ok := <-proc.io
 	fmt.Printf("io %v\n", ok)
+	dump(log)
 	// Unordered output:
 	// <nil>
 	// {"hello": "Mike"}
@@ -93,7 +99,8 @@ func ExampleNewExecutor_hello() {
 }
 
 func ExampleNewExecutor_term() {
-	proc := NewExecutor("_test/hello.sh")
+	log, _ := ioutil.TempFile("", "log")
+	proc := NewExecutor(log, "_test/hello.sh")
 	err := proc.Start()
 	fmt.Println(err)
 	proc.io <- `{"name":"*"}`
@@ -111,6 +118,7 @@ func ExampleNewExecutor_term() {
 	time.Sleep(100 * time.Millisecond)
 	_, ok := <-proc.io
 	fmt.Printf("io %v\n", ok)
+	dump(log)
 	// Unordered output:
 	// <nil>
 	// exit true

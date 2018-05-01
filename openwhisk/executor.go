@@ -42,11 +42,13 @@ type Executor struct {
 	_output *bufio.Scanner
 	_logout *bufio.Scanner
 	_logerr *bufio.Scanner
+	_logbuf *os.File
 }
 
-// NewExecutor creates a child subprocess using the provided command line.
+// NewExecutor creates a child subprocess using the provided command line,
+// writing the logs in the given file.
 // You can then start it getting a communication channel
-func NewExecutor(command string, args ...string) (proc *Executor) {
+func NewExecutor(logbuf *os.File, command string, args ...string) (proc *Executor) {
 	cmd := exec.Command(command, args...)
 
 	stdin, err := cmd.StdinPipe()
@@ -79,6 +81,7 @@ func NewExecutor(command string, args ...string) (proc *Executor) {
 		bufio.NewScanner(pipeOut),
 		bufio.NewScanner(stdout),
 		bufio.NewScanner(stderr),
+		logbuf,
 	}
 }
 
@@ -106,6 +109,19 @@ func (proc *Executor) run() {
 	log.Println("run: end")
 }
 
+func (proc *Executor) drain(ch chan string) {
+	runtime.Gosched()
+	for loop := true; loop; {
+		select {
+		case buf := <-ch:
+			fmt.Fprintln(proc._logbuf, buf)
+		case <-time.After(TIMEOUT):
+			loop = false
+		}
+	}
+	fmt.Fprintln(proc._logbuf, "XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX")
+}
+
 // manage copying stdout and stder in output
 // with log guards
 func (proc *Executor) logger() {
@@ -119,28 +135,9 @@ func (proc *Executor) logger() {
 	// wait for the signal
 	for <-proc.log {
 		// flush stdout
-		runtime.Gosched()
-		for loop := true; loop; {
-			select {
-			case buf := <-chOut:
-				fmt.Println(buf)
-			case <-time.After(TIMEOUT):
-				loop = false
-			}
-		}
-		fmt.Println("XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX")
-
+		proc.drain(chOut)
 		// flush stderr
-		runtime.Gosched()
-		for loop := true; loop; {
-			select {
-			case buf := <-chErr:
-				fmt.Println(buf)
-			case <-time.After(TIMEOUT):
-				loop = false
-			}
-		}
-		fmt.Println("XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX")
+		proc.drain(chErr)
 	}
 	log.Printf("logger: end")
 }
