@@ -24,36 +24,67 @@ import (
 	"os"
 )
 
-// theServer is the current server
-var theServer http.Server
+// ActionProxy is the container of the data specific to a server
+type ActionProxy struct {
+	// current directory
+	baseDir string
 
-// theChannel is the channel communicating with the action
-var theExecutor *Executor
+	// Compiler is the script to use to compile your code when action are source code
+	compiler string
+
+	// index current dir
+	currentDir int
+
+	// theChannel is the channel communicating with the action
+	theExecutor *Executor
+
+	// log file
+	logFile *os.File
+
+	// debug
+	Debug bool
+	Trace bool
+}
+
+// NewActionProxy creates a new action proxy that can handle http requests
+func NewActionProxy(baseDir string, compiler string, logFile *os.File) *ActionProxy {
+	os.Mkdir(baseDir, 0755)
+	return &ActionProxy{
+		baseDir,
+		compiler,
+		highestDir(baseDir),
+		nil,
+		logFile,
+		false,
+		false,
+	}
+}
 
 // StartLatestAction tries to start
 // the more recently uplodaded
 // action if valid, otherwise remove it
 // and fallback to the previous, if any
-func StartLatestAction() error {
+func (ap *ActionProxy) StartLatestAction(main string) error {
 
 	// find the action if any
-	highestDir := highestDir("./action")
+	highestDir := highestDir(ap.baseDir)
 	if highestDir == 0 {
 		log.Println("no action found")
-		theExecutor = nil
+		ap.theExecutor = nil
 		return fmt.Errorf("no valid actions available")
 	}
 
 	// save the current executor
-	curExecutor := theExecutor
+	curExecutor := ap.theExecutor
 
 	// try to launch the action
-	executable := fmt.Sprintf("./action/%d/exec", highestDir)
-	newExecutor := NewExecutor(executable)
+	executable := fmt.Sprintf("%s/%d/%s", ap.baseDir, highestDir, main)
+	os.Chmod(executable, 0755)
+	newExecutor := NewExecutor(ap.logFile, executable)
 	log.Printf("starting %s", executable)
 	err := newExecutor.Start()
 	if err == nil {
-		theExecutor = newExecutor
+		ap.theExecutor = newExecutor
 		if curExecutor != nil {
 			log.Println("stopping old executor")
 			curExecutor.Stop()
@@ -63,22 +94,30 @@ func StartLatestAction() error {
 
 	// cannot start, removing the action
 	// and leaving the current executor running
+	if !ap.Debug {
+		exeDir := fmt.Sprintf("./action/%d/", highestDir)
+		log.Printf("removing the failed action in %s", exeDir)
+		os.RemoveAll(exeDir)
+	}
 
-	exeDir := fmt.Sprintf("./action/%d/", highestDir)
-	log.Printf("removing the failed action in %s", exeDir)
-	os.RemoveAll(exeDir)
 	return err
 }
 
-// Start creates a proxy to execute actions
-func Start() {
-	// handle initialization
-	http.HandleFunc("/init", initHandler)
-	// handle execution
-	http.HandleFunc("/run", runHandler)
+func (ap *ActionProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	//fmt.Println(r.URL.Path)
+	switch r.URL.Path {
+	case "/init":
+		ap.initHandler(w, r)
+	case "/run":
+		ap.runHandler(w, r)
+	}
+}
 
-	// start
-	log.Println("Started!")
-	theServer.Addr = ":8080"
-	log.Fatal(theServer.ListenAndServe())
+// Start creates a proxy to execute actions
+func (ap *ActionProxy) Start(port int) {
+
+	// listen and start
+	//http.HandleFunc("/init", func(w http.ResponseWriter, r *http.Request) { ap.initHandler(w, r) })
+	//http.HandleFunc("/run", func(w http.ResponseWriter, r *http.Request) { ap.runHandler(w, r) })
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), ap))
 }

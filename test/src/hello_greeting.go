@@ -21,10 +21,10 @@ import (
 	"os"
 
 	"github.com/apache/incubator-openwhisk-client-go/whisk"
-	"github.com/sciabarracom/incubator-openwhisk-runtime-go/test/src/hello"
+	"github.com/sciabarracom/incubator-openwhisk-runtime-go/test/src/action"
 )
 
 func main() {
 	log.SetPrefix("hello_greeting: ")
-	whisk.StartWithArgs(hello.Hello, os.Args[1:])
+	whisk.StartWithArgs(action.Hello, os.Args[1:])
 }
