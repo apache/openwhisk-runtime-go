@@ -20,17 +20,31 @@ import (
 	"flag"
 	"io/ioutil"
 	"log"
+	"os"
 
 	"github.com/sciabarracom/incubator-openwhisk-runtime-go/openwhisk"
 )
 
-// disable stderr except when debugging
+// flag to enable tracing
+var trace = flag.Bool("trace", false, "enable detailed tracing output")
+
+// flag to enable debug
 var debug = flag.Bool("debug", false, "enable debug output")
+
+// flag for the compiler
+var compiler = flag.String("compiler", os.Getenv("COMPILER"), "define the compiler on the command line")
 
 func main() {
 	flag.Parse()
-	if !*debug {
+
+	if !(*debug || *trace) {
+		// hide log unless you are debugging
 		log.SetOutput(ioutil.Discard)
 	}
-	openwhisk.Start()
+
+	// start the balls rolling
+	ap := openwhisk.NewActionProxy("./action", *compiler, os.Stdout)
+	ap.Debug = *debug || *trace
+	ap.Trace = *trace
+	ap.Start(8080)
 }

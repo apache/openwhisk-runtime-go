@@ -22,30 +22,37 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
+type initBodyRequest struct {
+	Code   string `json:"code,omitempty"`
+	Binary bool   `json:"binary,omitempty"`
+	Main   string `json:"main,omitempty"`
+}
 type initRequest struct {
-	Value struct {
-		Code   string `json:",omitempty"`
-		Binary bool   `json:",omitempty"`
-	} `json:",omitempty"`
+	Value initBodyRequest `json:"value,omitempty"`
 }
 
 func sendOK(w http.ResponseWriter) {
 	// answer OK
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Content-Length", "12")
-	w.Write([]byte("{\"ok\":true}\n"))
+	buf := []byte("{\"ok\":true}\n")
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(buf)))
+	w.Write(buf)
 	if f, ok := w.(http.Flusher); ok {
 		f.Flush()
 	}
 }
 
-func initHandler(w http.ResponseWriter, r *http.Request) {
+func (ap *ActionProxy) initHandler(w http.ResponseWriter, r *http.Request) {
 
 	// read body of the request
-	// log.Println("init: reading")
+	if ap.compiler != "" {
+		log.Println("compiler: " + ap.compiler)
+	}
+
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
@@ -53,7 +60,9 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// decode request parameters
-	//log.Println("init: decoding")
+	if ap.Trace {
+		log.Printf("init: decoding %s\n", string(body))
+	}
 	var request initRequest
 	err = json.Unmarshal(body, &request)
 
@@ -62,32 +71,58 @@ func initHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// request with empty code - stop any executor but return ok
+	if ap.Trace {
+		log.Printf("request: %v\n", request)
+	}
 	if request.Value.Code == "" {
+		if ap.theExecutor != nil {
+			log.Printf("stop running action")
+			ap.theExecutor.Stop()
+			ap.theExecutor = nil
+		}
 		sendOK(w)
 		return
 	}
 
-	// check if it is a binary
+	main := request.Value.Main
+	if main == "" {
+		main = "main"
+	}
+
+	// extract code eventually decoding it
+	var buf []byte
 	if request.Value.Binary {
-		var decoded []byte
-		decoded, err = base64.StdEncoding.DecodeString(request.Value.Code)
+		log.Printf("binary")
+		buf, err = base64.StdEncoding.DecodeString(request.Value.Code)
 		if err != nil {
 			sendError(w, http.StatusBadRequest, "cannot decode the request: "+err.Error())
 			return
 		}
-		// extract the replacement, stopping and then starting the action
-		err = extractAction(&decoded, false)
 	} else {
-		buf := []byte(request.Value.Code)
-		err = extractAction(&buf, true)
+		log.Printf("plain text")
+		buf = []byte(request.Value.Code)
 	}
-	if err != nil {
+
+	// extract the action,
+	file, err := ap.ExtractAction(&buf, main)
+	if err != nil || file == "" {
 		sendError(w, http.StatusBadRequest, "invalid action: "+err.Error())
 		return
 	}
 
+	// compile it if a compiler is available
+	if ap.compiler != "" && !isCompiled(file, main) {
+		log.Printf("compiling: %s main: %s", file, main)
+		err = ap.CompileAction(main, file, file)
+		if err != nil {
+			sendError(w, http.StatusBadRequest, "cannot compile action: "+err.Error())
+			return
+		}
+	}
+
 	// stop and start
-	err = StartLatestAction()
+	err = ap.StartLatestAction(main)
 	if err != nil {
 		sendError(w, http.StatusBadRequest, "cannot start action: "+err.Error())
 		return

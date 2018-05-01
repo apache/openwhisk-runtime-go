@@ -1,0 +1,17 @@
+ext.dockerImageName = 'actionloop-golang-v1.9'
+apply from: '../../gradle/docker.gradle'
+
+distDocker.dependsOn ':build'
+distDocker.dependsOn 'copyProxy'
+distDocker.dependsOn 'copyCompiler'
+
+
+task copyProxy(type: Copy) {
+    from '../proxy'
+    into '.'
+}
+
+task copyCompiler(type: Copy) {
+    from '../gobuild'
+    into '.'
+}

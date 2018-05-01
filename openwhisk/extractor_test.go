@@ -29,23 +29,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func sys(cli string) {
-	cmd := exec.Command(cli)
+func sys(cli string, args ...string) {
+	os.Chmod(cli, 0755)
+	cmd := exec.Command(cli, args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Print(err)
 	} else {
 		fmt.Print(string(out))
 	}
-}
-
-func TestExtractActionTest_exec(t *testing.T) {
-	sys("_test/build.sh")
-	// cleanup
-	assert.Nil(t, os.RemoveAll("./action"))
-	file, _ := ioutil.ReadFile("_test/exec")
-	extractAction(&file, false)
-	assert.Nil(t, exists("./action", "exec"))
 }
 
 func exists(dir, filename string) error {
@@ -60,32 +52,51 @@ func detect(dir, filename string) string {
 	kind, _ := filetype.Match(file)
 	return kind.Extension
 }
-func TestExtractActionTest_exe(t *testing.T) {
+
+func TestExtractActionTest_exec(t *testing.T) {
+	log, _ := ioutil.TempFile("", "log")
+	ap := NewActionProxy("./action/x1", "", log)
 	sys("_test/build.sh")
 	// cleanup
-	assert.Nil(t, os.RemoveAll("./action"))
+	assert.Nil(t, os.RemoveAll("./action/x1"))
+	file, _ := ioutil.ReadFile("_test/exec")
+	ap.ExtractAction(&file, "exec")
+	assert.Nil(t, exists("./action/x1", "exec"))
+}
+
+func TestExtractActionTest_exe(t *testing.T) {
+	log, _ := ioutil.TempFile("", "log")
+	ap := NewActionProxy("./action/x2", "", log)
+	sys("_test/build.sh")
+	// cleanup
+	assert.Nil(t, os.RemoveAll("./action/x2"))
 	// match  exe
 	file, _ := ioutil.ReadFile("_test/exec")
-	extractAction(&file, false)
-	assert.Equal(t, detect("./action", "exec"), "elf")
+	ap.ExtractAction(&file, "exec")
+	assert.Equal(t, detect("./action/x2", "exec"), "elf")
 }
 
 func TestExtractActionTest_zip(t *testing.T) {
+	log, _ := ioutil.TempFile("", "log")
 	sys("_test/build.sh")
+	ap := NewActionProxy("./action/x3", "", log)
 	// cleanup
-	assert.Nil(t, os.RemoveAll("./action"))
+	assert.Nil(t, os.RemoveAll("./action/x3"))
 	// match  exe
 	file, _ := ioutil.ReadFile("_test/exec.zip")
-	extractAction(&file, false)
-	assert.Equal(t, detect("./action", "exec"), "elf")
-	assert.Nil(t, exists("./action", "etc"))
-	assert.Nil(t, exists("./action", "dir/etc"))
+	ap.ExtractAction(&file, "exec")
+	assert.Equal(t, detect("./action/x3", "exec"), "elf")
+	assert.Nil(t, exists("./action/x3", "etc"))
+	assert.Nil(t, exists("./action/x3", "dir/etc"))
 }
 
 func TestExtractAction_script(t *testing.T) {
+	log, _ := ioutil.TempFile("", "log")
+	ap := NewActionProxy("./action/x4", "", log)
 	buf := []byte("#!/bin/sh\necho ok")
-	assert.NotNil(t, extractAction(&buf, false))
-	assert.Nil(t, extractAction(&buf, true))
+	_, err := ap.ExtractAction(&buf, "exec")
+	//fmt.Print(err)
+	assert.Nil(t, err)
 }
 
 func TestHighestDir(t *testing.T) {
