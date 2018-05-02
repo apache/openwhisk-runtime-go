@@ -21,7 +21,7 @@ import (
 	"os"
 
 	"github.com/apache/incubator-openwhisk-client-go/whisk"
-	"github.com/sciabarracom/incubator-openwhisk-runtime-go/openwhisk/_test/action"
+	"github.com/apache/incubator-openwhisk-runtime-go/openwhisk/_test/action"
 )
 
 func main() {
