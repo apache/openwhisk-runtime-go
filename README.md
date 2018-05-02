@@ -32,9 +32,20 @@ This is an OpenWhisk runtime for Golang and Generic executables.
 
 You need a linux environment, with Java and Docker installed to build the sources.
 
-To build and run the test suite, use: 
+Prerequisites for running build and tests:
+- docker
+- jdk
+- go 1.10.1
+- bc (sudo apt-get install bc)
 
-`./gradlew distDocker`
+To compile go proxy
+```
+./gradlew build
+```
+To build the docker images after compiling go proxy
+```
+./gradlew distDocker
+```
 
 This will build the images:
 
@@ -42,6 +53,11 @@ This will build the images:
 * `actionloop`: the base image, supporting generic executables
 
 The `actionloop` image is used as a basis also for the `actionloop-swift` image. It can be used for supporting other compiled programming languages as long as they implement a `compile` script and the *action loop* protocol described below.
+
+To run tests
+```
+./gradlew test --info
+```
 
 <a name="gosources"/>
 
