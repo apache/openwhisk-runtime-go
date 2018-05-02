@@ -27,10 +27,10 @@ TO use it:
 - you can run them with `cram test_actionloop.t`
 - and `cram test_actionloop-golang`
 
-also you can start directy the binary without the images with
+also you can start directly the binary without the images with
 
 - `./start.sh` 
-- or `COMPILER=../core/goproxy ./start.sh`
+- or `COMPILER=../common/gobuild.sh ./start.sh`
 
 If you start them,  images won't be started by the test.
 

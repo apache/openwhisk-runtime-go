@@ -26,7 +26,7 @@ import (
 func Example_compileAction_wrong() {
 	sys("_test/precompile.sh", "hello.sh", "0")
 	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/0", "../core/gobuild", log)
+	ap := NewActionProxy("./action/0", "../common/gobuild.sh", log)
 	fmt.Println(ap.CompileAction("_test/compile/0/exec", "exec", ""))
 	// Output:
 	// exit status 1
@@ -40,7 +40,7 @@ func Example_isCompiled() {
 	fmt.Println(isCompiled(dir, "exec"))
 
 	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/c", "../core/gobuild", log)
+	ap := NewActionProxy("./action/c", "../common/gobuild.sh", log)
 	ap.CompileAction("main", abs("_test/compile/c/exec"), "")
 
 	fmt.Println(isCompiled(file, "main"))
@@ -61,7 +61,7 @@ func Example_isCompiled() {
 func Example_compileAction_singlefile_main() {
 	sys("_test/precompile.sh", "hello.src", "1")
 	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/1", "../core/gobuild", log)
+	ap := NewActionProxy("./action/1", "../common/gobuild.sh", log)
 	fmt.Println(ap.CompileAction("main", abs("_test/compile/1/exec"), ""))
 	sys("_test/postcompile.sh", "_test/compile/1/exec")
 	// Output:
@@ -74,7 +74,7 @@ func Example_compileAction_singlefile_main() {
 func Example_compileAction_singlefile_main_out() {
 	sys("_test/precompile.sh", "hello.src", "1a")
 	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/1a", "../core/gobuild", log)
+	ap := NewActionProxy("./action/1a", "../common/gobuild.sh", log)
 	fmt.Println(ap.CompileAction("main", abs("_test/compile/1a/exec"), abs("_test/output/1a")))
 	sys("_test/postcompile.sh", "_test/output/1a/main")
 	// Output:
@@ -87,7 +87,7 @@ func Example_compileAction_singlefile_main_out() {
 func Example_compileAction_singlefile_hello() {
 	sys("_test/precompile.sh", "hello1.src", "2")
 	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/2", "../core/gobuild", log)
+	ap := NewActionProxy("./action/2", "../common/gobuild.sh", log)
 	fmt.Println(ap.CompileAction("hello", "_test/compile/2/exec", ""))
 	sys("_test/postcompile.sh", "_test/compile/2/exec")
 	// Output:
@@ -100,7 +100,7 @@ func Example_compileAction_singlefile_hello() {
 func Example_compileAction_singlefile_hello_out() {
 	sys("_test/precompile.sh", "hello1.src", "2a")
 	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/2a", "../core/gobuild", log)
+	ap := NewActionProxy("./action/2a", "../common/gobuild.sh", log)
 	fmt.Println(ap.CompileAction("hello", "_test/compile/2a/exec", abs("_test/output/2a")))
 	sys("_test/postcompile.sh", "_test/output/2a/hello")
 	// Output:
@@ -113,7 +113,7 @@ func Example_compileAction_singlefile_hello_out() {
 func Example_compileAction_multifile_main() {
 	sys("_test/precompile.sh", "action", "3")
 	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/3", "../core/gobuild", log)
+	ap := NewActionProxy("./action/3", "../common/gobuild.sh", log)
 	fmt.Println(ap.CompileAction("main", "_test/compile/3/", ""))
 	sys("_test/postcompile.sh", "_test/compile/3/main")
 	// Output:
@@ -127,7 +127,7 @@ func Example_compileAction_multifile_main() {
 func Example_compileAction_multifile_main_out() {
 	sys("_test/precompile.sh", "action", "3a")
 	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/3a", "../core/gobuild", log)
+	ap := NewActionProxy("./action/3a", "../common/gobuild.sh", log)
 	fmt.Println(ap.CompileAction("main", "_test/compile/3a/", abs("_test/output/3a")))
 	sys("_test/postcompile.sh", "_test/output/3a/main")
 	// Output:
@@ -141,7 +141,7 @@ func Example_compileAction_multifile_main_out() {
 func Example_compileAction_multifile_hello() {
 	sys("_test/precompile.sh", "action", "4")
 	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/4", "../core/gobuild", log)
+	ap := NewActionProxy("./action/4", "../common/gobuild.sh", log)
 	fmt.Println(ap.CompileAction("hello", "_test/compile/4/", ""))
 	sys("_test/postcompile.sh", "_test/compile/4/hello")
 	// Output:
@@ -154,7 +154,7 @@ func Example_compileAction_multifile_hello() {
 func Example_compileAction_multifile_hello_out() {
 	sys("_test/precompile.sh", "action", "4a")
 	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/4a", "../core/gobuild", log)
+	ap := NewActionProxy("./action/4a", "../common/gobuild.sh", log)
 	fmt.Println(ap.CompileAction("hello", "_test/compile/4/", abs("_test/output/4a")))
 	sys("_test/postcompile.sh", "_test/output/4a/hello")
 	// Output:

@@ -1,0 +1,2 @@
+ext.dockerImageName = 'actionloop'
+apply from: '../gradle/docker.gradle'

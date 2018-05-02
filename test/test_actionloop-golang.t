@@ -16,7 +16,7 @@
 #
 
   $ export T=$TESTDIR
-  $ $T/start.sh actionloop-golang-v1.9 2>$T/err.log >$T/out.log 
+  $ $T/start.sh actionloop-golang-v1.10 2>$T/err.log >$T/out.log 
 
   $ $T/bin/run.sh
   {"error":"no action defined yet"}

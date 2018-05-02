@@ -16,27 +16,28 @@
 # limitations under the License.
 #
 
-set -ex
+set -eux
 
 # Build script for Travis-CI.
 
-SCRIPTDIR=$(cd $(dirname "$0") && pwd)
-ROOTDIR="$SCRIPTDIR/../.."
-WHISKDIR="$ROOTDIR/../openwhisk"
-UTILDIR="$ROOTDIR/../incubator-openwhisk-utilities"
+IMAGE_PREFIX=$1
+RUNTIME_VERSION=$2
+IMAGE_TAG=$3
 
-export OPENWHISK_HOME=$WHISKDIR
+if [ ${RUNTIME_VERSION} == "1.10" ]; then
+  RUNTIME="golang1.10"
+elif [ ${RUNTIME_VERSION} == "1.11" ]; then
+  RUNTIME="golang1.11"
+fi
 
-IMAGE_PREFIX="testing"
+if [[ ! -z ${DOCKER_USER} ]] && [[ ! -z ${DOCKER_PASSWORD} ]]; then
+docker login -u "${DOCKER_USER}" -p "${DOCKER_PASSWORD}"
+fi
 
-# run scancode using the ASF Release configuration
-cd $UTILDIR
-scancode/scanCode.py --config scancode/ASF-Release.cfg $ROOTDIR
-
-cd $ROOTDIR
-
-# Build/Compile go
-TERM=dumb ./gradlew build
-
-# Build runtime image
-TERM=dumb ./gradlew distDocker -PdockerImagePrefix=${IMAGE_PREFIX}
+if [[ ! -z ${RUNTIME} ]]; then
+TERM=dumb ./gradlew \
+:${RUNTIME}:distDocker \
+-PdockerRegistry=docker.io \
+-PdockerImagePrefix=${IMAGE_PREFIX} \
+-PdockerImageTag=${IMAGE_TAG}
+fi
