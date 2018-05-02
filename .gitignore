@@ -1,11 +1,12 @@
+# Mac
+.DS_Store
+
 .gradle/
 .gogradle/
 *.log
 vendor/
-core/proxy
-core/actionloop-golang/proxy
-core/actionloop-golang/gobuild
-core/actionloop/proxy
+actionProxyLoop/proxy
+golang1.10/proxy
 openwhisk/_test/exec
 openwhisk/_test/hi
 openwhisk/_test/hello_greeting

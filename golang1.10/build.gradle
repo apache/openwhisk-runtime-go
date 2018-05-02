@@ -1,0 +1,22 @@
+ext.dockerImageName = 'actionloop-golang-v1.10'
+apply from: '../gradle/docker.gradle'
+
+distDocker.dependsOn 'copyProxy'
+distDocker.dependsOn 'copyCompiler'
+distDocker.finalizedBy('cleanup')
+
+
+task copyProxy(type: Copy) {
+    from '../actionProxyLoop/proxy'
+    into '.'
+}
+
+task copyCompiler(type: Copy) {
+    from '../common/gobuild.sh'
+    into '.'
+}
+
+task cleanup(type: Delete) {
+    delete 'proxy'
+    delete 'gobuild.sh'
+}

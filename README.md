@@ -17,6 +17,8 @@
 -->
 # Apache OpenWhisk Runtime for Go (and Generic executables)
 
+:warning: Work in progress :warning:
+
 This is an OpenWhisk runtime for Golang and Generic executables.
 
 - [Building it](#building)

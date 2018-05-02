@@ -3,7 +3,7 @@ RUN apt-get -y update && apt-get -y upgrade && apt-get -y install curl jq git
 RUN mkdir /action /home/go
 WORKDIR /action
 ADD proxy /proxy
-ADD gobuild /bin/compile
+ADD gobuild.sh /bin/compile
 RUN curl https://dl.google.com/go/go1.10.1.linux-amd64.tar.gz  | tar xzvf - -C /usr/local
 ENV GOROOT /usr/local/go
 ENV GOPATH /home/go
