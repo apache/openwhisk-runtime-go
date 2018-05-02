@@ -36,7 +36,7 @@ To build and run the test suite, use:
 
 This will build the images:
 
-* `actionloop-golang-v1.9`: an image supporting  Go sources
+* `actionloop-golang-v1.10`: an image supporting  Go sources
 * `actionloop`: the base image, supporting generic executables
 
 The `actionloop` image is used as a basis also for the `actionloop-swift` image. It can be used for supporting other compiled programming languages as long as they implement a `compile` script and the *action loop* protocol described below.
@@ -95,7 +95,7 @@ If you have docker, you can do it this way:
 
 - place your sources under `src` folder in current directory
 - create an `out` folder to receive the binary
-- run: `docker run -v $PWD/src:/src -v $PWD/out openwhisk/actionloop-golang-v1.9 compile`
+- run: `docker run -v $PWD/src:/src -v $PWD/out openwhisk/actionloop-golang-v1.10 compile`
 - you can now use `wsk` to publish the `out/main` executable
 
 If you have a function named in a different way, for example `Hello`, specify `compile hello`. It will produce a binary named `out/hello`

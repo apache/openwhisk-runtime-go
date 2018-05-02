@@ -33,8 +33,9 @@ IMAGE_PREFIX="testing"
 cd $UTILDIR
 scancode/scanCode.py --config scancode/ASF-Release.cfg $ROOTDIR
 
-# Build runtime
+# Build/Compile go
+TERM=dumb ./gradlew build
+
+# Build runtime image
 cd $ROOTDIR
-TERM=dumb ./gradlew \
-distDocker \
--PdockerImagePrefix=${IMAGE_PREFIX}
+TERM=dumb ./gradlew distDocker -PdockerImagePrefix=${IMAGE_PREFIX}

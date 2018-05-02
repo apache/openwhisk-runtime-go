@@ -21,8 +21,6 @@ golang {
 }
 
 
-build.dependsOn check
-
 build.dependsOn vendor
 
 build {

@@ -17,17 +17,20 @@
 sudo: required
 language: go
 go: 
-  - "1.9"
+  - "1.10.1"
 services:
-- docker
+  - docker
 
 notifications:
   email: true
 
 before_install:
-- "./tools/travis/setup.sh"
+  - "./tools/travis/setup.sh"
+
 install: true
+
 script:
-- "./tools/travis/build.sh &&  ./tools/travis/test.sh"
-after_failure: "cat /home/travis/gopath/src/github.com/apache/incubator-openwhisk-runtime-go/.gogradle/reports/test/index.html"
+  - "./tools/travis/build.sh &&  ./tools/travis/test.sh"
+
+after_failure: "cat .gogradle/reports/test/index.html"
 
