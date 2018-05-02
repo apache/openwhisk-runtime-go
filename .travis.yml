@@ -29,5 +29,5 @@ before_install:
 install: true
 script:
 - "./tools/travis/build.sh &&  ./tools/travis/test.sh"
-after_failure: "cat /home/travis/gopath/src/github.com/sciabarracom/incubator-openwhisk-runtime-go/.gogradle/reports/test/index.html"
+after_failure: "cat /home/travis/gopath/src/github.com/apache/incubator-openwhisk-runtime-go/.gogradle/reports/test/index.html"
 

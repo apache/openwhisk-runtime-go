@@ -22,7 +22,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/sciabarracom/incubator-openwhisk-runtime-go/openwhisk"
+	"github.com/apache/incubator-openwhisk-runtime-go/openwhisk"
 )
 
 // flag to enable tracing
