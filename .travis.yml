@@ -34,10 +34,17 @@ deploy:
   on:
     tags: true
     all_branches: true
+    repo: apache/incubator-openwhisk-runtime-go
 - provider: script
-  script: "./tools/travis/publish.sh openwhisk 1.10 master"
+  script: "./tools/travis/publish.sh openwhisk actionProxyLoop master"
   on:
     branch: master
+    repo: apache/incubator-openwhisk-runtime-go
+- provider: script
+  script: "./tools/travis/publish.sh openwhisk golang1.10 master"
+  on:
+    branch: master
+    repo: apache/incubator-openwhisk-runtime-go
 env:
   global:
   - secure: GNKMZjEW1BKBb8NSiFB/Bogh0V5co5TefLLaj9oYJrKCP8rheFY4mWwINR74dYwSFIVmBhuuwZCm62zZwzb2TTivjQihOwU9SeTaUvJHlcLu6j1T/gTcMX5dkDOrdzqZaKoU5NpMbvad1fnDfEG9oU/VE7fARAxziZ2yBXOGkt2p2whkGXrs43gMyRKJv7ytUwpjvzhD48hJHgn0Eq6EwVIYxO5gJfGAhiA0ucH75c3jI4yEz7sw7SaoFxAQRL7VICaTH8JI+tKWU673HCclIRiPeZWQ23rI/f3MV8SNTKJm0GtnjM8LA9uC96qV6f5aXMn1EdaMGoCQbR9jBeqZG7pq8O2QHA/1eNNDw5sCISS05plCJ2yz/G4PUndnuToKm/sx6/qbdRA3QzTrNQfwTTcuUi+j4mYEFANgT774CeGdnajfNy4cZoeVEFmBTXdi5V1DuFLujSQrzRSHddHHUQXGUMaz4qv5R8g2aQNNJzYfknGwG0AbqCKld5j3VNtrjpiUqPAHmAi2O1/4gNd5dM42h4ARNnX4S8M/SPqWmzTAbtXaLcJIKxsyh9Xb1FINiCDsLNiuYWHb2QIjnuiXXgQvy/F1FAn231hJOYq1p6gA0QT/WBaAE77yfDR6EKmvaoBfqUuFQgfjwDH9hdsBiPb9U1jS/74yJqMBFiyW0nU=
