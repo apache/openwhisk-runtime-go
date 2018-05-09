@@ -35,7 +35,7 @@ You need a linux environment, with Java and Docker installed to build the source
 Prerequisites for running build and tests:
 - docker
 - jdk
-- go 1.10.1
+- go 1.10.2
 - bc (sudo apt-get install bc)
 
 To compile go proxy
