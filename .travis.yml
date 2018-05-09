@@ -30,17 +30,20 @@ script:
 after_failure: cat .gogradle/reports/test/index.html
 deploy:
 - provider: script
+  skip_cleanup: true
   script: "./tools/travis/publish.sh openwhisk ${TRAVIS_TAG%@*} ${TRAVIS_TAG##*@}"
   on:
     tags: true
     all_branches: true
     repo: apache/incubator-openwhisk-runtime-go
 - provider: script
+  skip_cleanup: true
   script: "./tools/travis/publish.sh openwhisk actionProxyLoop master"
   on:
     branch: master
     repo: apache/incubator-openwhisk-runtime-go
 - provider: script
+  skip_cleanup: true
   script: "./tools/travis/publish.sh openwhisk golang1.10 master"
   on:
     branch: master
