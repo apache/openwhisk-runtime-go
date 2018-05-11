@@ -11,6 +11,15 @@ plugins {
     id 'com.github.blindpirate.gogradle' version '0.8.1'
 }
 
+dependencies {
+    golang {
+        build 'github.com/h2non/filetype@v1.0.5'
+        build 'github.com/apache/incubator-openwhisk-client-go#e452b524cd745f71c913c5acccf72a8daba6dc71'
+        test 'github.com/stretchr/testify@v1.2.1'
+    }
+}
+
+
 subprojects {
     apply plugin: 'scalafmt'
     scalafmt.configFilePath = gradle.scalafmt.config
