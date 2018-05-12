@@ -30,13 +30,15 @@ This is an OpenWhisk runtime for Golang and Generic executables.
 
 # How to Build
 
-You need a linux environment, with Java and Docker installed to build the sources.
+You need a Linux or an OSX environment, with Java and Docker installed to build the sources.
 
 Prerequisites for running build and tests:
 - docker
 - jdk
 - go 1.10.2
 - bc (sudo apt-get install bc)
+- zip
+- realpath
 
 To compile go proxy
 ```

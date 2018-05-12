@@ -3,9 +3,9 @@
 exec="${1:-main}"
 # absolute path of taget dir or file
 source="${2:-/src}"
-source="$(readlink -f $source)"
+source="$(realpath $source)"
 dest="${3:-/out}"
-dest="$(readlink -f $dest)"
+dest="$(realpath $dest)"
 # prepare a compilation dir
 compiledir="$(mktemp -d)"
 compilefile="$(mktemp)"
