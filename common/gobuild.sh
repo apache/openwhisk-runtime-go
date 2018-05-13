@@ -1,7 +1,7 @@
 #!/bin/bash
 # executable, defaults to main
 exec="${1:-main}"
-# absolute path of taget dir or file
+# absolute path of target dir or file
 source="${2:-/src}"
 source="$(realpath $source)"
 dest="${3:-/out}"

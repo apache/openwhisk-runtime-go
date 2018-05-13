@@ -32,6 +32,27 @@ func Example_compileAction_wrong() {
 	// exit status 1
 }*/
 
+/**
+
+Note to understand tests:
+- tests are run from the openwhisk as the current directory
+- compiler (../../common/gobuild.sh) takes 3 arguments:
+   <main> <source-dir-or-file> <target-dir>
+
+ You create a proxy (NewActionProxy) with the target dir
+ then invoke compilation with the source dir (implicit is 'main' as the function)
+
+ You can test if compilation works with
+
+   cd openwhisk
+   ../common/gobuild.sh main _test/compile/c/exe ./action/c
+
+   _test/precompile.sh simply copies files to test folder
+   _test/postcompile.sh simply checks if the file is compiled
+
+
+*/
+
 func Example_isCompiled() {
 	sys("_test/precompile.sh", "hello.src", "c")
 	file := abs("./_test/compile/c/exec")

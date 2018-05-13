@@ -22,6 +22,11 @@ import (
 	"path/filepath"
 )
 
+/**
+The _test/build.sh script builds some binaries that are used to actually run tests.
+Tests basically submit various binaries to the handler, simulating the init of the runtime.
+**/
+
 func Example_json_init() {
 	fmt.Println(initCode("", ""))
 	fmt.Println(initCode("_test/etc", ""))
@@ -34,17 +39,6 @@ func Example_json_init() {
 	// {"value":{"code":"1\n","main":"world"}}
 	// {"value":{"code":"MQo=","binary":true}}
 	// {"value":{"code":"MQo=","binary":true,"main":"hello"}}
-}
-func Example_badinit_nocompiler1() {
-	ts, cur, log := startTestServer("")
-	sys("_test/build.sh")
-	doRun(ts, "")
-	doInit(ts, "{}")
-	doInit(ts, initBinary("_test/exec", "")) // empty
-	stopTestServer(ts, cur, log)
-	// Output:
-	// -
-
 }
 
 func Example_badinit_nocompiler() {
