@@ -17,7 +17,35 @@
 
 package openwhisk
 
-import "path/filepath"
+import (
+	"fmt"
+	"path/filepath"
+)
+
+func Example_json_init() {
+	fmt.Println(initCode("", ""))
+	fmt.Println(initCode("_test/etc", ""))
+	fmt.Println(initCode("_test/etc", "world"))
+	fmt.Println(initBinary("_test/etc", ""))
+	fmt.Println(initBinary("_test/etc", "hello"))
+	// Output:
+	// {"value":{}}
+	// {"value":{"code":"1\n"}}
+	// {"value":{"code":"1\n","main":"world"}}
+	// {"value":{"code":"MQo=","binary":true}}
+	// {"value":{"code":"MQo=","binary":true,"main":"hello"}}
+}
+func Example_badinit_nocompiler1() {
+	ts, cur, log := startTestServer("")
+	sys("_test/build.sh")
+	doRun(ts, "")
+	doInit(ts, "{}")
+	doInit(ts, initBinary("_test/exec", "")) // empty
+	stopTestServer(ts, cur, log)
+	// Output:
+	// -
+
+}
 
 func Example_badinit_nocompiler() {
 	ts, cur, log := startTestServer("")
@@ -37,7 +65,6 @@ func Example_badinit_nocompiler() {
 	// 400 {"error":"cannot start action: command exited"}
 	// 400 {"error":"cannot start action: command exited"}
 	// 400 {"error":"no action defined yet"}
-
 }
 
 func Example_bininit_nocompiler() {

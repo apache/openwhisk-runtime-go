@@ -48,8 +48,8 @@ func TestStartLatestAction(t *testing.T) {
 
 	// cleanup
 	os.RemoveAll("./action")
-	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action", "", log)
+	logf, _ := ioutil.TempFile("/tmp", "log")
+	ap := NewActionProxy("./action", "", logf)
 
 	// start an action that terminate immediately
 	buf := []byte("#!/bin/sh\ntrue\n")

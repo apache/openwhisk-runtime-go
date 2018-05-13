@@ -66,7 +66,7 @@ func Example_compileAction_singlefile_main() {
 	sys("_test/postcompile.sh", "_test/compile/1/exec")
 	// Output:
 	// <nil>
-	// _test/compile/1/exec: application/x-executable; charset=binary
+	// _test/compile/1/exec: application/x-executable
 	// name=Mike
 	// {"message":"Hello, Mike!"}
 }
@@ -79,7 +79,7 @@ func Example_compileAction_singlefile_main_out() {
 	sys("_test/postcompile.sh", "_test/output/1a/main")
 	// Output:
 	// <nil>
-	// _test/output/1a/main: application/x-executable; charset=binary
+	// _test/output/1a/main: application/x-executable
 	// name=Mike
 	// {"message":"Hello, Mike!"}
 }
@@ -92,7 +92,7 @@ func Example_compileAction_singlefile_hello() {
 	sys("_test/postcompile.sh", "_test/compile/2/exec")
 	// Output:
 	// <nil>
-	// _test/compile/2/exec: application/x-executable; charset=binary
+	// _test/compile/2/exec: application/x-executable
 	// name=Mike
 	// {"hello":"Hello, Mike!"}
 }
@@ -105,7 +105,7 @@ func Example_compileAction_singlefile_hello_out() {
 	sys("_test/postcompile.sh", "_test/output/2a/hello")
 	// Output:
 	// <nil>
-	// _test/output/2a/hello: application/x-executable; charset=binary
+	// _test/output/2a/hello: application/x-executable
 	// name=Mike
 	// {"hello":"Hello, Mike!"}
 }
@@ -118,7 +118,7 @@ func Example_compileAction_multifile_main() {
 	sys("_test/postcompile.sh", "_test/compile/3/main")
 	// Output:
 	// <nil>
-	// _test/compile/3/main: application/x-executable; charset=binary
+	// _test/compile/3/main: application/x-executable
 	// Main:
 	// Hello, Mike
 	// {"greetings":"Hello, Mike"}
@@ -132,7 +132,7 @@ func Example_compileAction_multifile_main_out() {
 	sys("_test/postcompile.sh", "_test/output/3a/main")
 	// Output:
 	// <nil>
-	// _test/output/3a/main: application/x-executable; charset=binary
+	// _test/output/3a/main: application/x-executable
 	// Main:
 	// Hello, Mike
 	// {"greetings":"Hello, Mike"}
@@ -146,7 +146,7 @@ func Example_compileAction_multifile_hello() {
 	sys("_test/postcompile.sh", "_test/compile/4/hello")
 	// Output:
 	// <nil>
-	// _test/compile/4/hello: application/x-executable; charset=binary
+	// _test/compile/4/hello: application/x-executable
 	// Hello, Mike
 	// {"greetings":"Hello, Mike"}
 }
@@ -159,7 +159,7 @@ func Example_compileAction_multifile_hello_out() {
 	sys("_test/postcompile.sh", "_test/output/4a/hello")
 	// Output:
 	// <nil>
-	// _test/output/4a/hello: application/x-executable; charset=binary
+	// _test/output/4a/hello: application/x-executable
 	// Hello, Mike
 	// {"greetings":"Hello, Mike"}
 }

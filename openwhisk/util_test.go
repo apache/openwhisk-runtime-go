@@ -27,9 +27,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"time"
+
+	"github.com/h2non/filetype"
 )
 
 func startTestServer(compiler string) (*httptest.Server, string, *os.File) {
@@ -118,24 +121,42 @@ func abs(in string) string {
 	return out
 }
 
-func Example_json_init() {
-	fmt.Println(initCode("", ""))
-	fmt.Println(initCode("_test/etc", ""))
-	fmt.Println(initCode("_test/etc", "world"))
-	fmt.Println(initBinary("_test/etc", ""))
-	fmt.Println(initBinary("_test/etc", "hello"))
-	// Output:
-	// {"value":{}}
-	// {"value":{"code":"1\n"}}
-	// {"value":{"code":"1\n","main":"world"}}
-	// {"value":{"code":"MQo=","binary":true}}
-	// {"value":{"code":"MQo=","binary":true,"main":"hello"}}
-}
-
 func dump(file *os.File) {
 	//file.Read()
 	buf, _ := ioutil.ReadFile(file.Name())
 	fmt.Print(string(buf))
 	//fmt.Print(file.ReadAll())
 	os.Remove(file.Name())
+}
+
+func sys(cli string, args ...string) {
+	os.Chmod(cli, 0755)
+	cmd := exec.Command(cli, args...)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Print(err)
+	} else {
+		fmt.Print(string(out))
+	}
+}
+
+func exists(dir, filename string) error {
+	path := fmt.Sprintf("%s/%d/%s", dir, highestDir(dir), filename)
+	_, err := os.Stat(path)
+	return err
+}
+
+// definig a type to recognizing also mac executables
+var pseudoElfForMacType = filetype.NewType("elf", "darwin/mach")
+
+func pseudoElfForMacMatcher(buf []byte) bool {
+	return len(buf) > 4 && buf[0] == 0xcf && buf[1] == 0xfa && buf[2] == 0xed && buf[3] == 0xfe
+}
+
+func detect(dir, filename string) string {
+	path := fmt.Sprintf("%s/%d/%s", dir, highestDir(dir), filename)
+	file, _ := ioutil.ReadFile(path)
+	filetype.AddMatcher(pseudoElfForMacType, pseudoElfForMacMatcher)
+	kind, _ := filetype.Match(file)
+	return kind.Extension
 }

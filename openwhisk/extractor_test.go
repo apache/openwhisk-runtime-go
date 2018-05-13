@@ -18,40 +18,12 @@
 package openwhisk
 
 import (
-	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
-	"os/exec"
 	"testing"
 
-	"github.com/h2non/filetype"
 	"github.com/stretchr/testify/assert"
 )
-
-func sys(cli string, args ...string) {
-	os.Chmod(cli, 0755)
-	cmd := exec.Command(cli, args...)
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		log.Print(err)
-	} else {
-		fmt.Print(string(out))
-	}
-}
-
-func exists(dir, filename string) error {
-	path := fmt.Sprintf("%s/%d/%s", dir, highestDir(dir), filename)
-	_, err := os.Stat(path)
-	return err
-}
-
-func detect(dir, filename string) string {
-	path := fmt.Sprintf("%s/%d/%s", dir, highestDir(dir), filename)
-	file, _ := ioutil.ReadFile(path)
-	kind, _ := filetype.Match(file)
-	return kind.Extension
-}
 
 func TestExtractActionTest_exec(t *testing.T) {
 	log, _ := ioutil.TempFile("", "log")
