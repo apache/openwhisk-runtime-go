@@ -3,6 +3,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     jq \
     git \
+    realpath \
     && rm -rf /var/lib/apt/lists/*
 RUN mkdir /action /home/go
 WORKDIR /action
