@@ -24,7 +24,7 @@ function build {
    fi
    cp $1.src $1.go
    go build -a -o $1 $1.go
-   rm $1.go  
+   rm $1.go
 }
 
 function zipit {
