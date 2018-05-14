@@ -1,3 +1,4 @@
+// +build linux
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -15,26 +16,29 @@
  * limitations under the License.
  */
 
+ /*
+This test depends on the fact the proxy can detect the termination
+of an executable that terminates before or after reading the output.
+On OSX command termination is not detected until some input is read.
+*/
 package openwhisk
 
-import (
-	"fmt"
-)
-
-func Example_startTestServer() {
+func Example_badinit_nocompiler() {
 	ts, cur, log := startTestServer("")
-	res, _, _ := doPost(ts.URL+"/init", "{}")
-	fmt.Print(res)
-	res, _, _ = doPost(ts.URL+"/init", "XXX")
-	fmt.Print(res)
-	res, _, _ = doPost(ts.URL+"/run", "{}")
-	fmt.Print(res)
-	res, _, _ = doPost(ts.URL+"/run", "XXX")
-	fmt.Print(res)
+	sys("_test/build.sh")
+	doRun(ts, "")
+	doInit(ts, "{}")
+	//sys("ls", "_test/exec")
+	doInit(ts, initBinary("_test/exec", ""))      // empty
+	doInit(ts, initBinary("_test/hi", ""))        // say hi
+	doInit(ts, initBinary("_test/hello.src", "")) // source not excutable
+	doRun(ts, "")
 	stopTestServer(ts, cur, log)
 	// Output:
-	// {"ok":true}
-	// {"error":"Error unmarshaling request: invalid character 'X' looking for beginning of value"}
-	// {"error":"no action defined yet"}
-	// {"error":"Error unmarshaling request: invalid character 'X' looking for beginning of value"}
+	// 400 {"error":"no action defined yet"}
+	// 200 {"ok":true}
+	// 400 {"error":"cannot start action: command exited"}
+	// 400 {"error":"cannot start action: command exited"}
+	// 400 {"error":"cannot start action: command exited"}
+	// 400 {"error":"no action defined yet"}
 }

@@ -22,29 +22,31 @@
 This is an OpenWhisk runtime for Golang and Generic executables.
 
 - [Building it](#building)
+- [Developing it](#development)
 - [Using it with Go Sources](#gosources)
 - [Precompiling Go Sources](#precompile)
 - [Using it with Generic executables](#generic)
 
 <a name="building"/>
 
-# How to Build
+# How to Build and Test
 
 You need a Linux or an OSX environment, with Java and Docker installed to build the sources.
 
-Prerequisites for running build and tests:
+Prerequisites for running build and tests with gradle:
+
 - docker
 - jdk
-- go 1.10.2
-- bc (sudo apt-get install bc)
-- zip
-- realpath
 
-To compile go proxy
+
+To compile go proxy *in amd64 architecture* for docker:
+
 ```
 ./gradlew build
 ```
-To build the docker images after compiling go proxy
+
+To build the docker images after compiling go proxy:
+
 ```
 ./gradlew distDocker
 ```
@@ -60,6 +62,26 @@ To run tests
 ```
 ./gradlew test --info
 ```
+<a name="development"/>
+
+# Local Development
+
+If you want to develop the proxy and run tests natively, you can on Linux or OSX. 
+Tested on Ubuntu Linux (14.04) and OSX 10.13. Probably other distributions work, maybe even Windows with WSL, but since it is not tested YMMMV.
+
+You need of course [go 1.10.2](https://golang.org/doc/install)
+
+Then you need a set of utilities used in tests:
+
+- bc 
+- zip
+- realpath
+
+Linux: `apt-get install bc zip realpath` 
+OSX: `brew install zip coreutils`
+
+**NOTE**: Because tests build and cache some binary files, perform a `git clean -fx` and **do not share folders between linux and osx** because binaries are in different format...
+
 
 <a name="gosources"/>
 
