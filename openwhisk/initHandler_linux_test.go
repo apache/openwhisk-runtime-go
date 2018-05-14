@@ -1,4 +1,5 @@
 // +build linux
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -16,7 +17,7 @@
  * limitations under the License.
  */
 
- /*
+/*
 This test depends on the fact the proxy can detect the termination
 of an executable that terminates before or after reading the output.
 On OSX command termination is not detected until some input is read.
