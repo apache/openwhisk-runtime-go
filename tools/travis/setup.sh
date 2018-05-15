@@ -28,3 +28,5 @@ HOMEDIR="$SCRIPTDIR/../../../"
 cd $HOMEDIR
 git clone https://github.com/apache/incubator-openwhisk-utilities.git
 
+# add realpath
+apt-get -y update && apt-get -y install realpath 
