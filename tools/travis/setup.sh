@@ -23,7 +23,6 @@ set -e
 SCRIPTDIR=$(cd $(dirname "$0") && pwd)
 ROOTDIR="$SCRIPTDIR/../.."
 HOMEDIR="$SCRIPTDIR/../../../"
-sudo apt-get install -y realpath
 
 # clone OpenWhisk utilities repo. in order to run scanCode
 cd $HOMEDIR
