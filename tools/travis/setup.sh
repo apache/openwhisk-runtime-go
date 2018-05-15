@@ -29,4 +29,4 @@ cd $HOMEDIR
 git clone https://github.com/apache/incubator-openwhisk-utilities.git
 
 # add realpath
-sudo apt-get -y update && sudo apt-get -y install realpath 
+sudo apt-get -y update && sudo apt-get -y install realpath
