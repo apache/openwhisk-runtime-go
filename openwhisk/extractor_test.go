@@ -28,7 +28,6 @@ import (
 func TestExtractActionTest_exec(t *testing.T) {
 	log, _ := ioutil.TempFile("", "log")
 	ap := NewActionProxy("./action/x1", "", log)
-	sys("_test/build.sh")
 	// cleanup
 	assert.Nil(t, os.RemoveAll("./action/x1"))
 	file, _ := ioutil.ReadFile("_test/exec")
@@ -39,7 +38,6 @@ func TestExtractActionTest_exec(t *testing.T) {
 func TestExtractActionTest_exe(t *testing.T) {
 	log, _ := ioutil.TempFile("", "log")
 	ap := NewActionProxy("./action/x2", "", log)
-	sys("_test/build.sh")
 	// cleanup
 	assert.Nil(t, os.RemoveAll("./action/x2"))
 	// match  exe
@@ -50,7 +48,6 @@ func TestExtractActionTest_exe(t *testing.T) {
 
 func TestExtractActionTest_zip(t *testing.T) {
 	log, _ := ioutil.TempFile("", "log")
-	sys("_test/build.sh")
 	ap := NewActionProxy("./action/x3", "", log)
 	// cleanup
 	assert.Nil(t, os.RemoveAll("./action/x3"))

@@ -43,7 +43,6 @@ func Example_json_init() {
 
 func Example_bininit_nocompiler() {
 	ts, cur, log := startTestServer("")
-	sys("_test/build.sh")
 	doRun(ts, "")
 	doInit(ts, initBinary("_test/hello_message", ""))
 	doRun(ts, "")
@@ -66,7 +65,6 @@ func Example_bininit_nocompiler() {
 
 func Example_zipinit_nocompiler() {
 	ts, cur, log := startTestServer("")
-	sys("_test/build.sh")
 	doRun(ts, "")
 	doInit(ts, initBinary("_test/hello_greeting.zip", ""))
 	doRun(ts, "")
@@ -110,7 +108,6 @@ func Example_shell_nocompiler() {
 
 func Example_main_nocompiler() {
 	ts, cur, log := startTestServer("")
-	sys("_test/build.sh")
 	doRun(ts, "")
 	doInit(ts, initBinary("_test/hello_message", "message"))
 	doRun(ts, "")
@@ -133,7 +130,6 @@ func Example_main_nocompiler() {
 
 func Example_main_zipinit_nocompiler() {
 	ts, cur, log := startTestServer("")
-	sys("_test/build.sh")
 	doRun(ts, "")
 	doInit(ts, initBinary("_test/hello_greeting.zip", "greeting"))
 	doInit(ts, initBinary("_test/hello_greeting1.zip", "greeting"))
@@ -161,7 +157,6 @@ func Example_main_zipinit_nocompiler() {
 func Example_compile_simple() {
 	comp, _ := filepath.Abs("../common/gobuild.sh")
 	ts, cur, log := startTestServer(comp)
-	sys("_test/build.sh")
 	doRun(ts, "")
 	doInit(ts, initCode("_test/hello.src", ""))
 	doRun(ts, "")
@@ -195,7 +190,6 @@ func Example_compile_withMain() {
 }
 
 func Example_compile_withZipSrc() {
-	sys("_test/zips.sh")
 	comp, _ := filepath.Abs("../common/gobuild.sh")
 	ts, cur, log := startTestServer(comp)
 	doRun(ts, "")

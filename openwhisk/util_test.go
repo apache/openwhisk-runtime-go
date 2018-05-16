@@ -30,6 +30,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"testing"
 	"time"
 
 	"github.com/h2non/filetype"
@@ -159,4 +160,11 @@ func detect(dir, filename string) string {
 	filetype.AddMatcher(pseudoElfForMacType, pseudoElfForMacMatcher)
 	kind, _ := filetype.Match(file)
 	return kind.Extension
+}
+
+func TestMain(m *testing.M) {
+	sys("_test/build.sh")
+	sys("_test/zips.sh")
+	code := m.Run()
+	os.Exit(code)
 }

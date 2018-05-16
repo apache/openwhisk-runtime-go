@@ -26,7 +26,6 @@ package openwhisk
 
 func Example_badinit_nocompiler() {
 	ts, cur, log := startTestServer("")
-	sys("_test/build.sh")
 	doRun(ts, "")
 	doInit(ts, "{}")
 	//sys("ls", "_test/exec")
