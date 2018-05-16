@@ -19,14 +19,14 @@ if netstat -tlnp 2>/dev/null | grep :8080 >/dev/null
 then exit 0
 fi
 cd "$(dirname $0)"
-bin/build.sh src/hello_greeting.go 
-bin/build.sh src/hello_message.go 
+bin/build.sh src/hello_greeting.go
+bin/build.sh src/hello_message.go
 bin/build.sh src/empty.go
 bin/build.sh src/hi.go
 zip -j zip/hello_message1.zip bin/hello_message
 rm -Rvf action
 mkdir action
 if test -n "$1"
-then docker run --name=goproxy -p 8080:8080 -d "$@" 
+then docker run --name=goproxy -p 8080:8080 -d "$@"
 else go run ../main/proxy.go -debug
 fi

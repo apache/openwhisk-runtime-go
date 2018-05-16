@@ -200,3 +200,18 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+============
+MIT licenses
+============
+
+This distribution depends on the following components, which are available under an MIT License (https://opensource.org/licenses/MIT).
+
+Filetype 1.0.5 (https://github.com/h2non/filetype)
+  Licence included at LICENSE-filetype.txt or https://github.com/h2non/filetype/blob/v1.0.5/LICENSE 
+  Copyright (c) Tomas Aparicio
+
+Testify 1.2.1 (https://github.com/stretchr/testify)
+  Licence included at LICENSE-testify.txt orhttps://github.com/stretchr/testify/blob/v1.2.1/LICENSE
+  Copyright (c) 2012 - 2013 Mat Ryer and Tyler Bunnell
+

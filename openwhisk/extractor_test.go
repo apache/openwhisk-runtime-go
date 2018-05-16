@@ -18,45 +18,16 @@
 package openwhisk
 
 import (
-	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
-	"os/exec"
 	"testing"
 
-	"github.com/h2non/filetype"
 	"github.com/stretchr/testify/assert"
 )
-
-func sys(cli string, args ...string) {
-	os.Chmod(cli, 0755)
-	cmd := exec.Command(cli, args...)
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		log.Print(err)
-	} else {
-		fmt.Print(string(out))
-	}
-}
-
-func exists(dir, filename string) error {
-	path := fmt.Sprintf("%s/%d/%s", dir, highestDir(dir), filename)
-	_, err := os.Stat(path)
-	return err
-}
-
-func detect(dir, filename string) string {
-	path := fmt.Sprintf("%s/%d/%s", dir, highestDir(dir), filename)
-	file, _ := ioutil.ReadFile(path)
-	kind, _ := filetype.Match(file)
-	return kind.Extension
-}
 
 func TestExtractActionTest_exec(t *testing.T) {
 	log, _ := ioutil.TempFile("", "log")
 	ap := NewActionProxy("./action/x1", "", log)
-	sys("_test/build.sh")
 	// cleanup
 	assert.Nil(t, os.RemoveAll("./action/x1"))
 	file, _ := ioutil.ReadFile("_test/exec")
@@ -67,7 +38,6 @@ func TestExtractActionTest_exec(t *testing.T) {
 func TestExtractActionTest_exe(t *testing.T) {
 	log, _ := ioutil.TempFile("", "log")
 	ap := NewActionProxy("./action/x2", "", log)
-	sys("_test/build.sh")
 	// cleanup
 	assert.Nil(t, os.RemoveAll("./action/x2"))
 	// match  exe
@@ -78,7 +48,6 @@ func TestExtractActionTest_exe(t *testing.T) {
 
 func TestExtractActionTest_zip(t *testing.T) {
 	log, _ := ioutil.TempFile("", "log")
-	sys("_test/build.sh")
 	ap := NewActionProxy("./action/x3", "", log)
 	// cleanup
 	assert.Nil(t, os.RemoveAll("./action/x3"))

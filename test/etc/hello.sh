@@ -21,7 +21,7 @@ do
    if test "$name" == ""
    then exit
    fi
-   echo "name=$name" 
+   echo "name=$name"
    hello="Hello, $name"
    echo '{"hello":"'$hello'"}' >&3
 done

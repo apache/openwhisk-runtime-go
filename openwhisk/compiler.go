@@ -23,13 +23,22 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"runtime"
 
 	"github.com/h2non/filetype"
 )
 
+// this is only to let test run on OSX
+// it only recognizes OSX Mach 64 bit executable
+// (magic number: facefeed + 64bit flag)
+var mach64Type = filetype.NewType("mach", "darwin/mach")
+
+func mach64Matcher(buf []byte) bool {
+	return len(buf) > 4 && buf[0] == 0xcf && buf[1] == 0xfa && buf[2] == 0xed && buf[3] == 0xfe
+}
+
 // check if the file is already compiled
 // if the file is a directoy look for a file with the given name
-
 func isCompiled(fileOrDir string, name string) bool {
 	fi, err := os.Stat(fileOrDir)
 	if err != nil {
@@ -41,18 +50,26 @@ func isCompiled(fileOrDir string, name string) bool {
 		file = fmt.Sprintf("%s/%s", fileOrDir, name)
 	}
 
-	log.Printf("isCompiled: %s", file)
 	buf, err := ioutil.ReadFile(file)
 	if err != nil {
 		log.Println(err)
 		return false
 	}
+	// if a mac add a matched for mac
+	if runtime.GOOS == "darwin" {
+		filetype.AddMatcher(mach64Type, mach64Matcher)
+	}
+
 	kind, err := filetype.Match(buf)
+	log.Printf("isCompiled: %s kind=%s", file, kind)
 	if err != nil {
 		log.Println(err)
 		return false
 	}
 	if kind.Extension == "elf" {
+		return true
+	}
+	if kind.Extension == "mach" {
 		return true
 	}
 	return false

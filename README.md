@@ -1,20 +1,22 @@
 <!--
 #
-# Licensed to the Apache Software Foundation (ASF) under one or more contributor 
-# license agreements.  See the NOTICE file distributed with this work for additional 
-# information regarding copyright ownership.  The ASF licenses this file to you
-# under the Apache License, Version 2.0 (the # "License"); you may not use this 
-# file except in compliance with the License.  You may obtain a copy of the License 
-# at:
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
 #
-# http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software distributed 
-# under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
-# CONDITIONS OF ANY KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 -->
+
 # Apache OpenWhisk Runtime for Go (and Generic executables)
 
 :warning: Work in progress :warning:
@@ -22,27 +24,31 @@
 This is an OpenWhisk runtime for Golang and Generic executables.
 
 - [Building it](#building)
+- [Developing it](#development)
 - [Using it with Go Sources](#gosources)
 - [Precompiling Go Sources](#precompile)
 - [Using it with Generic executables](#generic)
 
 <a name="building"/>
 
-# How to Build
+# How to Build and Test
 
-You need a linux environment, with Java and Docker installed to build the sources.
+You need a Linux or an OSX environment, with Java and Docker installed to build the sources.
 
-Prerequisites for running build and tests:
+Prerequisites for running build and tests with gradle:
+
 - docker
 - jdk
-- go 1.10.2
-- bc (sudo apt-get install bc)
 
-To compile go proxy
+
+To compile go proxy *in amd64 architecture* for docker:
+
 ```
 ./gradlew build
 ```
-To build the docker images after compiling go proxy
+
+To build the docker images after compiling go proxy:
+
 ```
 ./gradlew distDocker
 ```
@@ -58,12 +64,32 @@ To run tests
 ```
 ./gradlew test --info
 ```
+<a name="development"/>
+
+# Local Development
+
+If you want to develop the proxy and run tests natively, you can on Linux or OSX.
+Tested on Ubuntu Linux (14.04) and OSX 10.13. Probably other distributions work, maybe even Windows with WSL, but since it is not tested YMMMV.
+
+You need of course [go 1.10.2](https://golang.org/doc/install)
+
+Then you need a set of utilities used in tests:
+
+- bc
+- zip
+- realpath
+
+Linux: `apt-get install bc zip realpath`
+OSX: `brew install zip coreutils`
+
+**NOTE**: Because tests build and cache some binary files, perform a `git clean -fx` and **do not share folders between linux and osx** because binaries are in different format...
+
 
 <a name="gosources"/>
 
 # Using it with Go Sources
 
-The image can execute, compiling them on the fly, Golang OpenWhisk actions in source format. An action must be a Go source file, placed in the `action` package, implementing the `Main` function (or the function specified as `main`).  
+The image can execute, compiling them on the fly, Golang OpenWhisk actions in source format. An action must be a Go source file, placed in the `action` package, implementing the `Main` function (or the function specified as `main`).
 
 The expected signature is:
 
@@ -92,7 +118,7 @@ func Main(event json.RawMessage) (json.RawMessage, error) {
     name = "Stranger"
   }
   msg := map[string]string{"message": ("Hello, " + name + "!")}
-  // log in stdout or in stderr 
+  // log in stdout or in stderr
   log.Printf("name=%s\n", name)
   // encode the result back in json
   return json.Marshal(msg)
@@ -122,7 +148,7 @@ If you have a function named in a different way, for example `Hello`, specify `c
 
 # Using it with generic Binaries
 
-The `actionloop` image is designed to support generic linux executable in an efficient way. 
+The `actionloop` image is designed to support generic linux executable in an efficient way.
 
 As such it works with any executable that supports the following simple protocol:
 

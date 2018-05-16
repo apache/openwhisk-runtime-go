@@ -17,32 +17,32 @@
 
 package openwhisk
 
-import "path/filepath"
+import (
+	"fmt"
+	"path/filepath"
+)
 
-func Example_badinit_nocompiler() {
-	ts, cur, log := startTestServer("")
-	sys("_test/build.sh")
-	doRun(ts, "")
-	doInit(ts, "{}")
-	//sys("ls", "_test/exec")
-	doInit(ts, initBinary("_test/exec", ""))      // empty
-	doInit(ts, initBinary("_test/hi", ""))        // say hi
-	doInit(ts, initBinary("_test/hello.src", "")) // source not excutable
-	doRun(ts, "")
-	stopTestServer(ts, cur, log)
+/**
+The _test/build.sh script builds some binaries that are used to actually run tests.
+Tests basically submit various binaries to the handler, simulating the init of the runtime.
+**/
+
+func Example_json_init() {
+	fmt.Println(initCode("", ""))
+	fmt.Println(initCode("_test/etc", ""))
+	fmt.Println(initCode("_test/etc", "world"))
+	fmt.Println(initBinary("_test/etc", ""))
+	fmt.Println(initBinary("_test/etc", "hello"))
 	// Output:
-	// 400 {"error":"no action defined yet"}
-	// 200 {"ok":true}
-	// 400 {"error":"cannot start action: command exited"}
-	// 400 {"error":"cannot start action: command exited"}
-	// 400 {"error":"cannot start action: command exited"}
-	// 400 {"error":"no action defined yet"}
-
+	// {"value":{}}
+	// {"value":{"code":"1\n"}}
+	// {"value":{"code":"1\n","main":"world"}}
+	// {"value":{"code":"MQo=","binary":true}}
+	// {"value":{"code":"MQo=","binary":true,"main":"hello"}}
 }
 
 func Example_bininit_nocompiler() {
 	ts, cur, log := startTestServer("")
-	sys("_test/build.sh")
 	doRun(ts, "")
 	doInit(ts, initBinary("_test/hello_message", ""))
 	doRun(ts, "")
@@ -65,7 +65,6 @@ func Example_bininit_nocompiler() {
 
 func Example_zipinit_nocompiler() {
 	ts, cur, log := startTestServer("")
-	sys("_test/build.sh")
 	doRun(ts, "")
 	doInit(ts, initBinary("_test/hello_greeting.zip", ""))
 	doRun(ts, "")
@@ -86,7 +85,7 @@ func Example_zipinit_nocompiler() {
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
 }
 
-/* commented out test for timing problems
+/* commented out test for timing problems*/
 func Example_shell_nocompiler() {
 	ts, cur, log := startTestServer("")
 	doRun(ts, "")
@@ -105,11 +104,10 @@ func Example_shell_nocompiler() {
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
 	// Goodbye!
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
-}*/
+} /**/
 
 func Example_main_nocompiler() {
 	ts, cur, log := startTestServer("")
-	sys("_test/build.sh")
 	doRun(ts, "")
 	doInit(ts, initBinary("_test/hello_message", "message"))
 	doRun(ts, "")
@@ -132,7 +130,6 @@ func Example_main_nocompiler() {
 
 func Example_main_zipinit_nocompiler() {
 	ts, cur, log := startTestServer("")
-	sys("_test/build.sh")
 	doRun(ts, "")
 	doInit(ts, initBinary("_test/hello_greeting.zip", "greeting"))
 	doInit(ts, initBinary("_test/hello_greeting1.zip", "greeting"))
@@ -160,7 +157,6 @@ func Example_main_zipinit_nocompiler() {
 func Example_compile_simple() {
 	comp, _ := filepath.Abs("../common/gobuild.sh")
 	ts, cur, log := startTestServer(comp)
-	sys("_test/build.sh")
 	doRun(ts, "")
 	doInit(ts, initCode("_test/hello.src", ""))
 	doRun(ts, "")
@@ -194,7 +190,6 @@ func Example_compile_withMain() {
 }
 
 func Example_compile_withZipSrc() {
-	sys("_test/zips.sh")
 	comp, _ := filepath.Abs("../common/gobuild.sh")
 	ts, cur, log := startTestServer(comp)
 	doRun(ts, "")

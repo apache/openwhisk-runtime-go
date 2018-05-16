@@ -32,6 +32,27 @@ func Example_compileAction_wrong() {
 	// exit status 1
 }*/
 
+/**
+
+Note to understand tests:
+- tests are run from the openwhisk as the current directory
+- compiler (../../common/gobuild.sh) takes 3 arguments:
+   <main> <source-dir-or-file> <target-dir>
+
+ You create a proxy (NewActionProxy) with the target dir
+ then invoke compilation with the source dir (implicit is 'main' as the function)
+
+ You can test if compilation works with
+
+   cd openwhisk
+   ../common/gobuild.sh main _test/compile/c/exe ./action/c
+
+   _test/precompile.sh simply copies files to test folder
+   _test/postcompile.sh simply checks if the file is compiled
+
+
+*/
+
 func Example_isCompiled() {
 	sys("_test/precompile.sh", "hello.src", "c")
 	file := abs("./_test/compile/c/exec")
@@ -66,7 +87,7 @@ func Example_compileAction_singlefile_main() {
 	sys("_test/postcompile.sh", "_test/compile/1/exec")
 	// Output:
 	// <nil>
-	// _test/compile/1/exec: application/x-executable; charset=binary
+	// _test/compile/1/exec: application/x-executable
 	// name=Mike
 	// {"message":"Hello, Mike!"}
 }
@@ -79,7 +100,7 @@ func Example_compileAction_singlefile_main_out() {
 	sys("_test/postcompile.sh", "_test/output/1a/main")
 	// Output:
 	// <nil>
-	// _test/output/1a/main: application/x-executable; charset=binary
+	// _test/output/1a/main: application/x-executable
 	// name=Mike
 	// {"message":"Hello, Mike!"}
 }
@@ -92,7 +113,7 @@ func Example_compileAction_singlefile_hello() {
 	sys("_test/postcompile.sh", "_test/compile/2/exec")
 	// Output:
 	// <nil>
-	// _test/compile/2/exec: application/x-executable; charset=binary
+	// _test/compile/2/exec: application/x-executable
 	// name=Mike
 	// {"hello":"Hello, Mike!"}
 }
@@ -105,7 +126,7 @@ func Example_compileAction_singlefile_hello_out() {
 	sys("_test/postcompile.sh", "_test/output/2a/hello")
 	// Output:
 	// <nil>
-	// _test/output/2a/hello: application/x-executable; charset=binary
+	// _test/output/2a/hello: application/x-executable
 	// name=Mike
 	// {"hello":"Hello, Mike!"}
 }
@@ -118,7 +139,7 @@ func Example_compileAction_multifile_main() {
 	sys("_test/postcompile.sh", "_test/compile/3/main")
 	// Output:
 	// <nil>
-	// _test/compile/3/main: application/x-executable; charset=binary
+	// _test/compile/3/main: application/x-executable
 	// Main:
 	// Hello, Mike
 	// {"greetings":"Hello, Mike"}
@@ -132,7 +153,7 @@ func Example_compileAction_multifile_main_out() {
 	sys("_test/postcompile.sh", "_test/output/3a/main")
 	// Output:
 	// <nil>
-	// _test/output/3a/main: application/x-executable; charset=binary
+	// _test/output/3a/main: application/x-executable
 	// Main:
 	// Hello, Mike
 	// {"greetings":"Hello, Mike"}
@@ -146,7 +167,7 @@ func Example_compileAction_multifile_hello() {
 	sys("_test/postcompile.sh", "_test/compile/4/hello")
 	// Output:
 	// <nil>
-	// _test/compile/4/hello: application/x-executable; charset=binary
+	// _test/compile/4/hello: application/x-executable
 	// Hello, Mike
 	// {"greetings":"Hello, Mike"}
 }
@@ -159,7 +180,7 @@ func Example_compileAction_multifile_hello_out() {
 	sys("_test/postcompile.sh", "_test/output/4a/hello")
 	// Output:
 	// <nil>
-	// _test/output/4a/hello: application/x-executable; charset=binary
+	// _test/output/4a/hello: application/x-executable
 	// Hello, Mike
 	// {"greetings":"Hello, Mike"}
 }

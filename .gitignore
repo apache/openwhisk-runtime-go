@@ -8,6 +8,7 @@ vendor/
 actionProxyLoop/proxy
 golang1.10/proxy
 openwhisk/_test/exec
+openwhisk/_test/exec.go
 openwhisk/_test/hi
 openwhisk/_test/hello_greeting
 openwhisk/_test/hello_message

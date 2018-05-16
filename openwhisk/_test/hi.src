@@ -17,8 +17,13 @@
 
 package main
 
-import "fmt"
+import (
+	"bufio"
+	"os"
+)
 
 func main() {
-	fmt.Println("hi")
+	f := bufio.NewWriter(os.Stdout)
+	defer f.Flush()
+	f.Write([]byte("hi\n"))
 }
