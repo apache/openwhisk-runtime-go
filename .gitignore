@@ -1,12 +1,19 @@
 # Mac
 .DS_Store
 
+# Gradle
 .gradle/
 .gogradle/
 *.log
+
+# Dependencies
 vendor/
+
+# Go binary proxy
 actionProxyLoop/proxy
 golang1.10/proxy
+
+# Go test transient files
 openwhisk/_test/exec
 openwhisk/_test/exec.go
 openwhisk/_test/hi
@@ -18,3 +25,17 @@ openwhisk/_test/output/
 openwhisk/action/
 openwhisk/compile/
 openwhisk/debug.test
+
+# Eclipse
+tests/bin/
+**/.project
+.settings/
+.classpath
+.cache-main
+.cache-tests
+
+# IntelliJ
+.idea
+*.class
+*.iml
+tests/out/
