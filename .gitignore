@@ -5,6 +5,7 @@
 .gogradle/
 *.log
 vendor/
+golang1.10/gobuild.sh
 actionProxyLoop/proxy
 golang1.10/proxy
 openwhisk/_test/exec
@@ -18,4 +19,3 @@ openwhisk/_test/output/
 openwhisk/action/
 openwhisk/compile/
 openwhisk/debug.test
-golang1.10/gobuild.sh
