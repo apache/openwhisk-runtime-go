@@ -231,3 +231,22 @@ func Example_compile_withZipSrcDefault() {
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
 }
 /**/
+
+func Example_badinit_nocompiler() {
+	ts, cur, log := startTestServer("")
+	doRun(ts, "")
+	doInit(ts, "{}")
+	//sys("ls", "_test/exec")
+	doInit(ts, initBinary("_test/exec", ""))      // empty
+	doInit(ts, initBinary("_test/hi", ""))        // say hi
+	doInit(ts, initBinary("_test/hello.src", "")) // source not excutable
+	doRun(ts, "")
+	stopTestServer(ts, cur, log)
+	// Output:
+	// 400 {"error":"no action defined yet"}
+	// 200 {"ok":true}
+	// 400 {"error":"cannot start action: command exited"}
+	// 400 {"error":"cannot start action: command exited"}
+	// 400 {"error":"cannot start action: command exited"}
+	// 400 {"error":"no action defined yet"}
+}

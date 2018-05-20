@@ -27,24 +27,24 @@ import (
 	"time"
 )
 
-// DefaultTimeout to wait for a process
-// to start and  produce logs
-// You can change it in the main for tests
-var DefaultTimeout = 5 * time.Millisecond
+// DefaultTimeoutInit to wait for a process to start
+var DefaultTimeoutInit = 5 * time.Millisecond
+
+// DefaultTimeoutDrain to wait for draining logs
+var DefaultTimeoutDrain = 5 * time.Millisecond
 
 // Executor is the container and the guardian  of a child process
 // It starts a command, feeds input and output, read logs and control its termination
 type Executor struct {
-	io             chan string
-	log            chan bool
-	exit           chan error
-	_cmd           *exec.Cmd
-	_input         *bufio.Writer
-	_output        *bufio.Scanner
-	_logout        *bufio.Scanner
-	_logerr        *bufio.Scanner
-	_logbuf        *os.File
-	defaultTimeout time.Duration
+	io      chan string
+	log     chan bool
+	exit    chan error
+	_cmd    *exec.Cmd
+	_input  *bufio.Writer
+	_output *bufio.Scanner
+	_logout *bufio.Scanner
+	_logerr *bufio.Scanner
+	_logbuf *os.File
 }
 
 // NewExecutor creates a child subprocess using the provided command line,
@@ -84,7 +84,6 @@ func NewExecutor(logbuf *os.File, command string, args ...string) (proc *Executo
 		bufio.NewScanner(stdout),
 		bufio.NewScanner(stderr),
 		logbuf,
-		DefaultTimeout,
 	}
 }
 
@@ -113,12 +112,12 @@ func (proc *Executor) run() {
 }
 
 func (proc *Executor) drain(ch chan string) {
-	runtime.Gosched()
 	for loop := true; loop; {
+		runtime.Gosched()
 		select {
 		case buf := <-ch:
 			fmt.Fprintln(proc._logbuf, buf)
-		case <-time.After(proc.defaultTimeout):
+		case <-time.After(DefaultTimeoutDrain):
 			loop = false
 		}
 	}
@@ -142,6 +141,7 @@ func (proc *Executor) logger() {
 		// flush stderr
 		proc.drain(chErr)
 	}
+	proc._logbuf.Sync()
 	log.Printf("logger: end")
 }
 
@@ -183,7 +183,7 @@ func (proc *Executor) Start() error {
 	case <-proc.exit:
 		// oops, it died
 		return fmt.Errorf("command exited")
-	case <-time.After(proc.defaultTimeout):
+	case <-time.After(DefaultTimeoutInit):
 		// ok let's process it
 		go proc.service()
 		go proc.logger()
