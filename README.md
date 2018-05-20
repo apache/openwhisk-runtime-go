@@ -19,6 +19,10 @@
 
 # Apache OpenWhisk Runtime for Go (and Generic executables)
 
+[![Build Status](https://travis-ci.org/apache/incubator-openwhisk-runtime-go.svg?branch=master)](https://travis-ci.org/apache/incubator-openwhisk-runtime-go)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+[![Join Slack](https://img.shields.io/badge/join-slack-9B69A0.svg)](http://slack.openwhisk.org/)
+
 :warning: Work in progress :warning:
 
 This is an OpenWhisk runtime for Golang and Generic executables.
@@ -99,7 +103,7 @@ Note the name of the function must be capitalised, because it needs to be export
 
 For example:
 
-```
+```go
 package action
 
 import (
@@ -160,7 +164,7 @@ Repeat forever:
 
 The `actionloop` image works actually with executable in unix sense, so also scripts are acceptable. In the actionloop image there is `bash` and the `jq` command, so you can for example implement the actionloop with a shell script:
 
-```
+```bash
 #!/bin/bash
 # read input forever line by line
 while read line
