@@ -27,22 +27,24 @@ import (
 	"time"
 )
 
-// TIMEOUT to wait for process to start
-// and log to be produced
-const TIMEOUT = 5 * time.Millisecond
+// DefaultTimeout to wait for a process
+// to start and  produce logs
+// You can change it in the main for tests
+var DefaultTimeout = 5 * time.Millisecond
 
 // Executor is the container and the guardian  of a child process
 // It starts a command, feeds input and output, read logs and control its termination
 type Executor struct {
-	io      chan string
-	log     chan bool
-	exit    chan error
-	_cmd    *exec.Cmd
-	_input  *bufio.Writer
-	_output *bufio.Scanner
-	_logout *bufio.Scanner
-	_logerr *bufio.Scanner
-	_logbuf *os.File
+	io             chan string
+	log            chan bool
+	exit           chan error
+	_cmd           *exec.Cmd
+	_input         *bufio.Writer
+	_output        *bufio.Scanner
+	_logout        *bufio.Scanner
+	_logerr        *bufio.Scanner
+	_logbuf        *os.File
+	defaultTimeout time.Duration
 }
 
 // NewExecutor creates a child subprocess using the provided command line,
@@ -82,6 +84,7 @@ func NewExecutor(logbuf *os.File, command string, args ...string) (proc *Executo
 		bufio.NewScanner(stdout),
 		bufio.NewScanner(stderr),
 		logbuf,
+		DefaultTimeout,
 	}
 }
 
@@ -115,7 +118,7 @@ func (proc *Executor) drain(ch chan string) {
 		select {
 		case buf := <-ch:
 			fmt.Fprintln(proc._logbuf, buf)
-		case <-time.After(TIMEOUT):
+		case <-time.After(proc.defaultTimeout):
 			loop = false
 		}
 	}
@@ -180,7 +183,7 @@ func (proc *Executor) Start() error {
 	case <-proc.exit:
 		// oops, it died
 		return fmt.Errorf("command exited")
-	case <-time.After(TIMEOUT):
+	case <-time.After(proc.defaultTimeout):
 		// ok let's process it
 		go proc.service()
 		go proc.logger()

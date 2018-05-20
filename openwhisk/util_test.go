@@ -34,6 +34,7 @@ import (
 	"time"
 
 	"github.com/h2non/filetype"
+	"github.com/sciabarracom/incubator-openwhisk-runtime-go/openwhisk"
 )
 
 func startTestServer(compiler string) (*httptest.Server, string, *os.File) {
@@ -165,6 +166,8 @@ func detect(dir, filename string) string {
 func TestMain(m *testing.M) {
 	sys("_test/build.sh")
 	sys("_test/zips.sh")
+	// increate timeouts
+	openwhisk.DefaultTimeout = 1000 * time.Millisecond
 	code := m.Run()
 	os.Exit(code)
 }
