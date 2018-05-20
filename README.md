@@ -179,3 +179,6 @@ done
 ```
 
 Note the `actionloop` image will accept any source and will try to run it (if it is possible), while the `actionloop-golang` and `actionloop-swift` images will try to compile the sources instead.
+
+
+Force a build...
