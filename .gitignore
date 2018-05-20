@@ -18,3 +18,4 @@ openwhisk/_test/output/
 openwhisk/action/
 openwhisk/compile/
 openwhisk/debug.test
+golang1.10/gobuild.sh
