@@ -34,7 +34,7 @@ import (
 	"time"
 
 	"github.com/h2non/filetype"
-	"github.com/sciabarracom/incubator-openwhisk-runtime-go/openwhisk"
+	"github.com/apache/incubator-openwhisk-runtime-go/openwhisk"
 )
 
 func startTestServer(compiler string) (*httptest.Server, string, *os.File) {
