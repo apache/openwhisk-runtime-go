@@ -55,7 +55,8 @@ func startTestServer(compiler string) (*httptest.Server, string, *os.File) {
 
 func stopTestServer(ts *httptest.Server, cur string, buf *os.File) {
 	runtime.Gosched()
-	time.Sleep(1 * time.Second)
+	// wait 2 seconds before declaring a test done
+	time.Sleep(2 * time.Second)
 	os.Chdir(cur)
 	ts.Close()
 	dump(buf)
@@ -162,11 +163,17 @@ func detect(dir, filename string) string {
 	return kind.Extension
 }
 
+func waitabit() {
+	time.Sleep(1000 * time.Millisecond)
+}
+
 func TestMain(m *testing.M) {
 	sys("_test/build.sh")
 	sys("_test/zips.sh")
-	// increase timeouts
+	// increase timeouts for init
 	DefaultTimeoutInit = 1000 * time.Millisecond
+	// timeout for drain - shoud less (or you can get stuck on stdout without getting the stderr)
+	DefaultTimeoutDrain = 100 * time.Millisecond
 	code := m.Run()
 	os.Exit(code)
 }
