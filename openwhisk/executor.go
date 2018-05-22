@@ -27,9 +27,11 @@ import (
 	"time"
 )
 
-// TIMEOUT to wait for process to start
-// and log to be produced
-const TIMEOUT = 5 * time.Millisecond
+// DefaultTimeoutInit to wait for a process to start
+var DefaultTimeoutInit = 5 * time.Millisecond
+
+// DefaultTimeoutDrain to wait for draining logs
+var DefaultTimeoutDrain = 5 * time.Millisecond
 
 // Executor is the container and the guardian  of a child process
 // It starts a command, feeds input and output, read logs and control its termination
@@ -110,12 +112,12 @@ func (proc *Executor) run() {
 }
 
 func (proc *Executor) drain(ch chan string) {
-	runtime.Gosched()
 	for loop := true; loop; {
+		runtime.Gosched()
 		select {
 		case buf := <-ch:
 			fmt.Fprintln(proc._logbuf, buf)
-		case <-time.After(TIMEOUT):
+		case <-time.After(DefaultTimeoutDrain):
 			loop = false
 		}
 	}
@@ -139,6 +141,7 @@ func (proc *Executor) logger() {
 		// flush stderr
 		proc.drain(chErr)
 	}
+	proc._logbuf.Sync()
 	log.Printf("logger: end")
 }
 
@@ -180,7 +183,7 @@ func (proc *Executor) Start() error {
 	case <-proc.exit:
 		// oops, it died
 		return fmt.Errorf("command exited")
-	case <-time.After(TIMEOUT):
+	case <-time.After(DefaultTimeoutInit):
 		// ok let's process it
 		go proc.service()
 		go proc.logger()
