@@ -19,7 +19,6 @@ package openwhisk
 import (
 	"fmt"
 	"io/ioutil"
-	"time"
 )
 
 func ExampleNewExecutor_failed() {
@@ -64,7 +63,7 @@ func ExampleNewExecutor_bc() {
 	case <-proc.exit:
 		fmt.Println("exit")
 	}
-	time.Sleep(100 * time.Millisecond)
+	waitabit()
 	proc.Stop()
 	dump(log)
 	// Output:
@@ -83,9 +82,9 @@ func ExampleNewExecutor_hello() {
 	proc.io <- `{"name":"Mike"}`
 	fmt.Println(<-proc.io)
 	proc.log <- true
-	time.Sleep(100 * time.Millisecond)
+	waitabit()
 	proc.Stop()
-	time.Sleep(100 * time.Millisecond)
+	waitabit()
 	_, ok := <-proc.io
 	fmt.Printf("io %v\n", ok)
 	dump(log)
@@ -113,9 +112,9 @@ func ExampleNewExecutor_term() {
 	}
 	proc.log <- true
 	fmt.Printf("exit %v\n", exited)
-	time.Sleep(100 * time.Millisecond)
+	waitabit()
 	proc.Stop()
-	time.Sleep(100 * time.Millisecond)
+	waitabit()
 	_, ok := <-proc.io
 	fmt.Printf("io %v\n", ok)
 	dump(log)
