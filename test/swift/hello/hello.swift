@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 func hello(args: [String:Any]) -> [String:Any] {
     if let name = args["name"] as? String {
         print(name)
