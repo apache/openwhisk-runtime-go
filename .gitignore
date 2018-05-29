@@ -40,3 +40,6 @@ tests/bin/
 *.iml
 tests/out/
 
+# VSCode
+.vscode
+
