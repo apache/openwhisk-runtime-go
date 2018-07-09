@@ -137,7 +137,7 @@ You can also have multiple source files in an action. In this case you need to c
 
 Compiling sources on the image can take some time when the images is initialised. You can speed up precompiling the sources using the image as an offline compiler. You need `docker` for doing that.
 
-The images accepts a `compile` command expecting sources in `/src`. It will then compile them and place the resut in `/out`.
+The images accepts a `compile` command expecting sources in `/src`. It will then compile them and place the result in `/out`.
 
 If you have docker, you can do it this way:
 
@@ -157,10 +157,10 @@ The `actionloop` image is designed to support generic linux executable in an eff
 As such it works with any executable that supports the following simple protocol:
 
 Repeat forever:
-- read one line from stadard input (file descriptor 0)
+- read one line from standard input (file descriptor 0)
 - parse the line as a json object
-- execute the action, logging in standard output and in standardar error (file descriptor 1 and 2)
-- write an anwser in json format as a single line (without embedding newlines - newlines in strings must be quoted)
+- execute the action, logging in standard output and in standard error (file descriptor 1 and 2)
+- write an answer in json format as a single line (without embedding newlines - newlines in strings must be quoted)
 
 The `actionloop` image works actually with executable in unix sense, so also scripts are acceptable. In the actionloop image there is `bash` and the `jq` command, so you can for example implement the actionloop with a shell script:
 
