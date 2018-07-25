@@ -17,23 +17,24 @@
 #
 -->
 
-This is an optional command line test kit.
+This is an (optional) command line test kit.
 
-It has been superseded by a go test suite and scalatests,
-but it is still around for debugging.
+There is now also go test suite and scalatests,
+but we still use it for debugging.
 
+- It works on Linux Ubuntu only (on OSX there are some differences in the CLI).
+- You need to build the images with `dockerDist`.
+- You need to install cram .
+- Test action loop: `cram test_actionloop.t`
+- Test golang `cram test_actionloop-golang.t`
 
-TO use it:
-- you need to install cram to use it and build images
-- you can run them with `cram test_actionloop.t`
-- and `cram test_actionloop-golang`
+Also you can start directly the executable, using `start.sh`  without building the images.
+So you can debug outside of Docker.
+If you start the executable  images won't be started by the test.
 
-also you can start directly the binary without the images with
+- `unset COMPILER ; ./start.sh` for action loop, then  `cram test_actionloop.t`
+- or `COMPILER=../common/gobuild.sh ./start.sh` then `cram test_actionlooop-golang.t`
 
-- `./start.sh`
-- or `COMPILER=../common/gobuild.sh ./start.sh`
-
-If you start them,  images won't be started by the test.
 
 
 

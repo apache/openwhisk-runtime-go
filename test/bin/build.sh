@@ -20,8 +20,10 @@ EXEC=${2:-main}
 OUT=$(basename $FILE)
 BIN=${OUT%%.go}
 ZIP=${BIN}.zip
+rm bin/$BIN
 go build -i -o bin/$BIN $FILE
 GOOS=linux GOARCH=amd64 go build -o $EXEC $FILE
+rm zip/$ZIP
 zip zip/$ZIP $EXEC
 rm $EXEC
 echo "built $EXEC bin/$BIN zip/$ZIP"

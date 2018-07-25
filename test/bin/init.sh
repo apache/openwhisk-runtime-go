@@ -23,7 +23,7 @@ then MAIN=",\"main\":\"$MAIN\""
 fi
 if file -i $FILE | grep text/ >/dev/null
 then echo '{"value":{"code":' $(cat $FILE | jq -R -s .) $MAIN '}}' >$JSON
-else echo '{"value":{"binary":true,"code":"'$(base64 -w 0 $FILE)'"}}' >$JSON
+else echo '{"value":{"binary":true,"code":"'$(base64 $FILE | tr -d '\n')'"}}' >$JSON
 fi
 curl -H "Content-Type: application/json" -XPOST -w "%{http_code}\n" http://${HOST:-localhost}:${PORT:-8080}/init -d @"$JSON" 2>/dev/null
 #echo $JSON

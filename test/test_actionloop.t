@@ -129,5 +129,4 @@ Test with a non-main executable
   {"error":"cannot start action: command exited"}
   400
 
-
   $ $T/stop.sh 
