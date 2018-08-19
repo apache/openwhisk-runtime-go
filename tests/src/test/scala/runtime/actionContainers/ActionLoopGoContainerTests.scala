@@ -245,3 +245,4 @@ class ActionLoopGoContainerTests extends ActionProxyContainerTestUtils with WskA
     }
   }
 }
+

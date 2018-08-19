@@ -88,5 +88,5 @@ class ActionLoopContainerTests extends ActionProxyContainerTestUtils with WskAct
         c.run(helloMsg()) should be(okMsg("main", "Hello, Demo"))
     }
   }
-
  }
+
