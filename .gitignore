@@ -5,6 +5,7 @@
 .gradle/
 .gogradle/
 *.log
+tests/build/
 
 # Dependencies
 vendor/

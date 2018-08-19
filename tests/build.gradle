@@ -15,24 +15,30 @@
  * limitations under the License.
  */
 
-include 'tests'
+apply plugin: 'scala'
+apply plugin: 'eclipse'
+compileTestScala.options.encoding = 'UTF-8'
 
-include 'actionProxyLoop'
-include 'golang1.10'
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
 
-rootProject.name = 'runtime-golang'
+tasks.withType(Test) {
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = true
+        exceptionFormat = 'full'
+    }
+    outputs.upToDateWhen { false } // force tests to run every time
+}
 
-gradle.ext.openwhisk = [
-        version: '1.0.0-SNAPSHOT'
-]
+dependencies {
+    compile "org.scala-lang:scala-library:${gradle.scala.version}"
+    compile "org.apache.openwhisk:openwhisk-tests:${gradle.openwhisk.version}:tests"
+    compile "org.apache.openwhisk:openwhisk-tests:${gradle.openwhisk.version}:test-sources"
+}
 
-gradle.ext.scala = [
-    version: '2.11.8',
-    compileFlags: ['-feature', '-unchecked', '-deprecation', '-Xfatal-warnings', '-Ywarn-unused-import']
-]
-
-gradle.ext.scalafmt = [
-    version: '1.5.0',
-    config: new File(rootProject.projectDir, '.scalafmt.conf')
-]
-
+tasks.withType(ScalaCompile) {
+    scalaCompileOptions.additionalParameters = gradle.scala.compileFlags
+}
