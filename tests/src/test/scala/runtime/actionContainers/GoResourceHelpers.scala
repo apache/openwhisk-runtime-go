@@ -151,7 +151,10 @@ object GoResourceHelpers {
 
       // command to compile
       val exe = new File(out, main)
-      val cmd = s"${dockerBin} run -v ${src}:/src -v ${out}:/out  ${image} compile ${main}"
+      val cmd = s"${dockerBin} run " +
+        s"--mount type=bind,source=${src},target=/src " +
+        s"--mount type=bind,source=${out},target=/out " +
+        s"${image} compile ${main}"
 
       // compiling
       import sys.process._
