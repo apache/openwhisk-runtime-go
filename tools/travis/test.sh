@@ -26,5 +26,3 @@ ROOTDIR="$SCRIPTDIR/../.."
 cd ${ROOTDIR}
 TERM=dumb ./gradlew test --info
 
-
-

@@ -33,10 +33,6 @@ IMAGE_PREFIX="testing"
 cd $UTILDIR
 scancode/scanCode.py --config scancode/ASF-Release.cfg $ROOTDIR
 
-# Build OpenWhisk deps before we run tests
-cd $WHISKDIR
-TERM=dumb ./gradlew install
-
 # Build/Compile go
 cd $ROOTDIR
 TERM=dumb ./gradlew build

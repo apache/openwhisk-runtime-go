@@ -25,14 +25,15 @@ ROOTDIR="$SCRIPTDIR/../.."
 HOMEDIR="$SCRIPTDIR/../../../"
 
 # add realpath
-sudo apt-get -y update && sudo apt-get -y install realpath
+test -e /etc/debian_release && sudo apt-get -y update
+which realpath || sudo apt-get -y install realpath
 
 # clone OpenWhisk utilities repo. in order to run scanCode
 cd $HOMEDIR
-git clone https://github.com/apache/incubator-openwhisk-utilities.git
+test -d incubator-openwhisk-utilities || git clone https://github.com/apache/incubator-openwhisk-utilities.git
 
 # clone main openwhisk repo. for testing purposes
-git clone --depth=1 https://github.com/apache/incubator-openwhisk.git openwhisk
+test -d openwhisk || git clone --depth=1 https://github.com/apache/incubator-openwhisk.git openwhisk
 cd openwhisk
-./tools/travis/setup.sh
+./gradlew install
 
