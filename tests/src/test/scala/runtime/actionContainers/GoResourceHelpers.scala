@@ -37,7 +37,7 @@ object GoResourceHelpers {
     *
     */
   def createHomeTmpDirectory(prefix: String, suffix: String = "") = {
-    val srcFileDir = new File(new File(System.getProperty("user.home"), "tmp"), prefix+System.currentTimeMillis().toString+suffix)
+    val srcFileDir = new File(new File("/tmp", "openwhisk"), prefix+System.currentTimeMillis().toString+suffix)
     srcFileDir.mkdirs()
     srcFileDir.toPath.toAbsolutePath()
   }
