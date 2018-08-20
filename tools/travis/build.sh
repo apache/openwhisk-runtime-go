@@ -43,4 +43,5 @@ cd $ROOTDIR
 TERM=dumb ./gradlew build
 
 # Build runtime image
-TERM=dumb ./gradlew distDocker 
+TERM=dumb ./gradlew distDocker
+
