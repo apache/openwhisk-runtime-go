@@ -18,6 +18,10 @@
 
 set -e
 
+# add realpath
+apt-get -y update
+apt-get -y install realpath
+
 # Build script for Travis-CI.
 
 SCRIPTDIR=$(cd $(dirname "$0") && pwd)
