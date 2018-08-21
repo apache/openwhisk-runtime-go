@@ -28,18 +28,22 @@ import actionContainers.ResourceHelpers
 
 object GoResourceHelpers {
 
-  /** Create a temporary directory in your home directory.
+
+  /** Create a temporary directory in your /tmp directory.
     *
     * This is needed to use docker volume mounts.
-    * On mac I need to use the home directory,
+    * On mac I need to use the /tmp directory,
     * because the default folder used by gradle under Mac
     * is not accessible by default by Docker for Mac
     *
     */
-  def createHomeTmpDirectory(prefix: String, suffix: String = "") = {
-    val srcFileDir = new File(new File("/tmp", "openwhisk"), prefix+System.currentTimeMillis().toString+suffix)
-    srcFileDir.mkdirs()
-    srcFileDir.toPath.toAbsolutePath()
+  def tmpDirectoryFile(prefix: String, suffix: String = "") =
+    new File(new File("/tmp", "openwhisk"), prefix+System.currentTimeMillis().toString+suffix)
+
+  def createTmpDirectory(prefix: String, suffix: String = "") = {
+    val tmpDir = tmpDirectoryFile(prefix,suffix)
+    tmpDir.mkdirs()
+    tmpDir.toPath.toAbsolutePath
   }
 
   private def makeZipFromDir(dir: Path): Path = makeArchiveFromDir(dir, ".zip")
@@ -52,7 +56,7 @@ object GoResourceHelpers {
     */
   private def makeArchiveFromDir(dir: Path, extension: String): Path = {
     // Any temporary file name for the archive.
-    val arPath = createHomeTmpDirectory("output", extension).toAbsolutePath()
+    val arPath = createTmpDirectory("output", extension).toAbsolutePath()
 
     // We "mount" it as a filesystem, so we can just copy files into it.
     val dstUri = new URI("jar:" + arPath.toUri().getScheme(), arPath.toAbsolutePath().toString(), null)
@@ -103,7 +107,7 @@ object GoResourceHelpers {
     * */
   private def writeSourcesToHomeTmpDirectory(sources: Seq[(Seq[String], String)]): (Path, Seq[Path]) = {
     // A temporary directory for the source files.
-    val srcDir = createHomeTmpDirectory("src")
+    val srcDir = createTmpDirectory("src")
     val srcAbsPaths = for ((sourceName, sourceContent) <- sources) yield {
       // The relative path of the source file
       val srcRelPath = Paths.get(sourceName.head, sourceName.tail: _*)
@@ -146,14 +150,16 @@ object GoResourceHelpers {
       val src = srcDir.toFile.getAbsolutePath
 
       // A temporary directory for the destination files.
-      val outDir = createHomeTmpDirectory("out").toAbsolutePath()
-      val out = outDir.toFile.getAbsolutePath
+      // DO NOT CREATE IT IN ADVANCE or you will get a permission denied
+      val outDir = tmpDirectoryFile("out")
+      val out = outDir.toPath.toAbsolutePath
 
       // command to compile
-      val exe = new File(out, main)
+      val exe = new File(outDir, main)
+
       val cmd = s"${dockerBin} run " +
-        s"--mount type=bind,source=${src},target=/src " +
-        s"--mount type=bind,source=${out},target=/out " +
+        s"-v ${src}:/src " +
+        s"-v ${out}:/out:rw " +
         s"${image} compile ${main}"
 
       // compiling
@@ -161,7 +167,7 @@ object GoResourceHelpers {
       cmd.!
 
       // result
-      exe -> outDir
+      exe -> outDir.toPath
 
     }
 
