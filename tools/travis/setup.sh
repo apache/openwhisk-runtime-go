@@ -19,8 +19,8 @@
 set -e
 
 # add realpath
-apt-get -y update
-apt-get -y install realpath
+sudo apt-get -y update
+sudo apt-get -y install realpath
 
 # Build script for Travis-CI.
 
