@@ -27,16 +27,21 @@ UTILDIR="$ROOTDIR/../incubator-openwhisk-utilities"
 
 export OPENWHISK_HOME=$WHISKDIR
 
-IMAGE_PREFIX="testing"
-
 # run scancode using the ASF Release configuration
 cd $UTILDIR
 scancode/scanCode.py --config scancode/ASF-Release.cfg $ROOTDIR
 
-cd $ROOTDIR
+# Build OpenWhisk deps before we run tests
+cd $WHISKDIR
+TERM=dumb ./gradlew install
+# Mock file (works around bug upstream)
+echo "openwhisk.home=$WHISKDIR" > whisk.properties
+echo "vcap.services.file=" >> whisk.properties
 
 # Build/Compile go
-TERM=dumb ./gradlew build
+cd $ROOTDIR
+# compile without testing as we need docker images first
+TERM=dumb ./gradlew build -x test
+# ok now you can build docker images using the compiled proxy
+TERM=dumb ./gradlew distDocker
 
-# Build runtime image
-TERM=dumb ./gradlew distDocker -PdockerImagePrefix=${IMAGE_PREFIX}

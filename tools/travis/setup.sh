@@ -18,6 +18,10 @@
 
 set -e
 
+# add realpath
+sudo apt-get -y update
+sudo apt-get -y install realpath
+
 # Build script for Travis-CI.
 
 SCRIPTDIR=$(cd $(dirname "$0") && pwd)
@@ -28,5 +32,7 @@ HOMEDIR="$SCRIPTDIR/../../../"
 cd $HOMEDIR
 git clone https://github.com/apache/incubator-openwhisk-utilities.git
 
-# add realpath
-sudo apt-get -y update && sudo apt-get -y install realpath
+# clone main openwhisk repo. for testing purposes
+git clone --depth=1 https://github.com/apache/incubator-openwhisk.git openwhisk
+cd openwhisk
+./tools/travis/setup.sh
