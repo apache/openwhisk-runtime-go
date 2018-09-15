@@ -17,23 +17,21 @@
 
 package runtime.actionContainers
 
-//import java.util.concurrent.TimeoutException
 import actionContainers.{ActionContainer, ActionProxyContainerTestUtils}
 import actionContainers.ActionContainer.withContainer
 import common.WskActorSystem
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
-//import spray.json.JsNumber
 import spray.json.{JsObject, JsString}
-//import spray.json.JsBoolean
 
 @RunWith(classOf[JUnitRunner])
 class ActionLoopContainerTests extends ActionProxyContainerTestUtils with WskActorSystem {
 
   import GoResourceHelpers._
 
-  // "example" is the image build by /sdk/docker
+  val image = "actionloop"
+
   def withActionLoopContainer(code: ActionContainer => Unit) = withContainer("actionloop")(code)
 
   behavior of "actionloop"
@@ -43,7 +41,7 @@ class ActionLoopContainerTests extends ActionProxyContainerTestUtils with WskAct
       s"""#!/bin/bash
          |while read line
          |do
-         |   name="$$(echo $$line | jq -r .name)"
+         |   name="$$(echo $$line | jq -r .value.name)"
          |   if test "$$name" == ""
          |   then exit
          |   fi
@@ -63,8 +61,8 @@ class ActionLoopContainerTests extends ActionProxyContainerTestUtils with WskAct
 
   it should "run sample with init that does nothing" in {
     val (out, err) = withActionLoopContainer { c =>
-      c.init(JsObject())._1 should be(200)
-      c.run(JsObject())._1 should be(400)
+      c.init(JsObject())._1 should be(403)
+      c.run(JsObject())._1 should be(500)
     }
   }
 

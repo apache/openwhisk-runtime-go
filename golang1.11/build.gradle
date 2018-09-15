@@ -15,17 +15,32 @@
  * limitations under the License.
  */
 
-package main
+ext.dockerImageName = 'actionloop-golang-v1.11'
+apply from: '../gradle/docker.gradle'
 
-import "fmt"
+distDocker.dependsOn 'copyProxy'
+distDocker.dependsOn 'copyCompiler'
+distDocker.dependsOn 'copyEpilogue'
+distDocker.finalizedBy('cleanup')
 
-func Main(obj map[string]interface{}) map[string]interface{} {
-	name, ok := obj["name"].(string)
-	if !ok {
-		name = "Stranger"
-	}
-	fmt.Printf("name=%s\n", name)
-	msg := make(map[string]interface{})
-	msg["message"] = "Hello, " + name + "!"
-	return msg
+
+task copyProxy(type: Copy) {
+    from '../actionProxyLoop/proxy'
+    into '.'
+}
+
+task copyCompiler(type: Copy) {
+    from '../common/gobuild.py'
+    into '.'
+}
+
+task copyEpilogue(type: Copy) {
+    from '../common/gobuild.py.launcher.go'
+    into '.'
+}
+
+task cleanup(type: Delete) {
+    delete 'proxy'
+    delete 'gobuild.py'
+    delete 'gobuild.py.launcher.go'
 }

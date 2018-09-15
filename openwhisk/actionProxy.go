@@ -24,8 +24,15 @@ import (
 	"os"
 )
 
+// OutputGuard constant string
+const OutputGuard = "XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX"
+
 // ActionProxy is the container of the data specific to a server
 type ActionProxy struct {
+
+	// is it initialized?
+	initialized bool
+
 	// current directory
 	baseDir string
 
@@ -38,25 +45,22 @@ type ActionProxy struct {
 	// theChannel is the channel communicating with the action
 	theExecutor *Executor
 
-	// log file
-	logFile *os.File
-
-	// debug
-	Debug bool
-	Trace bool
+	// out and err files
+	outFile *os.File
+	errFile *os.File
 }
 
 // NewActionProxy creates a new action proxy that can handle http requests
-func NewActionProxy(baseDir string, compiler string, logFile *os.File) *ActionProxy {
+func NewActionProxy(baseDir string, compiler string, outFile *os.File, errFile *os.File) *ActionProxy {
 	os.Mkdir(baseDir, 0755)
 	return &ActionProxy{
+		false,
 		baseDir,
 		compiler,
 		highestDir(baseDir),
 		nil,
-		logFile,
-		false,
-		false,
+		outFile,
+		errFile,
 	}
 }
 
@@ -69,7 +73,7 @@ func (ap *ActionProxy) StartLatestAction(main string) error {
 	// find the action if any
 	highestDir := highestDir(ap.baseDir)
 	if highestDir == 0 {
-		log.Println("no action found")
+		Debug("no action found")
 		ap.theExecutor = nil
 		return fmt.Errorf("no valid actions available")
 	}
@@ -78,15 +82,15 @@ func (ap *ActionProxy) StartLatestAction(main string) error {
 	curExecutor := ap.theExecutor
 
 	// try to launch the action
-	executable := fmt.Sprintf("%s/%d/%s", ap.baseDir, highestDir, main)
+	executable := fmt.Sprintf("%s/%d/bin/%s", ap.baseDir, highestDir, main)
 	os.Chmod(executable, 0755)
-	newExecutor := NewExecutor(ap.logFile, executable)
-	log.Printf("starting %s", executable)
+	newExecutor := NewExecutor(ap.outFile, ap.errFile, executable)
+	Debug("starting %s", executable)
 	err := newExecutor.Start()
 	if err == nil {
 		ap.theExecutor = newExecutor
 		if curExecutor != nil {
-			log.Println("stopping old executor")
+			Debug("stopping old executor")
 			curExecutor.Stop()
 		}
 		return nil
@@ -94,9 +98,9 @@ func (ap *ActionProxy) StartLatestAction(main string) error {
 
 	// cannot start, removing the action
 	// and leaving the current executor running
-	if !ap.Debug {
+	if !Debugging {
 		exeDir := fmt.Sprintf("./action/%d/", highestDir)
-		log.Printf("removing the failed action in %s", exeDir)
+		Debug("removing the failed action in %s", exeDir)
 		os.RemoveAll(exeDir)
 	}
 

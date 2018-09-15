@@ -18,7 +18,7 @@
 include 'tests'
 
 include 'actionProxyLoop'
-include 'golang1.10'
+include 'golang1.11'
 
 rootProject.name = 'runtime-golang'
 

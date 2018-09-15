@@ -19,168 +19,107 @@ package openwhisk
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 )
 
-/* this test confuses gogradle
-func Example_compileAction_wrong() {
-	sys("_test/precompile.sh", "hello.sh", "0")
-	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/0", "../common/gobuild.sh", log)
-	fmt.Println(ap.CompileAction("_test/compile/0/exec", "exec", ""))
-	// Output:
-	// exit status 1
-}*/
-
 /**
-
-Note to understand tests:
-- tests are run from the openwhisk as the current directory
-- compiler (../../common/gobuild.sh) takes 3 arguments:
-   <main> <source-dir-or-file> <target-dir>
-
- You create a proxy (NewActionProxy) with the target dir
- then invoke compilation with the source dir (implicit is 'main' as the function)
-
- You can test if compilation works with
-
-   cd openwhisk
-   ../common/gobuild.sh main _test/compile/c/exe ./action/c
-
-   _test/precompile.sh simply copies files to test folder
-   _test/postcompile.sh simply checks if the file is compiled
-
-
+Notes to understand tests:
+- tests are run from the "openwhisk" folder, as the current directory
+- precompile.sh prepare a compilation enviroment:
+	_test/precompile.sh hello.src aaa main
+  produces
+	 - _test/compile/src/aaa/src/main
+	 - _test/compile/src/aaa/bin/
+  ready for the compiler
+- compiler (../../common/gobuild.py) takes 3 arguments:
+   <main> <source-dir> <target-dir>
+   - it will look for a <source-dir>/<main> file
+   - will generate some files in <source-dir>
+   - compiler output is in <target-dir>/<main>
+ - postcompile.sh will
+	- execute the binary with 3>&1
+	- feed it with the json '{"name":"Mike"}
+	- will print the type of the executable and its output and log
 */
 
-func Example_isCompiled() {
-	sys("_test/precompile.sh", "hello.src", "c")
-	file := abs("./_test/compile/c/exec")
-	dir := abs("./_test/compile/c")
-	fmt.Println(isCompiled(file, "main"))
-	fmt.Println(isCompiled(dir, "exec"))
+const (
+	PREP  = "_test/precompile.sh"
+	CHECK = "_test/postcompile.sh"
+	TMP   = "_test/compile/"
+	COMP  = "../common/gobuild.py"
+)
 
-	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/c", "../common/gobuild.sh", log)
-	ap.CompileAction("main", abs("_test/compile/c/exec"), "")
-
-	fmt.Println(isCompiled(file, "main"))
-	fmt.Println(isCompiled(dir, "exec"))
+// compile a main
+func Example() {
+	sys(PREP, "hello.src", "0", "main")
+	ap := NewActionProxy(TMP, COMP, os.Stdout, os.Stderr)
+	fmt.Println(isCompiled(TMP+"0/src", "main"))
+	fmt.Println(isCompiled(TMP+"0/src/main", "main"))
+	ap.CompileAction("main", TMP+"0/src", TMP+"0/bin")
+	sys(CHECK, TMP+"0/bin/main")
+	fmt.Println(isCompiled(TMP+"0/bin", "main"))
+	fmt.Println(isCompiled(TMP+"0/bin/main", "main"))
 	// errors
-	fmt.Println(isCompiled(dir, "main"))
-	fmt.Println(isCompiled(file+"1", "main"))
-
+	fmt.Println(isCompiled(TMP+"0/bin1/main", "main"))
+	fmt.Println(isCompiled(TMP+"0/bin/main1", "main"))
 	// Output:
 	// false
 	// false
+	// _test/compile/0/bin/main: application/x-executable
+	// name=Mike
+	// {"message":"Hello, Mike!"}
 	// true
 	// true
 	// false
 	// false
 }
 
-func Example_compileAction_singlefile_main() {
-	sys("_test/precompile.sh", "hello.src", "1")
-	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/1", "../common/gobuild.sh", log)
-	fmt.Println(ap.CompileAction("main", abs("_test/compile/1/exec"), ""))
-	sys("_test/postcompile.sh", "_test/compile/1/exec")
+// compile a not-main (hello) function
+func Example_hello() {
+	N := "1"
+	sys(PREP, "hello1.src", N, "hello")
+	ap := NewActionProxy(TMP, COMP, os.Stdout, os.Stderr)
+	ap.CompileAction("hello", TMP+N+"/src", TMP+N+"/bin")
+	sys(CHECK, TMP+N+"/bin/hello")
 	// Output:
-	// <nil>
-	// _test/compile/1/exec: application/x-executable
-	// name=Mike
-	// {"message":"Hello, Mike!"}
-}
-
-func Example_compileAction_singlefile_main_out() {
-	sys("_test/precompile.sh", "hello.src", "1a")
-	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/1a", "../common/gobuild.sh", log)
-	fmt.Println(ap.CompileAction("main", abs("_test/compile/1a/exec"), abs("_test/output/1a")))
-	sys("_test/postcompile.sh", "_test/output/1a/main")
-	// Output:
-	// <nil>
-	// _test/output/1a/main: application/x-executable
-	// name=Mike
-	// {"message":"Hello, Mike!"}
-}
-
-func Example_compileAction_singlefile_hello() {
-	sys("_test/precompile.sh", "hello1.src", "2")
-	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/2", "../common/gobuild.sh", log)
-	fmt.Println(ap.CompileAction("hello", "_test/compile/2/exec", ""))
-	sys("_test/postcompile.sh", "_test/compile/2/exec")
-	// Output:
-	// <nil>
-	// _test/compile/2/exec: application/x-executable
+	// _test/compile/1/bin/hello: application/x-executable
 	// name=Mike
 	// {"hello":"Hello, Mike!"}
 }
 
-func Example_compileAction_singlefile_hello_out() {
-	sys("_test/precompile.sh", "hello1.src", "2a")
-	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/2a", "../common/gobuild.sh", log)
-	fmt.Println(ap.CompileAction("hello", "_test/compile/2a/exec", abs("_test/output/2a")))
-	sys("_test/postcompile.sh", "_test/output/2a/hello")
+// compile a function including a package
+func Example_package() {
+	N := "2"
+	sys(PREP, "hello2.src", N, "main", "hello")
+	ap := NewActionProxy(TMP, COMP, os.Stdout, os.Stderr)
+	ap.CompileAction("main", TMP+N+"/src", TMP+N+"/bin")
+	sys(CHECK, TMP+N+"/bin/main")
 	// Output:
-	// <nil>
-	// _test/output/2a/hello: application/x-executable
-	// name=Mike
-	// {"hello":"Hello, Mike!"}
-}
-
-func Example_compileAction_multifile_main() {
-	sys("_test/precompile.sh", "action", "3")
-	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/3", "../common/gobuild.sh", log)
-	fmt.Println(ap.CompileAction("main", "_test/compile/3/", ""))
-	sys("_test/postcompile.sh", "_test/compile/3/main")
-	// Output:
-	// <nil>
-	// _test/compile/3/main: application/x-executable
-	// Main:
+	// _test/compile/2/bin/main: application/x-executable
+	// Main
 	// Hello, Mike
 	// {"greetings":"Hello, Mike"}
 }
 
-func Example_compileAction_multifile_main_out() {
-	sys("_test/precompile.sh", "action", "3a")
-	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/3a", "../common/gobuild.sh", log)
-	fmt.Println(ap.CompileAction("main", "_test/compile/3a/", abs("_test/output/3a")))
-	sys("_test/postcompile.sh", "_test/output/3a/main")
-	// Output:
-	// <nil>
-	// _test/output/3a/main: application/x-executable
-	// Main:
-	// Hello, Mike
-	// {"greetings":"Hello, Mike"}
+func Example_compileError() {
+	N := "6"
+	sys(PREP, "hi1.src", N)
+	ap := NewActionProxy(TMP, COMP, os.Stdout, os.Stderr)
+	err := ap.CompileAction("main", TMP+N+"/src", TMP+N+"/bin")
+	fmt.Printf("%v", removeLineNr(err.Error()))
+	// Unordered output:
+	// ./func_Main_.go::: undefined: bufio
+	// ./func_Main_.go::: undefined: os
 }
 
-func Example_compileAction_multifile_hello() {
-	sys("_test/precompile.sh", "action", "4")
-	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/4", "../common/gobuild.sh", log)
-	fmt.Println(ap.CompileAction("hello", "_test/compile/4/", ""))
-	sys("_test/postcompile.sh", "_test/compile/4/hello")
+func Example_withMain() {
+	N := "7"
+	sys(PREP, "hi.src", N)
+	ap := NewActionProxy(TMP, COMP, os.Stdout, os.Stderr)
+	err := ap.CompileAction("main", TMP+N+"/src", TMP+N+"/bin")
+	fmt.Println(err)
+	sys(TMP + N + "/bin/main")
 	// Output:
 	// <nil>
-	// _test/compile/4/hello: application/x-executable
-	// Hello, Mike
-	// {"greetings":"Hello, Mike"}
-}
-
-func Example_compileAction_multifile_hello_out() {
-	sys("_test/precompile.sh", "action", "4a")
-	log, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy("./action/4a", "../common/gobuild.sh", log)
-	fmt.Println(ap.CompileAction("hello", "_test/compile/4/", abs("_test/output/4a")))
-	sys("_test/postcompile.sh", "_test/output/4a/hello")
-	// Output:
-	// <nil>
-	// _test/output/4a/hello: application/x-executable
-	// Hello, Mike
-	// {"greetings":"Hello, Mike"}
+	// hi
 }

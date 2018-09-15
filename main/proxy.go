@@ -25,26 +25,58 @@ import (
 	"github.com/apache/incubator-openwhisk-runtime-go/openwhisk"
 )
 
-// flag to enable tracing
-var trace = flag.Bool("trace", false, "enable detailed tracing output")
-
 // flag to enable debug
 var debug = flag.Bool("debug", false, "enable debug output")
 
-// flag for the compiler
-var compiler = flag.String("compiler", os.Getenv("COMPILER"), "define the compiler on the command line")
+// flag to require on-the-fly compilation
+var compile = flag.String("compile", "", "compile, reading in standard input the specified function, and producing the result in stdout")
+
+// use the runtime as a compiler "on-the-fly"
+func extractAndCompile(ap *openwhisk.ActionProxy) {
+	// read the std in
+	in, err := ioutil.ReadAll(os.Stdin)
+	if err != nil {
+		log.Printf(err.Error())
+		return
+	}
+
+	// extract and compile it
+	file, err := ap.ExtractAndCompile(&in, *compile)
+	if err != nil {
+		log.Printf(err.Error())
+		return
+	}
+
+	// read the file and write it to stdout
+	out, err := ioutil.ReadFile(file)
+	_, err = os.Stdout.Write(out)
+	if err != nil {
+		log.Printf(err.Error())
+		return
+	}
+}
 
 func main() {
 	flag.Parse()
 
-	if !(*debug || *trace) {
-		// hide log unless you are debugging
-		log.SetOutput(ioutil.Discard)
+	// debugging
+	if *debug {
+		// set debugging flag, propagated to the actions
+		openwhisk.Debugging = true
+		os.Setenv("OW_DEBUG", "1")
+	}
+
+	// create the action proxy
+	ap := openwhisk.NewActionProxy("./action", os.Getenv("OW_COMPILER"), os.Stdout, os.Stderr)
+
+	// compile on the fly upon request
+	if *compile != "" {
+		extractAndCompile(ap)
+		return
 	}
 
 	// start the balls rolling
-	ap := openwhisk.NewActionProxy("./action", *compiler, os.Stdout)
-	ap.Debug = *debug || *trace
-	ap.Trace = *trace
+	openwhisk.Debug("OpenWhisk Go Proxy: starting")
 	ap.Start(8080)
+
 }

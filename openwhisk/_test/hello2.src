@@ -17,15 +17,13 @@
 
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"hello"
+)
 
-func Main(obj map[string]interface{}) map[string]interface{} {
-	name, ok := obj["name"].(string)
-	if !ok {
-		name = "Stranger"
-	}
-	fmt.Printf("name=%s\n", name)
-	msg := make(map[string]interface{})
-	msg["message"] = "Hello, " + name + "!"
-	return msg
+// Main forwading to Hello
+func Main(args map[string]interface{}) map[string]interface{} {
+	fmt.Println("Main")
+	return hello.Hello(args)
 }

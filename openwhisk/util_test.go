@@ -29,7 +29,9 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
+	"strings"
 	"testing"
 	"time"
 
@@ -46,7 +48,7 @@ func startTestServer(compiler string) (*httptest.Server, string, *os.File) {
 	log.Printf(dir)
 	// setup the server
 	buf, _ := ioutil.TempFile("", "log")
-	ap := NewActionProxy(dir, compiler, buf)
+	ap := NewActionProxy(dir, compiler, buf, buf)
 	ts := httptest.NewServer(ap)
 	log.Printf(ts.URL)
 	doPost(ts.URL+"/init", `{value: {code: ""}}`)
@@ -85,6 +87,9 @@ func doRun(ts *httptest.Server, message string) {
 		fmt.Println(err)
 	} else {
 		fmt.Printf("%d %s", status, resp)
+	}
+	if !strings.HasSuffix(resp, "\n") {
+		fmt.Println()
 	}
 }
 
@@ -164,16 +169,28 @@ func detect(dir, filename string) string {
 }
 
 func waitabit() {
-	time.Sleep(1000 * time.Millisecond)
+	time.Sleep(2000 * time.Millisecond)
 }
 
+func removeLineNr(out string) string {
+	var re = regexp.MustCompile(`:\d+:\d+`)
+	return re.ReplaceAllString(out, "::")
+}
 func TestMain(m *testing.M) {
-	sys("_test/build.sh")
-	sys("_test/zips.sh")
+	//Debugging = true // enable debug
+	// silence those annoying logs
+	if !Debugging {
+		log.SetOutput(ioutil.Discard)
+	}
+
 	// increase timeouts for init
 	DefaultTimeoutInit = 1000 * time.Millisecond
 	// timeout for drain - shoud less (or you can get stuck on stdout without getting the stderr)
 	DefaultTimeoutDrain = 100 * time.Millisecond
+	// build some test stuff
+	sys("_test/build.sh")
+	sys("_test/zips.sh")
+	// go ahead
 	code := m.Run()
 	os.Exit(code)
 }

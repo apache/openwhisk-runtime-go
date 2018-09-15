@@ -18,18 +18,12 @@
 package openwhisk
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
-	"strings"
 )
-
-// Params are the parameteres sent to the action
-type Params struct {
-	Value json.RawMessage `json:"value"`
-}
 
 // ErrResponse is the response when there are errors
 type ErrResponse struct {
@@ -52,31 +46,27 @@ func sendError(w http.ResponseWriter, code int, cause string) {
 func (ap *ActionProxy) runHandler(w http.ResponseWriter, r *http.Request) {
 
 	// parse the request
-	params := Params{}
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
 		sendError(w, http.StatusBadRequest, fmt.Sprintf("Error reading request body: %v", err))
 		return
 	}
-
-	// decode request parameters
-	err = json.Unmarshal(body, &params)
-	if err != nil {
-		sendError(w, http.StatusBadRequest, fmt.Sprintf("Error unmarshaling request: %v", err))
-		return
-	}
+	Debug("done reading %d bytes", len(body))
 
 	// check if you have an action
 	if ap.theExecutor == nil {
-		sendError(w, http.StatusBadRequest, fmt.Sprintf("no action defined yet"))
+		sendError(w, http.StatusInternalServerError, fmt.Sprintf("no action defined yet"))
 		return
 	}
 
+	// remove newlines
+	body = bytes.Replace(body, []byte("\n"), []byte(""), -1)
+
 	// execute the action
 	// and check for early termination
-	ap.theExecutor.io <- string(params.Value)
-	var response string
+	ap.theExecutor.io <- body
+	var response []byte
 	var exited bool
 	select {
 	case response = <-ap.theExecutor.io:
@@ -87,28 +77,27 @@ func (ap *ActionProxy) runHandler(w http.ResponseWriter, r *http.Request) {
 
 	// check for early termination
 	if exited {
+		Debug("WARNING! Command exited")
 		ap.theExecutor = nil
 		sendError(w, http.StatusBadRequest, fmt.Sprintf("command exited"))
 		return
 	}
+	DebugLimit("received:", response, 120)
 
 	// flush the logs sending the activation message at the end
 	ap.theExecutor.log <- true
 
-	// check response
-	if response == "" {
-		sendError(w, http.StatusBadRequest, fmt.Sprintf("%v", err))
+	// check if the answer is an object map
+	var objmap map[string]*json.RawMessage
+	err = json.Unmarshal(response, &objmap)
+	if err != nil {
+		sendError(w, http.StatusBadGateway, "The action did not return a dictionary.")
 		return
 	}
 
-	// return the response
-	if !strings.HasSuffix(response, "\n") {
-		response = response + "\n"
-	}
-	log.Print(response)
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(response)))
-	numBytesWritten, err := w.Write([]byte(response))
+	numBytesWritten, err := w.Write(response)
 
 	// flush output
 	if f, ok := w.(http.Flusher); ok {

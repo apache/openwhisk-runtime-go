@@ -24,6 +24,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 )
 
 type initBodyRequest struct {
@@ -31,6 +33,7 @@ type initBodyRequest struct {
 	Binary bool   `json:"binary,omitempty"`
 	Main   string `json:"main,omitempty"`
 }
+
 type initRequest struct {
 	Value initBodyRequest `json:"value,omitempty"`
 }
@@ -48,21 +51,30 @@ func sendOK(w http.ResponseWriter) {
 
 func (ap *ActionProxy) initHandler(w http.ResponseWriter, r *http.Request) {
 
+	if ap.initialized {
+		msg := "Cannot initialize the action more than once."
+		sendError(w, http.StatusForbidden, msg)
+		log.Println(msg)
+		return
+	}
+
 	// read body of the request
 	if ap.compiler != "" {
-		log.Println("compiler: " + ap.compiler)
+		Debug("compiler: " + ap.compiler)
 	}
 
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
 		sendError(w, http.StatusBadRequest, fmt.Sprintf("%v", err))
+		return
 	}
 
 	// decode request parameters
-	if ap.Trace {
-		log.Printf("init: decoding %s\n", string(body))
+	if len(body) < 1000 {
+		Debug("init: decoding %s\n", string(body))
 	}
+
 	var request initRequest
 	err = json.Unmarshal(body, &request)
 
@@ -72,16 +84,8 @@ func (ap *ActionProxy) initHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// request with empty code - stop any executor but return ok
-	if ap.Trace {
-		log.Printf("request: %v\n", request)
-	}
 	if request.Value.Code == "" {
-		if ap.theExecutor != nil {
-			log.Printf("stop running action")
-			ap.theExecutor.Stop()
-			ap.theExecutor = nil
-		}
-		sendOK(w)
+		sendError(w, http.StatusForbidden, "Missing main/no code to execute.")
 		return
 	}
 
@@ -93,39 +97,77 @@ func (ap *ActionProxy) initHandler(w http.ResponseWriter, r *http.Request) {
 	// extract code eventually decoding it
 	var buf []byte
 	if request.Value.Binary {
-		log.Printf("binary")
+		Debug("it is binary code")
 		buf, err = base64.StdEncoding.DecodeString(request.Value.Code)
 		if err != nil {
 			sendError(w, http.StatusBadRequest, "cannot decode the request: "+err.Error())
 			return
 		}
 	} else {
-		log.Printf("plain text")
+		Debug("it is source code")
 		buf = []byte(request.Value.Code)
 	}
 
-	// extract the action,
-	file, err := ap.ExtractAction(&buf, main)
-	if err != nil || file == "" {
-		sendError(w, http.StatusBadRequest, "invalid action: "+err.Error())
+	// if a compiler is defined try to compile
+	_, err = ap.ExtractAndCompile(&buf, main)
+	if err != nil {
+		sendError(w, http.StatusBadGateway, err.Error())
 		return
 	}
 
-	// compile it if a compiler is available
-	if ap.compiler != "" && !isCompiled(file, main) {
-		log.Printf("compiling: %s main: %s", file, main)
-		err = ap.CompileAction(main, file, file)
-		if err != nil {
-			sendError(w, http.StatusBadRequest, "cannot compile action: "+err.Error())
-			return
-		}
-	}
-
-	// stop and start
+	// start an action
 	err = ap.StartLatestAction(main)
 	if err != nil {
 		sendError(w, http.StatusBadRequest, "cannot start action: "+err.Error())
 		return
 	}
+	ap.initialized = true
 	sendOK(w)
+}
+
+// ExtractAndCompile decode the buffer and if a compiler is defined, compile it also
+func (ap *ActionProxy) ExtractAndCompile(buf *[]byte, main string) (string, error) {
+	// extract in "bin" or in "src" if the runtime can compile
+	suffix := "bin"
+	if ap.compiler != "" {
+		suffix = "src"
+	}
+
+	// extract action
+	file, err := ap.ExtractAction(buf, main, suffix)
+	if err != nil {
+		return "", err
+	}
+	if file == "" {
+		return "", fmt.Errorf("empty filename")
+	}
+	// no compiler, we are done
+	if ap.compiler == "" {
+		return file, nil
+	}
+
+	// some path surgery
+	dir := filepath.Dir(file)
+	parent := filepath.Dir(dir)
+	srcDir := filepath.Join(parent, "src")
+	binDir := filepath.Join(parent, "bin")
+	binFile := filepath.Join(binDir, main)
+	os.Mkdir(binDir, 0755)
+
+	// if the file is already compiled just move it from src to bin
+	if isCompiled(file, main) {
+		os.Rename(file, binFile)
+		return binFile, nil
+	}
+
+	// ok let's try to compile
+	Debug("compiling: %s main: %s", file, main)
+	err = ap.CompileAction(main, srcDir, binDir)
+	if err != nil {
+		return "", err
+	}
+	if !isCompiled(binFile, main) {
+		return "", fmt.Errorf("cannot compile")
+	}
+	return binFile, nil
 }
