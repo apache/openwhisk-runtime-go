@@ -15,25 +15,24 @@
  * limitations under the License.
  */
 
-ext.dockerImageName = 'actionloop-golang-v1.10'
-apply from: '../gradle/docker.gradle'
+package hello
 
-distDocker.dependsOn 'copyProxy'
-distDocker.dependsOn 'copyCompiler'
-distDocker.finalizedBy('cleanup')
+import (
+	"fmt"
+)
 
-
-task copyProxy(type: Copy) {
-    from '../actionProxyLoop/proxy'
-    into '.'
-}
-
-task copyCompiler(type: Copy) {
-    from '../common/gobuild.sh'
-    into '.'
-}
-
-task cleanup(type: Delete) {
-    delete 'proxy'
-    delete 'gobuild.sh'
+// Hello receive an event in format
+// { "name": "Mike"}
+// and returns a greeting in format
+// { "greetings": "Hello, Mike"}
+func Hello(args map[string]interface{}) map[string]interface{} {
+	res := make(map[string]interface{})
+	greetings := "Stranger"
+	name, ok := args["name"].(string)
+	if ok {
+		greetings = name
+	}
+	res["greetings"] = "Hello, " + greetings
+	fmt.Printf("Hello, %s\n", greetings)
+	return res
 }

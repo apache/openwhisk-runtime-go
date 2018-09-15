@@ -17,7 +17,7 @@
 #
 while read line
 do
-   name="$(echo $line | jq -r .name)"
+   name="$(echo $line | jq -r .value.name)"
    if [ "$name" == "*" ]
    then echo "Goodbye!" >&2
         exit 0
@@ -25,4 +25,3 @@ do
    echo msg="hello $name"
    echo '{"hello": "'$name'"}' >&3
 done
-

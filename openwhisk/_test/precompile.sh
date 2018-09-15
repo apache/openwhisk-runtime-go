@@ -16,15 +16,14 @@
 # limitations under the License.
 #
 cd "$(dirname $0)"
-SRC=${1:?source}
-ID=${2:?numbe}
-go get github.com/apache/incubator-openwhisk-client-go/whisk
+SRC=${1:?source file or dir}
+ID=${2:?target dir}
+TGT=${3:-main}
+ETC=${4:-}
 rm -Rvf compile/$ID >/dev/null
-rm -Rvf output/$ID >/dev/null
-mkdir -p compile/$ID output/$ID
-if test -d "$SRC"
-then cp -r "$SRC" compile/$ID
-else cp $SRC compile/$ID/exec
+mkdir -p compile/$ID/src compile/$ID/bin
+cp $SRC compile/$ID/src/$TGT
+if test -d "$ETC"
+then cp -r "$ETC" compile/$ID/src
 fi
-
 

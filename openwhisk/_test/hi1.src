@@ -17,15 +17,9 @@
 
 package main
 
-import "fmt"
 
-func Main(obj map[string]interface{}) map[string]interface{} {
-	name, ok := obj["name"].(string)
-	if !ok {
-		name = "Stranger"
-	}
-	fmt.Printf("name=%s\n", name)
-	msg := make(map[string]interface{})
-	msg["message"] = "Hello, " + name + "!"
-	return msg
+func main() {
+	f := bufio.NewWriter(os.Stdout)
+	defer f.Flush()
+	f.Write([]byte("hi\n"))
 }

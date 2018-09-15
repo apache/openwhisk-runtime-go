@@ -59,10 +59,10 @@ To build the docker images after compiling go proxy:
 
 This will build the images:
 
-* `actionloop-golang-v1.10`: an image supporting  Go sources
-* `actionloop`: the base image, supporting generic executables
+* `actionloop-golang-v1.11`: an image supporting  Go sources
+* `actionloop`: the base image, supporting generic executables ans shell script
 
-The `actionloop` image is used as a basis also for the `actionloop-swift` image. It can be used for supporting other compiled programming languages as long as they implement a `compile` script and the *action loop* protocol described below.
+The `actionloop` image can be used for supporting other compiled programming languages as long as they implement a `compile` script and the *action loop* protocol described below.
 
 To run tests
 ```
@@ -75,7 +75,7 @@ To run tests
 If you want to develop the proxy and run tests natively, you can on Linux or OSX.
 Tested on Ubuntu Linux (14.04) and OSX 10.13. Probably other distributions work, maybe even Windows with WSL, but since it is not tested YMMMV.
 
-You need of course [go 1.10.2](https://golang.org/doc/install)
+You need of course [go 1.11.0](https://golang.org/doc/install)
 
 Then you need a set of utilities used in tests:
 
@@ -93,39 +93,36 @@ OSX: `brew install zip coreutils`
 
 # Using it with Go Sources
 
-The image can execute, compiling them on the fly, Golang OpenWhisk actions in source format. An action must be a Go source file, placed in the `action` package, implementing the `Main` function (or the function specified as `main`).
+The image can execute, compiling them on the fly, Golang OpenWhisk actions in source format.
 
-The expected signature is:
+An action must be a Go source file, placed in the `main` package and your action.
 
-`func Main(event json.RawMessage) (json.RawMessage, error)`
+Since `main.main` is reserved in Golang for the entry point of your program, and the entry point is used by support code, your action must be named `Main` (with capital `M`) even if your specify `main` as the name of the action (or you do not specify it, defaulting to `main`). If you specify a function name different than `main` the name of your functino  does not need to be capitalized.
 
-Note the name of the function must be capitalised, because it needs to be exported from the `action` package. You can say the name of the function also in lower case, it will be capitalised anyway.
+The expected signature for a `main` function is:
+
+`func Main(event map[string]interface{}) map[string]interface{}`
 
 For example:
 
 ```go
-package action
+package main
 
-import (
-  "encoding/json"
-  "log"
-)
+import "log"
 
 // Main is the function implementing the action
-func Main(event json.RawMessage) (json.RawMessage, error) {
-  // decode the json
-  var obj map[string]interface{}
-  json.Unmarshal(event, &obj)
+func Main(obj map[string]interface{}) map[string]interface{} {
   // do your work
   name, ok := obj["name"].(string)
   if !ok {
     name = "Stranger"
   }
-  msg := map[string]string{"message": ("Hello, " + name + "!")}
+  msg := make(map[string]interface{})
+  msg["message"] = "Hello, " + name + "!"
   // log in stdout or in stderr
   log.Printf("name=%s\n", name)
   // encode the result back in json
-  return json.Marshal(msg)
+  return msg
 }
 ```
 
@@ -137,16 +134,23 @@ You can also have multiple source files in an action. In this case you need to c
 
 Compiling sources on the image can take some time when the images is initialised. You can speed up precompiling the sources using the image as an offline compiler. You need `docker` for doing that.
 
-The images accepts a `compile` command expecting sources in `/src`. It will then compile them and place the result in `/out`.
+The images accepts a `-compile <main>` flag, and expects you provide sources in standard input. It will then compile them, emit the binary in standard output and errors in stderr.
 
 If you have docker, you can do it this way:
 
-- place your sources under `src` folder in current directory
-- create an `out` folder to receive the binary
-- run: `docker run -v $PWD/src:/src -v $PWD/out openwhisk/actionloop-golang-v1.10 compile`
-- you can now use `wsk` to publish the `out/main` executable
+If you have a single source maybe in file `main.go`, with a function named `Main` just do this:
 
-If you have a function named in a different way, for example `Hello`, specify `compile hello`. It will produce a binary named `out/hello`
+`cat main.go | docker run openwhisk/actionloop-golang-v1.11 -compile main >main`
+
+If you have multiple sources in current directory, even with a subfolder with sources, you can compile it all with:
+
+`zip -r - * | docker run openwhisk/actionloop-golang-v1.11 -compile main >main`
+
+The  generated executable is suitable to be deployed in openwhisk:
+
+`wsk action create my/action main -docker openwhisk/actionloop-golang-v1.11`
+
+Note that the output is always in Linux AMS64 format so the executable can be run only inside a Docker Linux container.
 
 <a name="generic"/>
 
@@ -158,8 +162,28 @@ As such it works with any executable that supports the following simple protocol
 
 Repeat forever:
 - read one line from standard input (file descriptor 0)
-- parse the line as a json object
-- execute the action, logging in standard output and in standard error (file descriptor 1 and 2)
+- parse the line as a json object, that will be in format:
+
+```{
+ "value": JSON,
+ "namespace": String,
+ "action_name": String,
+ "api_host": String,
+ "api_key": String,
+ "activation_id": String,
+ "deadline": Number
+}```
+
+Note that if you use libraries, those will expect the values in enviroment variables:
+
+- `__OW_NAMESPACE`
+- `__OW_ACTION_NAME`
+- `__OW_API_HOST`
+- `__OW_API_KEYS`
+- `__OW_ACTIVATION_ID`
+- `__OW_DEADLINE`
+
+- execute the action, using the `value` that contains the payload provided by the used and logging in standard output and in standard error (file descriptor 1 and 2)
 - write an answer in json format as a single line (without embedding newlines - newlines in strings must be quoted)
 
 The `actionloop` image works actually with executable in unix sense, so also scripts are acceptable. In the actionloop image there is `bash` and the `jq` command, so you can for example implement the actionloop with a shell script:
@@ -170,7 +194,7 @@ The `actionloop` image works actually with executable in unix sense, so also scr
 while read line
 do
    # parse the in input with `jq`
-   name="$(echo $line | jq -r .name)"
+   name="$(echo $line | jq -r .name.value)"
    # log in stdout
    echo msg="hello $name"
    # produce the result - note the fd3
@@ -178,5 +202,5 @@ do
 done
 ```
 
-Note the `actionloop` image will accept any source and will try to run it (if it is possible), while the `actionloop-golang` and `actionloop-swift` images will try to compile the sources instead.
+Note the `actionloop` image will accept any source and will try to run it (if it is possible), while the `actionloop-golang`  images will try to compile the sources instead.
 

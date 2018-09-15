@@ -26,10 +26,11 @@ import java.nio.file.attribute.BasicFileAttributes
 import collection.JavaConverters._
 import actionContainers.ResourceHelpers
 
+import scala.util.Random
+
 object GoResourceHelpers {
-
-
   /** Create a temporary directory in your /tmp directory.
+    * /tmp/openwhisk/random-lowercase-string/prefix+suffix
     *
     * This is needed to use docker volume mounts.
     * On mac I need to use the /tmp directory,
@@ -38,7 +39,9 @@ object GoResourceHelpers {
     *
     */
   def tmpDirectoryFile(prefix: String, suffix: String = "") =
-    new File(new File("/tmp", "openwhisk"), prefix+System.currentTimeMillis().toString+suffix)
+    new File(new File(new File("/tmp", "openwhisk"),
+      Random.alphanumeric.take(10).toArray.mkString.toLowerCase /*random filename alphanumeric and lower case*/)
+      , prefix++suffix)
 
   def createTmpDirectory(prefix: String, suffix: String = "") = {
     val tmpDir = tmpDirectoryFile(prefix,suffix)
@@ -147,31 +150,29 @@ object GoResourceHelpers {
 
       // The absolute paths of the source file
       val (srcDir, srcAbsPaths) = writeSourcesToHomeTmpDirectory(sources)
-      val src = srcDir.toFile.getAbsolutePath
+      val src = srcAbsPaths.head.toFile
 
       // A temporary directory for the destination files.
       // DO NOT CREATE IT IN ADVANCE or you will get a permission denied
-      val outDir = tmpDirectoryFile("out")
-      val out = outDir.toPath.toAbsolutePath
+      val binDir = tmpDirectoryFile("bin")
+      binDir.mkdirs()
+      val bin = new File(binDir, main)
 
       // command to compile
-      val exe = new File(outDir, main)
-
-      val cmd = s"${dockerBin} run " +
-        s"-v ${src}:/src " +
-        s"-v ${out}:/out:rw " +
-        s"${image} compile ${main}"
+      val cmd = s"${dockerBin} run -i ${image} -compile ${main}"
 
       // compiling
+      //println(s"${cmd}\n<${src}\n>${bin}")
+
       import sys.process._
-      cmd.!
+      (src #> cmd #> bin).!
 
       // result
-      exe -> outDir.toPath
+      bin -> binDir.toPath
 
     }
 
-    def mkBase64Exe(image: String, sources: Seq[(Seq[String], String)], main: String) = {
+    def mkBase64Exe(image: String, sources: Seq[(Seq[String] /*lines*/, String /*name*/)], main: String) = {
       val (exe, dir) = compile(image, sources, main)
       //println(s"exe=${exe.getAbsolutePath}")
       ResourceHelpers.readAsBase64(exe.toPath)
@@ -193,8 +194,8 @@ object GoResourceHelpers {
 
     def mkBase64SrcZip(sources: Seq[(Seq[String], String)], main: String) = {
       val (srcDir, srcAbsPaths) = writeSourcesToHomeTmpDirectory(sources)
-      //println(srcDir)
       val archive = makeZipFromDir(srcDir)
+      //println(s"zip=${archive.toFile.getAbsolutePath}")
       ResourceHelpers.readAsBase64(archive)
     }
   }

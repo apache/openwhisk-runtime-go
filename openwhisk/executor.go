@@ -20,7 +20,7 @@ package openwhisk
 import (
 	"bufio"
 	"fmt"
-	"log"
+	"io"
 	"os"
 	"os/exec"
 	"runtime"
@@ -36,22 +36,30 @@ var DefaultTimeoutDrain = 5 * time.Millisecond
 // Executor is the container and the guardian  of a child process
 // It starts a command, feeds input and output, read logs and control its termination
 type Executor struct {
-	io      chan string
+	io      chan []byte
 	log     chan bool
 	exit    chan error
 	_cmd    *exec.Cmd
-	_input  *bufio.Writer
-	_output *bufio.Scanner
-	_logout *bufio.Scanner
-	_logerr *bufio.Scanner
-	_logbuf *os.File
+	_input  io.WriteCloser
+	_output *bufio.Reader
+	_logout *bufio.Reader
+	_logerr *bufio.Reader
+	_outbuf *os.File
+	_errbuf *os.File
 }
 
 // NewExecutor creates a child subprocess using the provided command line,
 // writing the logs in the given file.
 // You can then start it getting a communication channel
-func NewExecutor(logbuf *os.File, command string, args ...string) (proc *Executor) {
+func NewExecutor(outbuf *os.File, errbuf *os.File, command string, args ...string) (proc *Executor) {
 	cmd := exec.Command(command, args...)
+	cmd.Env = []string{
+		"__OW_API_HOST=" + os.Getenv("__OW_API_HOST"),
+	}
+	if Debugging {
+		cmd.Env = append(cmd.Env, "OW_DEBUG=/tmp/action.log")
+	}
+	Debug("env: %v", cmd.Env)
 
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
@@ -74,60 +82,70 @@ func NewExecutor(logbuf *os.File, command string, args ...string) (proc *Executo
 	}
 	cmd.ExtraFiles = []*os.File{pipeIn}
 
+	pout := bufio.NewReader(pipeOut)
+	sout := bufio.NewReader(stdout)
+	serr := bufio.NewReader(stderr)
+
 	return &Executor{
-		make(chan string),
+		make(chan []byte),
 		make(chan bool),
 		make(chan error),
 		cmd,
-		bufio.NewWriter(stdin),
-		bufio.NewScanner(pipeOut),
-		bufio.NewScanner(stdout),
-		bufio.NewScanner(stderr),
-		logbuf,
+		stdin,
+		pout,
+		sout,
+		serr,
+		outbuf,
+		errbuf,
 	}
 }
 
 // collect log from a stream
-func _collect(ch chan string, scan *bufio.Scanner) {
-	for scan.Scan() {
-		ch <- scan.Text()
+func _collect(ch chan string, reader *bufio.Reader) {
+	for {
+		buf, err := reader.ReadBytes('\n')
+		if err != nil {
+			break
+		}
+		ch <- string(buf)
 	}
 }
 
 // loop over the command executing
 // returning when the command exits
 func (proc *Executor) run() {
-	log.Println("run: start")
+	Debug("run: start")
 	err := proc._cmd.Start()
 	if err != nil {
 		proc.exit <- err
-		log.Println("run: early exit")
+		Debug("run: early exit")
 		proc._cmd = nil // do not kill
 		return
 	}
+	Debug("pid: %d", proc._cmd.Process.Pid)
 	// wait for the exit
 	proc.exit <- proc._cmd.Wait()
 	proc._cmd = nil // do not kill
-	log.Println("run: end")
+	Debug("run: end")
 }
 
-func (proc *Executor) drain(ch chan string) {
+func drain(ch chan string, out *os.File) {
 	for loop := true; loop; {
 		runtime.Gosched()
 		select {
 		case buf := <-ch:
-			fmt.Fprintln(proc._logbuf, buf)
+			fmt.Fprint(out, buf)
 		case <-time.After(DefaultTimeoutDrain):
 			loop = false
 		}
 	}
-	fmt.Fprintln(proc._logbuf, "XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX")
+	fmt.Fprintln(out, OutputGuard)
 }
 
 // manage copying stdout and stder in output
 // with log guards
 func (proc *Executor) logger() {
-	log.Println("logger: start")
+	Debug("logger: start")
 	// poll stdout and stderr
 	chOut := make(chan string)
 	go _collect(chOut, proc._logout)
@@ -137,12 +155,13 @@ func (proc *Executor) logger() {
 	// wait for the signal
 	for <-proc.log {
 		// flush stdout
-		proc.drain(chOut)
+		drain(chOut, proc._outbuf)
 		// flush stderr
-		proc.drain(chErr)
+		drain(chErr, proc._errbuf)
 	}
-	proc._logbuf.Sync()
-	log.Printf("logger: end")
+	proc._outbuf.Sync()
+	proc._errbuf.Sync()
+	Debug("logger: end")
 }
 
 // main service function
@@ -150,27 +169,35 @@ func (proc *Executor) logger() {
 // and reading in output
 // using the provide channels
 func (proc *Executor) service() {
-	log.Println("service: start")
+	Debug("service: start")
 	for {
 		in := <-proc.io
-		if in == "" {
-			log.Println("terminated upon request")
+		if len(in) == 0 {
+			Debug("terminated upon request")
 			break
 		}
-		// input/output with the process
-		log.Printf(">>>%s\n", in)
-		proc._input.WriteString(in + "\n")
-		proc._input.Flush()
-		if proc._output.Scan() {
-			out := proc._output.Text()
-			log.Printf("<<<%s\n", out)
-			proc.io <- out
-			if out == "" {
-				break
-			}
+		// input to the subprocess
+		DebugLimit(">>>", in, 120)
+		proc._input.Write(in)
+		proc._input.Write([]byte("\n"))
+		Debug("done")
+
+		// ok now give a chance to run to goroutines
+		runtime.Gosched()
+
+		// input to the subprocess
+		out, err := proc._output.ReadBytes('\n')
+		if err != nil {
+			break
+		}
+		DebugLimit("<<<", out, 120)
+		proc.io <- out
+		if len(out) == 0 {
+			Debug("empty input - exiting")
+			break
 		}
 	}
-	log.Printf("service: end")
+	Debug("service: end")
 }
 
 // Start execution of the command
@@ -194,10 +221,10 @@ func (proc *Executor) Start() error {
 // Stop will kill the process
 // and close the channels
 func (proc *Executor) Stop() {
-	log.Println("stopping")
+	Debug("stopping")
 	if proc._cmd != nil {
 		proc.log <- false
-		proc.io <- ""
+		proc.io <- []byte("")
 		proc._cmd.Process.Kill()
 		<-proc.exit
 		proc._cmd = nil

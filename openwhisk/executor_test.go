@@ -23,19 +23,19 @@ import (
 
 func ExampleNewExecutor_failed() {
 	log, _ := ioutil.TempFile("", "log")
-	proc := NewExecutor(log, "true")
+	proc := NewExecutor(log, log, "true")
 	err := proc.Start()
 	fmt.Println(err)
 	proc.Stop()
-	proc = NewExecutor(log, "/bin/pwd")
+	proc = NewExecutor(log, log, "/bin/pwd")
 	err = proc.Start()
 	fmt.Println(err)
 	proc.Stop()
-	proc = NewExecutor(log, "donotexist")
+	proc = NewExecutor(log, log, "donotexist")
 	err = proc.Start()
 	fmt.Println(err)
 	proc.Stop()
-	proc = NewExecutor(log, "/etc/passwd")
+	proc = NewExecutor(log, log, "/etc/passwd")
 	err = proc.Start()
 	fmt.Println(err)
 	proc.Stop()
@@ -48,18 +48,18 @@ func ExampleNewExecutor_failed() {
 
 func ExampleNewExecutor_bc() {
 	log, _ := ioutil.TempFile("", "log")
-	proc := NewExecutor(log, "_test/bc.sh")
+	proc := NewExecutor(log, log, "_test/bc.sh")
 	err := proc.Start()
 	fmt.Println(err)
 	//proc.log <- true
-	proc.io <- "2+2"
-	fmt.Println(<-proc.io)
+	proc.io <- []byte("2+2")
+	fmt.Printf("%s", <-proc.io)
 	// and now, exit detection
-	proc.io <- "quit"
+	proc.io <- []byte("quit")
 	proc.log <- true
 	select {
 	case in := <-proc.io:
-		fmt.Println(in)
+		fmt.Printf("%s", in)
 	case <-proc.exit:
 		fmt.Println("exit")
 	}
@@ -76,11 +76,11 @@ func ExampleNewExecutor_bc() {
 
 func ExampleNewExecutor_hello() {
 	log, _ := ioutil.TempFile("", "log")
-	proc := NewExecutor(log, "_test/hello.sh")
+	proc := NewExecutor(log, log, "_test/hello.sh")
 	err := proc.Start()
 	fmt.Println(err)
-	proc.io <- `{"name":"Mike"}`
-	fmt.Println(<-proc.io)
+	proc.io <- []byte(`{"value":{"name":"Mike"}}`)
+	fmt.Printf("%s", <-proc.io)
 	proc.log <- true
 	waitabit()
 	proc.Stop()
@@ -99,10 +99,10 @@ func ExampleNewExecutor_hello() {
 
 func ExampleNewExecutor_term() {
 	log, _ := ioutil.TempFile("", "log")
-	proc := NewExecutor(log, "_test/hello.sh")
+	proc := NewExecutor(log, log, "_test/hello.sh")
 	err := proc.Start()
 	fmt.Println(err)
-	proc.io <- `{"name":"*"}`
+	proc.io <- []byte(`{"value":{"name":"*"}}`)
 	var exited bool
 	select {
 	case <-proc.io:

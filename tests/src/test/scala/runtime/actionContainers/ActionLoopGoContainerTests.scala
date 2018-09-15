@@ -33,43 +33,34 @@ class ActionLoopGoContainerTests extends ActionProxyContainerTestUtils with WskA
 
   import GoResourceHelpers._
 
-  val goCompiler = "actionloop-golang-v1.10"
+  val goCompiler = "actionloop-golang-v1.11"
   val image = goCompiler
 
   def withActionLoopContainer(code: ActionContainer => Unit) = withContainer(image)(code)
 
   behavior of image
 
-
-  private def checkresponse(res: Option[JsObject], args: JsObject = JsObject()) = {
-    res shouldBe defined
-    res.get.fields("error") shouldBe JsString("no action defined yet")
-    //res.get.fields("args") shouldBe args
+  def helloGo(main: String, pkg: String = "main") = {
+    val func = if (main == "main") "Main" else main
+    s"""|package ${pkg}
+        |
+        |import "fmt"
+        |
+        |func ${func}(obj map[string]interface{}) map[string]interface{} {
+        |	 name, ok := obj["name"].(string)
+        |	 if !ok {
+        |	  	name = "Stranger"
+        |	 }
+        |	 fmt.Printf("name=%s\\n", name)
+        |  msg := make(map[string]interface{})
+        |	 msg["${pkg}-${main}"] = "Hello, " + name + "!"
+        |	 return msg
+        |}
+        |""".stripMargin
   }
 
-  private def goCodeHello(file: String, main: String) = Seq(
-    Seq(s"${file}.go") ->
-      s"""
-         |package action
-         |
-         |import (
-         |	"encoding/json"
-         |	"fmt"
-         |)
-         |
-         |func ${main}(event json.RawMessage) (json.RawMessage, error) {
-         |	var obj map[string]interface{}
-         |	json.Unmarshal(event, &obj)
-         |	name, ok := obj["name"].(string)
-         |	if !ok {
-         |		name = "Stranger"
-         |	}
-         |	fmt.Printf("name=%s\\n", name)
-         |	msg := map[string]string{"${file}-${main}": ("Hello, " + name + "!")}
-         |	return json.Marshal(msg)
-         |}
-         |
-          """.stripMargin
+  private def helloSrc(main: String) = Seq(
+    Seq(s"${main}") -> helloGo(main)
   )
 
   private def helloMsg(name: String = "Demo") =
@@ -81,167 +72,108 @@ class ActionLoopGoContainerTests extends ActionProxyContainerTestUtils with WskA
 
   it should "run sample with init that does nothing" in {
     val (out, err) = withActionLoopContainer { c =>
-      c.init(JsObject())._1 should be(200)
-      c.run(JsObject())._1 should be(400)
+      c.init(JsObject())._1 should be(403)
+      c.run(JsObject())._1 should be(500)
     }
   }
 
   it should "accept a binary main" in {
     val exe = ExeBuilder.mkBase64Exe(
-      goCompiler, goCodeHello("main", "Main"), "main")
+      goCompiler, helloSrc("main"), "main")
 
     withActionLoopContainer {
       c =>
         c.init(initPayload(exe))._1 shouldBe (200)
-        c.run(helloMsg()) should be(okMsg("main-Main", "Hello, Demo!"))
+        c.run(helloMsg()) should be(okMsg("main-main", "Hello, Demo!"))
     }
   }
+
 
   //def pr(x: Any) = { println(x) ; x}
 
-  it should "build and run a go main zipped exe" in {
+  it should "accept a zipped main binary" in {
     val zip = ExeBuilder.mkBase64Zip(
-      goCompiler, goCodeHello("main", "Main"), "main")
+      goCompiler, helloSrc("main"), "main")
     withActionLoopContainer {
       c =>
         c.init(initPayload(zip))._1 should be(200)
-        c.run(helloMsg()) should be(okMsg("main-Main", "Hello, Demo!"))
+        c.run(helloMsg()) should be(okMsg("main-main", "Hello, Demo!"))
     }
   }
 
-  it should "buid and run a go hello exe " in {
+  it should "accept a binary not-main" in {
     val exe = ExeBuilder.mkBase64Exe(
-      goCompiler, goCodeHello("hello", "Hello"), "hello")
+      goCompiler, helloSrc("hello"), "hello")
     withActionLoopContainer {
       c =>
         c.init(initPayload(exe, "hello"))._1 shouldBe (200)
-        c.run(helloMsg()) should be(okMsg("hello-Hello", "Hello, Demo!"))
+        c.run(helloMsg()) should be(okMsg("main-hello", "Hello, Demo!"))
     }
   }
 
-  it should "build and run a go hello zipped exe" in {
+  it should "accept a zipped binary not-main" in {
     val zip = ExeBuilder.mkBase64Zip(
-      goCompiler, goCodeHello("hello", "Hello"), "hello")
+      goCompiler, helloSrc("hello"), "hello")
     withActionLoopContainer {
       c =>
         c.init(initPayload(zip, "hello"))._1 shouldBe (200)
+        c.run(helloMsg()) should be(okMsg("main-hello", "Hello, Demo!"))
+    }
+  }
+
+  it should "accept a src main action " in {
+    var src = ExeBuilder.mkBase64Src(helloSrc("main"), "main")
+    withActionLoopContainer {
+      c =>
+        c.init(initPayload(src))._1 shouldBe (200)
+        c.run(helloMsg()) should be(okMsg("main-main", "Hello, Demo!"))
+    }
+  }
+
+  it should "accept a src not-main action " in {
+    var src = ExeBuilder.mkBase64Src(helloSrc("hello"), "hello")
+    withActionLoopContainer {
+      c =>
+        c.init(initPayload(src, "hello"))._1 shouldBe (200)
+        c.run(helloMsg()) should be(okMsg("main-hello", "Hello, Demo!"))
+    }
+  }
+
+
+  it should "accept a zipped src main action" in {
+    var src = ExeBuilder.mkBase64SrcZip(helloSrc("main"), "main")
+    withActionLoopContainer {
+      c =>
+        c.init(initPayload(src))._1 shouldBe (200)
+        c.run(helloMsg()) should be(okMsg("main-main", "Hello, Demo!"))
+    }
+  }
+
+  it should "accept a zipped src not-main action" in {
+    var src = ExeBuilder.mkBase64SrcZip(helloSrc("hello"), "hello")
+    withActionLoopContainer {
+      c =>
+        c.init(initPayload(src, "hello"))._1 shouldBe (200)
+        c.run(helloMsg()) should be(okMsg("main-hello", "Hello, Demo!"))
+    }
+  }
+
+  it should "deploy a zip main src with subdir" in {
+    var src = ExeBuilder.mkBase64SrcZip(Seq(
+      Seq("hello", "hello.go") -> helloGo("Hello", "hello"),
+      Seq("main") ->
+        """
+          |package main
+          |import "hello"
+          |func Main(args map[string]interface{})map[string]interface{} {
+          | return hello.Hello(args)
+          |}
+        """.stripMargin
+    ), "main")
+    withActionLoopContainer {
+      c =>
+        c.init(initPayload(src))._1 shouldBe (200)
         c.run(helloMsg()) should be(okMsg("hello-Hello", "Hello, Demo!"))
-    }
-  }
-
-  val helloSrc =
-    """
-      |package action
-      |
-      |import (
-      |	"encoding/json"
-      |	"fmt"
-      |)
-      |
-      |func Hello(event json.RawMessage) (json.RawMessage, error) {
-      |	var obj struct {
-      |		Name string `json:",omitempty"`
-      |	}
-      |	err := json.Unmarshal(event, &obj)
-      |	if err != nil {
-      |		return nil, err
-      |	}
-      |	name := obj.Name
-      |	if name == "" {
-      |		name = "Stranger"
-      |	}
-      |	fmt.Printf("name=%s\n", name)
-      |	msg := map[string]string{"Hello": ("Hello, " + name + "!")}
-      |	return json.Marshal(msg)
-      |}
-    """.stripMargin
-
-  val mainSrc =
-    """
-      |package action
-      |
-      |import (
-      |	"encoding/json"
-      |	"fmt"
-      |)
-      |
-      |func Main(event json.RawMessage) (json.RawMessage, error) {
-      |	var obj map[string]interface{}
-      |	json.Unmarshal(event, &obj)
-      |	name, ok := obj["name"].(string)
-      |	if !ok {
-      |		name = "Stranger"
-      |	}
-      |	fmt.Printf("name=%s\n", name)
-      |	msg := map[string]string{"Main": ("Hello, " + name + "!")}
-      |	return json.Marshal(msg)
-      |}
-    """.stripMargin
-
-  it should "deploy a src main action " in {
-    var src = ExeBuilder.mkBase64Src(Seq(
-      Seq("main") -> mainSrc
-    ), "main")
-    withActionLoopContainer {
-      c =>
-        c.init(initPayload(src))._1 shouldBe (200)
-        c.run(helloMsg()) should be(okMsg("Main", "Hello, Demo!"))
-    }
-  }
-
-  it should "deploy a src hello action " in {
-    var src = ExeBuilder.mkBase64Src(Seq(
-      Seq("hello") -> helloSrc
-    ), "hello")
-    withActionLoopContainer {
-      c =>
-        c.init(initPayload(src, "hello"))._1 shouldBe (200)
-        c.run(helloMsg()) should be(okMsg("Hello", "Hello, Demo!"))
-    }
-  }
-
-  it should "deploy a zip main src action" in {
-    var src = ExeBuilder.mkBase64SrcZip(Seq(
-      Seq("main.go") -> mainSrc
-    ), "main")
-    withActionLoopContainer {
-      c =>
-        c.init(initPayload(src))._1 shouldBe (200)
-        c.run(helloMsg()) should be(okMsg("Main", "Hello, Demo!"))
-    }
-  }
-
-  it should "deploy a zip main src subdir action" in {
-    var src = ExeBuilder.mkBase64SrcZip(Seq(
-      Seq("action", "main.go") -> mainSrc
-    ), "main")
-    withActionLoopContainer {
-      c =>
-        c.init(initPayload(src))._1 shouldBe (200)
-        c.run(helloMsg()) should be(okMsg("Main", "Hello, Demo!"))
-    }
-  }
-
-  it should "deploy a zip src hello action " in {
-    var src = ExeBuilder.mkBase64SrcZip(Seq(
-      Seq("hello.go") -> helloSrc
-    ), "hello")
-    withActionLoopContainer {
-      c =>
-        c.init(initPayload(src, "hello"))._1 shouldBe (200)
-        c.run(helloMsg()) should be(okMsg("Hello", "Hello, Demo!"))
-    }
-  }
-
-
-  it should "deploy a zip src hello action in subdir" in {
-    var src = ExeBuilder.mkBase64SrcZip(Seq(
-      Seq("action", "hello.go") -> helloSrc
-    ), "hello")
-    withActionLoopContainer {
-      c =>
-        c.init(initPayload(src, "hello"))._1 shouldBe (200)
-        c.run(helloMsg()) should be(okMsg("Hello", "Hello, Demo!"))
     }
   }
 }

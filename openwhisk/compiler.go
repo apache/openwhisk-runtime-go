@@ -52,18 +52,18 @@ func isCompiled(fileOrDir string, name string) bool {
 
 	buf, err := ioutil.ReadFile(file)
 	if err != nil {
-		log.Println(err)
+		Debug(err.Error())
 		return false
 	}
-	// if a mac add a matched for mac
+	// if this is mac add a matcher for mac
 	if runtime.GOOS == "darwin" {
 		filetype.AddMatcher(mach64Type, mach64Matcher)
 	}
 
 	kind, err := filetype.Match(buf)
-	log.Printf("isCompiled: %s kind=%s", file, kind)
+	Debug("isCompiled: %s kind=%s", file, kind)
 	if err != nil {
-		log.Println(err)
+		Debug(err.Error())
 		return false
 	}
 	if kind.Extension == "elf" {
@@ -76,18 +76,25 @@ func isCompiled(fileOrDir string, name string) bool {
 }
 
 // CompileAction will compile an anction in source format invoking a compiler
-func (ap *ActionProxy) CompileAction(main string, src string, out string) error {
+func (ap *ActionProxy) CompileAction(main string, src_dir string, bin_dir string) error {
 	if ap.compiler == "" {
 		return fmt.Errorf("No compiler defined")
 	}
-	log.Printf("compiling: compiler=%s main=%s src=%s out=%s", ap.compiler, main, src, out)
+
+	Debug("compiling: %s %s %s %s", ap.compiler, main, src_dir, bin_dir)
+
 	var cmd *exec.Cmd
-	if out == "" {
-		cmd = exec.Command(ap.compiler, main, src, src)
-	} else {
-		cmd = exec.Command(ap.compiler, main, src, out)
+	cmd = exec.Command(ap.compiler, main, src_dir, bin_dir)
+	cmd.Env = []string{"PATH=" + os.Getenv("PATH")}
+
+	// gather stdout and stderr
+	out, err := cmd.CombinedOutput()
+	Debug("compiler out: %s, %v", out, err)
+	if err != nil {
+		return err
 	}
-	res, err := cmd.CombinedOutput()
-	log.Print(string(res))
-	return err
+	if len(out) > 0 {
+		return fmt.Errorf("%s", out)
+	}
+	return nil
 }

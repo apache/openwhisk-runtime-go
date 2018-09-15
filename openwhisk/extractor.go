@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -102,23 +101,23 @@ func highestDir(dir string) int {
 
 // ExtractAction accept a byte array and write it to a file
 // it handles zip files extracting the content
-// it stores in a new directory under ./action/XXX whee x is incremented every time
+// it stores in a new directory under ./action/XXX/suffix where x is incremented every time
 // it returns the file if a file or the directory if it was a zip file
-func (ap *ActionProxy) ExtractAction(buf *[]byte, main string) (string, error) {
+func (ap *ActionProxy) ExtractAction(buf *[]byte, main string, suffix string) (string, error) {
 	if buf == nil || len(*buf) == 0 {
 		return "", fmt.Errorf("no file")
 	}
 	ap.currentDir++
-	newDir := fmt.Sprintf("%s/%d", ap.baseDir, ap.currentDir)
+	newDir := fmt.Sprintf("%s/%d/%s", ap.baseDir, ap.currentDir, suffix)
 	os.MkdirAll(newDir, 0755)
 	kind, err := filetype.Match(*buf)
 	if err != nil {
 		return "", err
 	}
-	if kind.Extension == "zip" {
-		log.Println("Extract Action, assuming a zip")
-		return newDir, unzip(*buf, newDir)
-	}
 	file := newDir + "/" + main
+	if kind.Extension == "zip" {
+		Debug("Extract Action, assuming a zip")
+		return file, unzip(*buf, newDir)
+	}
 	return file, ioutil.WriteFile(file, *buf, 0755)
 }

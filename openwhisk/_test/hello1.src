@@ -15,26 +15,19 @@
  * limitations under the License.
  */
 
-package action
+package main
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
-func Hello(event json.RawMessage) (json.RawMessage, error) {
-	var obj struct {
-		Name string `json:",omitempty"`
-	}
-	err := json.Unmarshal(event, &obj)
-	if err != nil {
-		return nil, err
-	}
-	name := obj.Name
-	if name == "" {
+func hello(obj map[string]interface{}) map[string]interface{} {
+	name, ok := obj["name"].(string)
+	if !ok {
 		name = "Stranger"
 	}
 	fmt.Printf("name=%s\n", name)
-	msg := map[string]string{"hello": ("Hello, " + name + "!")}
-	return json.Marshal(msg)
+	msg := make(map[string]interface{})
+	msg["hello"] = "Hello, " + name + "!"
+	return msg
 }

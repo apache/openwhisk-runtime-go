@@ -23,6 +23,16 @@ function build {
    then return
    fi
    cp $1.src $1.go
+   GOPATH=$PWD go build -a -o $1 $1.go
+   rm $1.go
+}
+
+function build_main {
+   if test -e $1
+   then return
+   fi
+   cp ../../common/gobuild.py.launcher.go $1.go
+   cat $1.src >>$1.go
    go build -a -o $1 $1.go
    rm $1.go
 }
@@ -37,8 +47,6 @@ function zipit {
     rm -rf $$
 }
 
-go get github.com/apache/incubator-openwhisk-runtime-go/openwhisk
-
 build exec
 rm exec.zip
 zip -q -r exec.zip exec etc dir
@@ -46,11 +54,15 @@ zip -q -r exec.zip exec etc dir
 build hi
 zipit hi.zip hi main
 
-build hello_message
+build_main hello_message
 zipit hello_message.zip hello_message main
 zipit hello_message1.zip hello_message message
 
-build hello_greeting
+build_main hello_greeting
 zipit hello_greeting.zip hello_greeting main
 zipit hello_greeting1.zip hello_greeting greeting
 
+rm hello.zip
+cd src
+zip -q -r ../hello.zip main hello
+cd ..

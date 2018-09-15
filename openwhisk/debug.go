@@ -14,18 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package openwhisk
 
-package main
+import "log"
 
-import "fmt"
+// Debugging flag
+var Debugging = false
 
-func Main(obj map[string]interface{}) map[string]interface{} {
-	name, ok := obj["name"].(string)
-	if !ok {
-		name = "Stranger"
+// Debug emits a debug message
+func Debug(format string, args ...interface{}) {
+	if Debugging {
+		log.Printf(format, args...)
 	}
-	fmt.Printf("name=%s\n", name)
-	msg := make(map[string]interface{})
-	msg["message"] = "Hello, " + name + "!"
-	return msg
+}
+
+// DebugLimit emits a debug message with a limit in lenght
+func DebugLimit(msg string, in []byte, limit int) {
+	if len(in) < limit {
+		Debug("%s:%s", msg, in)
+	} else {
+		Debug("%s:%s...", msg, in[0:limit])
+	}
 }

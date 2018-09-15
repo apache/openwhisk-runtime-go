@@ -38,44 +38,47 @@ func Example_startTestServer() {
 	fmt.Print(res)
 	stopTestServer(ts, cur, log)
 	// Output:
-	// {"ok":true}
+	// {"error":"Missing main/no code to execute."}
 	// {"error":"Error unmarshaling request: invalid character 'X' looking for beginning of value"}
 	// {"error":"no action defined yet"}
-	// {"error":"Error unmarshaling request: invalid character 'X' looking for beginning of value"}
+	// {"error":"no action defined yet"}
 }
-func TestStartLatestAction(t *testing.T) {
 
-	// cleanup
-	os.RemoveAll("./action")
+func TestStartLatestAction_emit1(t *testing.T) {
+	os.RemoveAll("./action/t2")
 	logf, _ := ioutil.TempFile("/tmp", "log")
-	ap := NewActionProxy("./action", "", logf)
+	ap := NewActionProxy("./action/t2", "", logf, logf)
+	// start the action that emits 1
+	buf := []byte("#!/bin/sh\nwhile read a; do echo 1 >&3 ; done\n")
+	ap.ExtractAction(&buf, "main", "bin")
+	ap.StartLatestAction("main")
+	ap.theExecutor.io <- []byte("x")
+	res := <-ap.theExecutor.io
+	assert.Equal(t, res, []byte("1\n"))
+	ap.theExecutor.Stop()
+}
 
-	// start an action that terminate immediately
+func TestStartLatestAction_terminate(t *testing.T) {
+	os.RemoveAll("./action/t3")
+	logf, _ := ioutil.TempFile("/tmp", "log")
+	ap := NewActionProxy("./action/t3", "", logf, logf)
+	// now start an action that terminate immediately
 	buf := []byte("#!/bin/sh\ntrue\n")
-	ap.ExtractAction(&buf, "main")
+	ap.ExtractAction(&buf, "main", "bin")
 	ap.StartLatestAction("main")
 	assert.Nil(t, ap.theExecutor)
+}
 
-	// start the action that emits 1
-	buf = []byte("#!/bin/sh\nwhile read a; do echo 1 >&3 ; done\n")
-	ap.ExtractAction(&buf, "main")
-	ap.StartLatestAction("main")
-	ap.theExecutor.io <- "x"
-	assert.Equal(t, <-ap.theExecutor.io, "1")
-
-	// now start an action that terminate immediately
-	buf = []byte("#!/bin/sh\ntrue\n")
-	ap.ExtractAction(&buf, "main")
-	ap.StartLatestAction("main")
-	ap.theExecutor.io <- "y"
-	assert.Equal(t, <-ap.theExecutor.io, "1")
-
+func TestStartLatestAction_emit2(t *testing.T) {
+	os.RemoveAll("./action/t4")
+	logf, _ := ioutil.TempFile("/tmp", "log")
+	ap := NewActionProxy("./action/t4", "", logf, logf)
 	// start the action that emits 2
-	buf = []byte("#!/bin/sh\nwhile read a; do echo 2 >&3 ; done\n")
-	ap.ExtractAction(&buf, "main")
+	buf := []byte("#!/bin/sh\nwhile read a; do echo 2 >&3 ; done\n")
+	ap.ExtractAction(&buf, "main", "bin")
 	ap.StartLatestAction("main")
-	ap.theExecutor.io <- "z"
-	assert.Equal(t, <-ap.theExecutor.io, "2")
+	ap.theExecutor.io <- []byte("z")
+	assert.Equal(t, <-ap.theExecutor.io, []byte("2\n"))
 	/**/
 	ap.theExecutor.Stop()
 }
