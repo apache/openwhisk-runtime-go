@@ -27,25 +27,25 @@ class ActionLoopBasicTests extends BasicActionRunnerTests with WskActorSystem {
 
   val image = "actionloop"
 
-  override def withActionContainer(env: Map[String, String] = Map.empty)(code: ActionContainer => Unit) = {
+  override def withActionContainer(env: Map[String, String] = Map.empty)(
+      code: ActionContainer => Unit) = {
     withContainer(image, env)(code)
   }
 
-  def withActionLoopContainer(code: ActionContainer => Unit) = withContainer(image)(code)
+  def withActionLoopContainer(code: ActionContainer => Unit) =
+    withContainer(image)(code)
 
   behavior of image
 
   override val testNoSourceOrExec = TestConfig("")
 
-  override val testNotReturningJson = TestConfig(
-    """#!/bin/bash
+  override val testNotReturningJson = TestConfig("""#!/bin/bash
       |read line
       |echo '"not json"' >&3
       |read line
       |""".stripMargin)
 
-  override val testEcho = TestConfig(
-    """|#!/bin/bash
+  override val testEcho = TestConfig("""|#!/bin/bash
        |while read line
        |do
        |    echo "hello stdout"

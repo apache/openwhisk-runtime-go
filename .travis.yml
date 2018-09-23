@@ -4,7 +4,7 @@
 sudo: required
 language: go
 go:
-- 1.10.2
+- "1.11"
 services:
 - docker
 notifications:
@@ -25,13 +25,13 @@ deploy:
     repo: apache/incubator-openwhisk-runtime-go
 - provider: script
   skip_cleanup: true
-  script: "./tools/travis/publish.sh openwhisk actionProxyLoop master"
+  script: "./tools/travis/publish.sh openwhisk actionProxyLoop latest"
   on:
     branch: master
     repo: apache/incubator-openwhisk-runtime-go
 - provider: script
   skip_cleanup: true
-  script: "./tools/travis/publish.sh openwhisk golang1.10 master"
+  script: "./tools/travis/publish.sh openwhisk golang1.11 latest"
   on:
     branch: master
     repo: apache/incubator-openwhisk-runtime-go

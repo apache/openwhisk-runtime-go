@@ -23,16 +23,20 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ActionLoopBasicGoTests extends BasicActionRunnerTests with WskActorSystem {
+class ActionLoopBasicGoTests
+    extends BasicActionRunnerTests
+    with WskActorSystem {
 
   val goCompiler = "actionloop-golang-v1.11"
   val image = goCompiler
 
-  override def withActionContainer(env: Map[String, String] = Map.empty)(code: ActionContainer => Unit) = {
+  override def withActionContainer(env: Map[String, String] = Map.empty)(
+      code: ActionContainer => Unit) = {
     withContainer(image, env)(code)
   }
 
-  def withActionLoopContainer(code: ActionContainer => Unit) = withContainer(image)(code)
+  def withActionLoopContainer(code: ActionContainer => Unit) =
+    withContainer(image)(code)
 
   behavior of image
 
@@ -80,7 +84,6 @@ class ActionLoopBasicGoTests extends BasicActionRunnerTests with WskActorSystem 
        |}
        """.stripMargin)
 
-
   override val testEnv = TestConfig(
     """
       |package main
@@ -109,7 +112,9 @@ class ActionLoopBasicGoTests extends BasicActionRunnerTests with WskActorSystem 
        |func niam(args map[string]interface{}) map[string]interface{} {
        | return args
        |}
-    """.stripMargin, main="niam")
+    """.stripMargin,
+    main = "niam"
+  )
 
   override val testLargeInput = TestConfig(
     """|package main

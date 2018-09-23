@@ -29,14 +29,17 @@ import org.scalatest.junit.JUnitRunner
 import spray.json.{JsObject, JsString}
 
 @RunWith(classOf[JUnitRunner])
-class ActionLoopGoContainerTests extends ActionProxyContainerTestUtils with WskActorSystem {
+class ActionLoopGoContainerTests
+    extends ActionProxyContainerTestUtils
+    with WskActorSystem {
 
   import GoResourceHelpers._
 
   val goCompiler = "actionloop-golang-v1.11"
   val image = goCompiler
 
-  def withActionLoopContainer(code: ActionContainer => Unit) = withContainer(image)(code)
+  def withActionLoopContainer(code: ActionContainer => Unit) =
+    withContainer(image)(code)
 
   behavior of image
 
@@ -69,7 +72,6 @@ class ActionLoopGoContainerTests extends ActionProxyContainerTestUtils with WskA
   private def okMsg(key: String, value: String) =
     200 -> Some(JsObject(key -> JsString(value)))
 
-
   it should "run sample with init that does nothing" in {
     val (out, err) = withActionLoopContainer { c =>
       c.init(JsObject())._1 should be(403)
@@ -78,103 +80,90 @@ class ActionLoopGoContainerTests extends ActionProxyContainerTestUtils with WskA
   }
 
   it should "accept a binary main" in {
-    val exe = ExeBuilder.mkBase64Exe(
-      goCompiler, helloSrc("main"), "main")
+    val exe = ExeBuilder.mkBase64Exe(goCompiler, helloSrc("main"), "main")
 
-    withActionLoopContainer {
-      c =>
-        c.init(initPayload(exe))._1 shouldBe (200)
-        c.run(helloMsg()) should be(okMsg("main-main", "Hello, Demo!"))
+    withActionLoopContainer { c =>
+      c.init(initPayload(exe))._1 shouldBe (200)
+      c.run(helloMsg()) should be(okMsg("main-main", "Hello, Demo!"))
     }
   }
-
 
   //def pr(x: Any) = { println(x) ; x}
 
   it should "accept a zipped main binary" in {
-    val zip = ExeBuilder.mkBase64Zip(
-      goCompiler, helloSrc("main"), "main")
-    withActionLoopContainer {
-      c =>
-        c.init(initPayload(zip))._1 should be(200)
-        c.run(helloMsg()) should be(okMsg("main-main", "Hello, Demo!"))
+    val zip = ExeBuilder.mkBase64Zip(goCompiler, helloSrc("main"), "main")
+    withActionLoopContainer { c =>
+      c.init(initPayload(zip))._1 should be(200)
+      c.run(helloMsg()) should be(okMsg("main-main", "Hello, Demo!"))
     }
   }
 
   it should "accept a binary not-main" in {
-    val exe = ExeBuilder.mkBase64Exe(
-      goCompiler, helloSrc("hello"), "hello")
-    withActionLoopContainer {
-      c =>
-        c.init(initPayload(exe, "hello"))._1 shouldBe (200)
-        c.run(helloMsg()) should be(okMsg("main-hello", "Hello, Demo!"))
+    val exe = ExeBuilder.mkBase64Exe(goCompiler, helloSrc("hello"), "hello")
+    withActionLoopContainer { c =>
+      c.init(initPayload(exe, "hello"))._1 shouldBe (200)
+      c.run(helloMsg()) should be(okMsg("main-hello", "Hello, Demo!"))
     }
   }
 
   it should "accept a zipped binary not-main" in {
-    val zip = ExeBuilder.mkBase64Zip(
-      goCompiler, helloSrc("hello"), "hello")
-    withActionLoopContainer {
-      c =>
-        c.init(initPayload(zip, "hello"))._1 shouldBe (200)
-        c.run(helloMsg()) should be(okMsg("main-hello", "Hello, Demo!"))
+    val zip = ExeBuilder.mkBase64Zip(goCompiler, helloSrc("hello"), "hello")
+    withActionLoopContainer { c =>
+      c.init(initPayload(zip, "hello"))._1 shouldBe (200)
+      c.run(helloMsg()) should be(okMsg("main-hello", "Hello, Demo!"))
     }
   }
 
   it should "accept a src main action " in {
     var src = ExeBuilder.mkBase64Src(helloSrc("main"), "main")
-    withActionLoopContainer {
-      c =>
-        c.init(initPayload(src))._1 shouldBe (200)
-        c.run(helloMsg()) should be(okMsg("main-main", "Hello, Demo!"))
+    withActionLoopContainer { c =>
+      c.init(initPayload(src))._1 shouldBe (200)
+      c.run(helloMsg()) should be(okMsg("main-main", "Hello, Demo!"))
     }
   }
 
   it should "accept a src not-main action " in {
     var src = ExeBuilder.mkBase64Src(helloSrc("hello"), "hello")
-    withActionLoopContainer {
-      c =>
-        c.init(initPayload(src, "hello"))._1 shouldBe (200)
-        c.run(helloMsg()) should be(okMsg("main-hello", "Hello, Demo!"))
+    withActionLoopContainer { c =>
+      c.init(initPayload(src, "hello"))._1 shouldBe (200)
+      c.run(helloMsg()) should be(okMsg("main-hello", "Hello, Demo!"))
     }
   }
 
-
   it should "accept a zipped src main action" in {
     var src = ExeBuilder.mkBase64SrcZip(helloSrc("main"), "main")
-    withActionLoopContainer {
-      c =>
-        c.init(initPayload(src))._1 shouldBe (200)
-        c.run(helloMsg()) should be(okMsg("main-main", "Hello, Demo!"))
+    withActionLoopContainer { c =>
+      c.init(initPayload(src))._1 shouldBe (200)
+      c.run(helloMsg()) should be(okMsg("main-main", "Hello, Demo!"))
     }
   }
 
   it should "accept a zipped src not-main action" in {
     var src = ExeBuilder.mkBase64SrcZip(helloSrc("hello"), "hello")
-    withActionLoopContainer {
-      c =>
-        c.init(initPayload(src, "hello"))._1 shouldBe (200)
-        c.run(helloMsg()) should be(okMsg("main-hello", "Hello, Demo!"))
+    withActionLoopContainer { c =>
+      c.init(initPayload(src, "hello"))._1 shouldBe (200)
+      c.run(helloMsg()) should be(okMsg("main-hello", "Hello, Demo!"))
     }
   }
 
   it should "deploy a zip main src with subdir" in {
-    var src = ExeBuilder.mkBase64SrcZip(Seq(
-      Seq("hello", "hello.go") -> helloGo("Hello", "hello"),
-      Seq("main") ->
-        """
+    var src = ExeBuilder.mkBase64SrcZip(
+      Seq(
+        Seq("hello", "hello.go") -> helloGo("Hello", "hello"),
+        Seq("main") ->
+          """
           |package main
           |import "hello"
           |func Main(args map[string]interface{})map[string]interface{} {
           | return hello.Hello(args)
           |}
         """.stripMargin
-    ), "main")
-    withActionLoopContainer {
-      c =>
-        c.init(initPayload(src))._1 shouldBe (200)
-        c.run(helloMsg()) should be(okMsg("hello-Hello", "Hello, Demo!"))
+      ),
+      "main"
+    )
+    withActionLoopContainer { c =>
+      c.init(initPayload(src))._1 shouldBe (200)
+      c.run(helloMsg()) should be(okMsg("hello-Hello", "Hello, Demo!"))
     }
   }
 }
-
