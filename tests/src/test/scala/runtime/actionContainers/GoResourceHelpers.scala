@@ -29,6 +29,7 @@ import actionContainers.ResourceHelpers
 import scala.util.Random
 
 object GoResourceHelpers {
+
   /** Create a temporary directory in your /tmp directory.
     * /tmp/openwhisk/random-lowercase-string/prefix+suffix
     *
@@ -39,12 +40,18 @@ object GoResourceHelpers {
     *
     */
   def tmpDirectoryFile(prefix: String, suffix: String = "") =
-    new File(new File(new File("/tmp", "openwhisk"),
-      Random.alphanumeric.take(10).toArray.mkString.toLowerCase /*random filename alphanumeric and lower case*/)
-      , prefix++suffix)
+    new File(
+      new File(new File("/tmp", "openwhisk"),
+               Random.alphanumeric
+                 .take(10)
+                 .toArray
+                 .mkString
+                 .toLowerCase /*random filename alphanumeric and lower case*/ ),
+      prefix ++ suffix
+    )
 
   def createTmpDirectory(prefix: String, suffix: String = "") = {
-    val tmpDir = tmpDirectoryFile(prefix,suffix)
+    val tmpDir = tmpDirectoryFile(prefix, suffix)
     tmpDir.mkdirs()
     tmpDir.toPath.toAbsolutePath
   }
@@ -62,7 +69,9 @@ object GoResourceHelpers {
     val arPath = createTmpDirectory("output", extension).toAbsolutePath()
 
     // We "mount" it as a filesystem, so we can just copy files into it.
-    val dstUri = new URI("jar:" + arPath.toUri().getScheme(), arPath.toAbsolutePath().toString(), null)
+    val dstUri = new URI("jar:" + arPath.toUri().getScheme(),
+                         arPath.toAbsolutePath().toString(),
+                         null)
     // OK, that's a hack. Doing this because newFileSystem wants to create that file.
     arPath.toFile().delete()
     val fs = FileSystems.newFileSystem(dstUri, Map(("create" -> "true")).asJava)
@@ -91,13 +100,13 @@ object GoResourceHelpers {
 
           FileVisitResult.CONTINUE
         }
-      })
+      }
+    )
 
     fs.close()
 
     arPath
   }
-
 
   /**
     * Creates a temporary directory in the home and reproduces the desired file structure
@@ -108,7 +117,8 @@ object GoResourceHelpers {
     * a tmp folder in the home directory.
     *
     * */
-  private def writeSourcesToHomeTmpDirectory(sources: Seq[(Seq[String], String)]): (Path, Seq[Path]) = {
+  private def writeSourcesToHomeTmpDirectory(
+      sources: Seq[(Seq[String], String)]): (Path, Seq[Path]) = {
     // A temporary directory for the source files.
     val srcDir = createTmpDirectory("src")
     val srcAbsPaths = for ((sourceName, sourceContent) <- sources) yield {
@@ -145,7 +155,9 @@ object GoResourceHelpers {
 
     // prepare sources, then compile them
     // return the exe File  and the output dir Path
-    private def compile(image: String, sources: Seq[(Seq[String], String)], main: String) = {
+    private def compile(image: String,
+                        sources: Seq[(Seq[String], String)],
+                        main: String) = {
       require(!sources.isEmpty)
 
       // The absolute paths of the source file
@@ -172,13 +184,17 @@ object GoResourceHelpers {
 
     }
 
-    def mkBase64Exe(image: String, sources: Seq[(Seq[String] /*lines*/, String /*name*/)], main: String) = {
+    def mkBase64Exe(image: String,
+                    sources: Seq[(Seq[String] /*lines*/, String /*name*/ )],
+                    main: String) = {
       val (exe, dir) = compile(image, sources, main)
       //println(s"exe=${exe.getAbsolutePath}")
       ResourceHelpers.readAsBase64(exe.toPath)
     }
 
-    def mkBase64Zip(image: String, sources: Seq[(Seq[String], String)], main: String) = {
+    def mkBase64Zip(image: String,
+                    sources: Seq[(Seq[String], String)],
+                    main: String) = {
       val (exe, dir) = compile(image, sources, main)
       val archive = makeZipFromDir(dir)
       //println(s"zip=${archive.toFile.getAbsolutePath}")

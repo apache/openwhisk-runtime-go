@@ -26,13 +26,16 @@ import org.scalatest.junit.JUnitRunner
 import spray.json.{JsObject, JsString}
 
 @RunWith(classOf[JUnitRunner])
-class ActionLoopContainerTests extends ActionProxyContainerTestUtils with WskActorSystem {
+class ActionLoopContainerTests
+    extends ActionProxyContainerTestUtils
+    with WskActorSystem {
 
   import GoResourceHelpers._
 
   val image = "actionloop"
 
-  def withActionLoopContainer(code: ActionContainer => Unit) = withContainer("actionloop")(code)
+  def withActionLoopContainer(code: ActionContainer => Unit) =
+    withContainer("actionloop")(code)
 
   behavior of "actionloop"
 
@@ -58,7 +61,6 @@ class ActionLoopContainerTests extends ActionProxyContainerTestUtils with WskAct
   private def okMsg(key: String, value: String) =
     200 -> Some(JsObject(key -> JsString(value)))
 
-
   it should "run sample with init that does nothing" in {
     val (out, err) = withActionLoopContainer { c =>
       c.init(JsObject())._1 should be(403)
@@ -66,25 +68,21 @@ class ActionLoopContainerTests extends ActionProxyContainerTestUtils with WskAct
     }
   }
 
-
   it should "deploy a shell script" in {
     val script = shCodeHello("main")
     val mesg = ExeBuilder.mkBase64Src(script, "main")
-    withActionLoopContainer {
-      c =>
-        val payload = initPayload(mesg)
-        c.init(payload)._1 should be(200)
-        c.run(helloMsg()) should be(okMsg("main", "Hello, Demo"))
+    withActionLoopContainer { c =>
+      val payload = initPayload(mesg)
+      c.init(payload)._1 should be(200)
+      c.run(helloMsg()) should be(okMsg("main", "Hello, Demo"))
     }
   }
 
   it should "deploy a zip based script" in {
     val scr = ExeBuilder.mkBase64SrcZip(shCodeHello("main"), "main")
-    withActionLoopContainer {
-      c =>
-        c.init(initPayload(scr))._1 should be(200)
-        c.run(helloMsg()) should be(okMsg("main", "Hello, Demo"))
+    withActionLoopContainer { c =>
+      c.init(initPayload(scr))._1 should be(200)
+      c.run(helloMsg()) should be(okMsg("main", "Hello, Demo"))
     }
   }
- }
-
+}
