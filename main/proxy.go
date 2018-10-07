@@ -53,14 +53,15 @@ func extractAndCompile(ap *openwhisk.ActionProxy) {
 
 	// read the file, zip it and write it to stdout
 	buf := new(bytes.Buffer)
-	zip := zip.NewWriter(buf)
-	f, err := zip.Create("exec")
+	zwr := zip.NewWriter(buf)
+	zf, err := zwr.Create("exec")
 	fatalIf(err)
 	filedata, err := ioutil.ReadFile(file)
 	fatalIf(err)
-
-	_, err = f.Write(filedata)
+	_, err = zf.Write(filedata)
 	fatalIf(err)
+	fatalIf(zwr.Flush())
+	fatalIf(zwr.Close())
 	_, err = os.Stdout.Write(buf.Bytes())
 	fatalIf(err)
 }

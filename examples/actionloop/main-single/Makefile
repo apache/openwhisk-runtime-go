@@ -1,23 +1,20 @@
 MAIN=main
-RUSER ?= openwhisk
-RUNTIME=$(RUSER)/actionloop
-CUSER ?= openwhisk
-COMPILER=$(CUSER)/actionloop-golang-v1.11
+OW_RUNTIME?=openwhisk/actionloop
+OW_COMPILER?=openwhisk/actionloop-golang-v1.11
 SRC=$(MAIN).go
 NAME=golang-$(MAIN)-single
 ZIP=$(MAIN).zip
-WSK ?= wsk
+WSK?=wsk
 
 deploy: test.done $(ZIP)
-	$(WSK) action update test/$(NAME) $(ZIP) --main $(MAIN) --docker $(RUNTIME)
+	$(WSK) action update test/$(NAME) $(ZIP) --main $(MAIN) --docker $(OW_RUNTIME)
 
 $(ZIP): $(SRC)
-	docker run -i $(COMPILER) -compile $(MAIN) <$(SRC) >$(MAIN)
-	zip $(ZIP) $(MAIN)
+	docker run -i $(OW_COMPILER) -compile $(MAIN) <$(SRC) >$(ZIP)
 
 clean:
 	wsk action delete test/$(NAME)
-	rm $(MAIN) $(ZIP) test.done
+	rm $(ZIP) test.done
 
 test: deploy
 	$(WSK) action invoke test/$(NAME) -r

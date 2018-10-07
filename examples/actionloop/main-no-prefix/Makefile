@@ -3,7 +3,7 @@ OW_COMPILER?=openwhisk/actionloop-golang-v1.11
 WSK?=wsk
 MAIN=main
 SRC=src/$(MAIN).go
-NAME=golang-$(MAIN)-zip-package
+NAME=golang-$(MAIN)-no-prefix
 ZIP=$(MAIN).zip
 
 deploy: test.done $(ZIP)
