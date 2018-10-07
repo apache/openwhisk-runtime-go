@@ -18,7 +18,7 @@
 cd "$(dirname $0)"
 SRC=${1:?source file or dir}
 ID=${2:?target dir}
-TGT=${3:-main}
+TGT=${3:-exec}
 ETC=${4:-}
 rm -Rvf compile/$ID >/dev/null
 mkdir -p compile/$ID/src compile/$ID/bin

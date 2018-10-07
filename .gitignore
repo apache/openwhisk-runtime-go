@@ -44,3 +44,10 @@ tests/out/
 # VSCode
 .vscode
 
+# examples
+exec
+*.done
+*.zip
+*_launcher_.go
+pkg/
+bin/

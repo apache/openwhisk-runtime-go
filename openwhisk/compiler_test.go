@@ -50,39 +50,33 @@ const (
 )
 
 // compile a main
-func Example() {
-	sys(PREP, "hello.src", "0", "main")
+func Example_compile() {
+	sys(PREP, "hello.src", "0", "exec")
 	ap := NewActionProxy(TMP, COMP, os.Stdout, os.Stderr)
-	fmt.Println(isCompiled(TMP+"0/src", "main"))
-	fmt.Println(isCompiled(TMP+"0/src/main", "main"))
+	fmt.Println(isCompiled(TMP + "0/src/exec"))
 	ap.CompileAction("main", TMP+"0/src", TMP+"0/bin")
-	sys(CHECK, TMP+"0/bin/main")
-	fmt.Println(isCompiled(TMP+"0/bin", "main"))
-	fmt.Println(isCompiled(TMP+"0/bin/main", "main"))
+	sys(CHECK, TMP+"0/bin/exec")
+	fmt.Println(isCompiled(TMP + "0/bin/exec"))
 	// errors
-	fmt.Println(isCompiled(TMP+"0/bin1/main", "main"))
-	fmt.Println(isCompiled(TMP+"0/bin/main1", "main"))
+	fmt.Println(isCompiled(TMP + "0/bin/exec1"))
 	// Output:
 	// false
-	// false
-	// _test/compile/0/bin/main: application/x-executable
+	// _test/compile/0/bin/exec: application/x-executable
 	// name=Mike
 	// {"message":"Hello, Mike!"}
 	// true
-	// true
-	// false
 	// false
 }
 
 // compile a not-main (hello) function
 func Example_hello() {
 	N := "1"
-	sys(PREP, "hello1.src", N, "hello")
+	sys(PREP, "hello1.src", N, "exec")
 	ap := NewActionProxy(TMP, COMP, os.Stdout, os.Stderr)
 	ap.CompileAction("hello", TMP+N+"/src", TMP+N+"/bin")
-	sys(CHECK, TMP+N+"/bin/hello")
+	sys(CHECK, TMP+N+"/bin/exec")
 	// Output:
-	// _test/compile/1/bin/hello: application/x-executable
+	// _test/compile/1/bin/exec: application/x-executable
 	// name=Mike
 	// {"hello":"Hello, Mike!"}
 }
@@ -90,12 +84,12 @@ func Example_hello() {
 // compile a function including a package
 func Example_package() {
 	N := "2"
-	sys(PREP, "hello2.src", N, "main", "hello")
+	sys(PREP, "hello2.src", N, "exec", "hello")
 	ap := NewActionProxy(TMP, COMP, os.Stdout, os.Stderr)
 	ap.CompileAction("main", TMP+N+"/src", TMP+N+"/bin")
-	sys(CHECK, TMP+N+"/bin/main")
+	sys(CHECK, TMP+N+"/bin/exec")
 	// Output:
-	// _test/compile/2/bin/main: application/x-executable
+	// _test/compile/2/bin/exec: application/x-executable
 	// Main
 	// Hello, Mike
 	// {"greetings":"Hello, Mike"}
@@ -103,22 +97,21 @@ func Example_package() {
 
 func Example_compileError() {
 	N := "6"
-	sys(PREP, "hi1.src", N)
+	sys(PREP, "error.src", N)
 	ap := NewActionProxy(TMP, COMP, os.Stdout, os.Stderr)
 	err := ap.CompileAction("main", TMP+N+"/src", TMP+N+"/bin")
 	fmt.Printf("%v", removeLineNr(err.Error()))
 	// Unordered output:
-	// ./func_Main_.go::: undefined: bufio
-	// ./func_Main_.go::: undefined: os
+	// ./exec__.go::: syntax error: unexpected error at end of statement
 }
 
 func Example_withMain() {
 	N := "7"
-	sys(PREP, "hi.src", N)
+	sys(PREP, "hi.src", N, "main.go")
 	ap := NewActionProxy(TMP, COMP, os.Stdout, os.Stderr)
 	err := ap.CompileAction("main", TMP+N+"/src", TMP+N+"/bin")
 	fmt.Println(err)
-	sys(TMP + N + "/bin/main")
+	sys(TMP + N + "/bin/exec")
 	// Output:
 	// <nil>
 	// hi

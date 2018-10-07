@@ -23,7 +23,7 @@ function build {
    then return
    fi
    cp $1.src $1.go
-   GOPATH=$PWD go build -a -o $1 $1.go
+   GOPATH=$PWD go build -a -o exec $1.go
    rm $1.go
 }
 
@@ -33,7 +33,7 @@ function build_main {
    fi
    cp ../../common/gobuild.py.launcher.go $1.go
    cat $1.src >>$1.go
-   go build -a -o $1 $1.go
+   go build -a -o exec $1.go
    rm $1.go
 }
 
@@ -48,21 +48,19 @@ function zipit {
 }
 
 build exec
-rm exec.zip
+rm exec.zip 2>/dev/null
 zip -q -r exec.zip exec etc dir
 
 build hi
-zipit hi.zip hi main
+zipit hi.zip hi exec
 
 build_main hello_message
-zipit hello_message.zip hello_message main
-zipit hello_message1.zip hello_message message
+zipit hello_message.zip hello_message exec
 
 build_main hello_greeting
-zipit hello_greeting.zip hello_greeting main
-zipit hello_greeting1.zip hello_greeting greeting
+zipit hello_greeting.zip hello_greeting exec
 
-rm hello.zip
+rm hello.zip 2>/dev/null
 cd src
-zip -q -r ../hello.zip main hello
+zip -q -r ../hello.zip main.go hello
 cd ..

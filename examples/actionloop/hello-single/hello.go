@@ -14,20 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
-func Hello(obj map[string]interface{}) map[string]interface{} {
+// Hello function for the action
+func hello(obj map[string]interface{}) map[string]interface{} {
 	name, ok := obj["name"].(string)
 	if !ok {
-		name = "Stranger"
+		name = "world"
 	}
 	fmt.Printf("name=%s\n", name)
 	msg := make(map[string]interface{})
-	msg["hello"] = "Hello, " + name + "!"
+	msg["hello-single"] = "Hello, " + name + "!"
 	return msg
 }

@@ -1,4 +1,4 @@
-<!--
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -15,23 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
--->
-
-# Apache OpenWhisk Runtime for Go (and Generic executables)
-
-[![Build Status](https://travis-ci.org/apache/incubator-openwhisk-runtime-go.svg?branch=master)](https://travis-ci.org/apache/incubator-openwhisk-runtime-go)
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
-[![Join Slack](https://img.shields.io/badge/join-slack-9B69A0.svg)](http://slack.openwhisk.org/)
-
-:warning: Work in progress :warning:
-
-This is an OpenWhisk runtime for Golang and Generic executables.
-
-- [Building  it](BUILD.md#building)
-- [Developing it](BUILD.md#development)
-- [Using it with Go Sources](#gosources)
-- [Precompiling Go Sources](#precompile)
-- [Using it with Generic executables](PROTOCOL.md#generic)
-
-
-
+while read line
+do
+   name="$(echo $line | jq -r .value.name)"
+   test "$name" == "null" && name="world"
+   echo msg="hello $name"
+   echo '{"bash": "'$name'"}' >&3
+done

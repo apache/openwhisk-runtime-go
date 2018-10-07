@@ -26,40 +26,46 @@ import subprocess
 
 def sources(launcher, source_dir, main):
 
-    # if you choose main, then it must be upper case
-    func = "Main" if main == "main" else main
-
-    # copy the uploaded main code, if it exists
-    src = "%s/%s" % (source_dir, main)
+    func = main.capitalize()
     has_main = None
+
+    # copy the exec to exec.go 
+    src = "%s/exec" % source_dir
+    dst = "%s/exec__.go" % source_dir
     if os.path.isfile(src):
-        dst = "%s/func_%s_.go" % (source_dir, func)
-        with codecs.open(dst, 'w', 'utf-8') as d:
-            with codecs.open(src, 'r', 'utf-8') as s:
-                body = s.read()
-                has_main = re.match(r".*package\s+main\W.*func\s+main\s*\(\s*\)", body, flags=re.DOTALL)
-                d.write(body)
-
-
+        with codecs.open(src, 'r', 'utf-8') as s:
+            with codecs.open(dst, 'w', 'utf-8') as d:
+                d.write(s.read())
+ 
+    # check if it exists a main.go and it has a func main
+    src = "%s/main.go" % source_dir 
+    if os.path.isfile(src):
+        with codecs.open(src, 'r', 'utf-8') as s:
+            body = s.read()
+            has_main = re.match(r".*package\s+main\W.*func\s+main\s*\(\s*\)", body, flags=re.DOTALL)
+ 
+ 
     # copy the launcher fixing the main
     if not has_main:
-        dst = "%s/launch_%s_.go" % (source_dir, func)
+        dst = "%s/main__.go" % source_dir
         with codecs.open(dst, 'w', 'utf-8') as d:
             with codecs.open(launcher, 'r', 'utf-8') as e:
                 code = e.read()
                 code = code.replace("Main", func)
                 d.write(code)
 
-    return os.path.abspath(dst)
-
 def build(parent, source_dir, target):
     # compile...
+    env = {  
+      "PATH": os.environ["PATH"],
+      "GOPATH": os.path.abspath(parent)
+    }
     p = subprocess.Popen(
-        ["go", "build", "-i", "-o", target],
+        ["go", "build", "-i", "-ldflags=-s -w",  "-o", target],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         cwd=source_dir,
-        env={ "GOPATH": os.path.abspath(parent), "PATH": os.environ["PATH"]})
+        env=env)
     (o, e) = p.communicate()
 
     # stdout/stderr may be either text or bytes, depending on Python
@@ -91,10 +97,10 @@ def main(argv):
     source_dir = argv[2]
     target_dir = argv[3]
 
-    parent = os.path.dirname(source_dir)
-    source = sources(argv[0]+".launcher.go", source_dir, main)
-    target = os.path.abspath("%s/%s" % (target_dir, main))
+    parent = os.path.dirname(os.path.abspath(source_dir))
+    target = os.path.abspath("%s/exec" % target_dir)
 
+    sources(argv[0]+".launcher.go", source_dir, main)
     build(parent, source_dir, target)
 
 if __name__ == '__main__':

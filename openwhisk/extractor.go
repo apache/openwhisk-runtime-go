@@ -103,7 +103,7 @@ func highestDir(dir string) int {
 // it handles zip files extracting the content
 // it stores in a new directory under ./action/XXX/suffix where x is incremented every time
 // it returns the file if a file or the directory if it was a zip file
-func (ap *ActionProxy) ExtractAction(buf *[]byte, main string, suffix string) (string, error) {
+func (ap *ActionProxy) ExtractAction(buf *[]byte, suffix string) (string, error) {
 	if buf == nil || len(*buf) == 0 {
 		return "", fmt.Errorf("no file")
 	}
@@ -114,7 +114,7 @@ func (ap *ActionProxy) ExtractAction(buf *[]byte, main string, suffix string) (s
 	if err != nil {
 		return "", err
 	}
-	file := newDir + "/" + main
+	file := newDir + "/exec"
 	if kind.Extension == "zip" {
 		Debug("Extract Action, assuming a zip")
 		return file, unzip(*buf, newDir)
