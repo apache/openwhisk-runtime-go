@@ -105,7 +105,7 @@ The image can execute, compiling them on the fly, Golang OpenWhisk actions in so
 
 An action must be a Go source file, placed in the `main` package and your action.
 
-Since `main.main` is reserved in Golang for the entry point of your program, and the entry point is used by support code, your action must be named `Main` (with capital `M`) even if your specify `main` as the name of the action (or you do not specify it, defaulting to `main`). Also if you specify a function name different than `main`, for example `hello`, the name of your function  need to be capitalized, so your entry point will be `main.Hello`. 
+Since `main.main` is reserved in Golang for the entry point of your program, and the entry point is used by support code, your action must be named `Main` (with capital `M`) even if your specify `main` as the name of the action (or you do not specify it, defaulting to `main`). Also if you specify a function name different than `main`, for example `hello`, the name of your function  need to be capitalized, so your entry point will be `main.Hello`.
 
 The expected signature for a `main` function is:
 

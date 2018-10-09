@@ -16,3 +16,5 @@ test.done:
 
 clean:
 	$(WSK) action delete test/$(NAME)
+
+.PHONY: test deploy clean

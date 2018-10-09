@@ -24,4 +24,4 @@ test.done:
 	$(WSK) package update test
 	touch test.done
 
-.PHONY: deploy test
+.PHONY: deploy test clean
