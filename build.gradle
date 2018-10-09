@@ -31,7 +31,7 @@ plugins {
 dependencies {
     golang {
         build 'github.com/h2non/filetype@v1.0.5'
-        build 'github.com/apache/incubator-openwhisk-client-go#e452b524cd745f71c913c5acccf72a8daba6dc71'
+        build 'github.com/sirupsen/logrus@v1.1.0'
         test 'github.com/stretchr/testify@v1.2.1'
     }
 }
