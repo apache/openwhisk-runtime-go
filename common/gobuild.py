@@ -29,22 +29,17 @@ def sources(launcher, source_dir, main):
     func = main.capitalize()
     has_main = None
 
-    # copy the exec to exec.go 
+    # copy the exec to exec.go
+    # also check if it has a main in it
     src = "%s/exec" % source_dir
     dst = "%s/exec__.go" % source_dir
     if os.path.isfile(src):
         with codecs.open(src, 'r', 'utf-8') as s:
             with codecs.open(dst, 'w', 'utf-8') as d:
-                d.write(s.read())
- 
-    # check if it exists a main.go and it has a func main
-    src = "%s/main.go" % source_dir 
-    if os.path.isfile(src):
-        with codecs.open(src, 'r', 'utf-8') as s:
-            body = s.read()
-            has_main = re.match(r".*package\s+main\W.*func\s+main\s*\(\s*\)", body, flags=re.DOTALL)
- 
- 
+                body = s.read()
+                has_main = re.match(r".*package\s+main\W.*func\s+main\s*\(\s*\)", body, flags=re.DOTALL)
+                d.write(body)
+
     # copy the launcher fixing the main
     if not has_main:
         dst = "%s/main__.go" % source_dir
@@ -56,7 +51,7 @@ def sources(launcher, source_dir, main):
 
 def build(parent, source_dir, target):
     # compile...
-    env = {  
+    env = {
       "PATH": os.environ["PATH"],
       "GOPATH": os.path.abspath(parent)
     }

@@ -107,7 +107,7 @@ func Example_compileError() {
 
 func Example_withMain() {
 	N := "7"
-	sys(PREP, "hi.src", N, "main.go")
+	sys(PREP, "hi.src", N, "exec")
 	ap := NewActionProxy(TMP, COMP, os.Stdout, os.Stderr)
 	err := ap.CompileAction("main", TMP+N+"/src", TMP+N+"/bin")
 	fmt.Println(err)
