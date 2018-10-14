@@ -35,7 +35,7 @@ func TestHello_noName(t *testing.T) {
 	var input = make(map[string]interface{})
 	output := Hello(input)
 	json, _ := json.Marshal(output)
-	if string(json) != `{"hello-zip-vendor":"Hello, world"}` {
+	if string(json) != `{"golang-hello-vendor":"Hello, world"}` {
 		t.Fail()
 	}
 }
