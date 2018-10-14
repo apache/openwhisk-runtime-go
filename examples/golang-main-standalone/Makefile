@@ -21,9 +21,12 @@ clean:
 	wsk action delete $(PACKAGE)/$(NAME)
 	rm $(ZIP) package.done
 
-test: 
+test: test.json
 	$(WSK) action invoke test/$(NAME) -r
-	$(WSK) action invoke test/$(NAME) -P name.json -r
+	$(WSK) action invoke test/$(NAME) -P test.json -r
+
+test.json:
+	echo '{ "name": "Mike" }' >test.json
 
 package.done:
 	$(WSK) package update $(PACKAGE)

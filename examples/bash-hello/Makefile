@@ -8,15 +8,21 @@ SRC=hello.sh
 deploy: package.done
 	$(WSK) action update $(PACKAGE)/$(NAME) $(SRC) --docker $(OW_RUNTIME)
 
-test: 
+devel: deploy
+
+test: test.json
 	$(WSK) action invoke $(PACKAGE)/$(NAME) -r
-	$(WSK) action invoke $(PACKAGE)/$(NAME) -P name.json -r
+	$(WSK) action invoke $(PACKAGE)/$(NAME) -P test.json -r
+
+clean:
+	$(WSK) action delete $(PACKAGE)/$(NAME)
 
 package.done:
 	$(WSK) package update $(PACKAGE)
 	touch package.done
 
-clean:
-	$(WSK) action delete $(PACKAGE)/$(NAME)
+test.json:
+	echo '{ "name": "Mike" }' >test.json
 
-.PHONY: test deploy clean
+
+.PHONY: test devel deploy clean

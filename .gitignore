@@ -49,5 +49,6 @@ exec
 *.done
 *.zip
 *_launcher_.go
+test.json
 pkg/
 bin/
