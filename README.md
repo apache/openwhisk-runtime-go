@@ -11,7 +11,7 @@ This is an OpenWhisk runtime for Golang and Generic executables.
 - How to deploy your [Golang](docs/DEPLOY.md#golang) sources
 - Precompiling [Golang](docs/DEPLOY.md#precompile) actions
 - Writing [Generic](docs/ACTION.md#generic) actions,  in bash or as a generic linux binary
-- Deploying for [Generic](docs/DEPLOY.md#generic)  
+- Deployment for [Generic](docs/DEPLOY.md#generic)   actions
 - The [ActionLoop](docs/ACTION.md#actionloop) protocol for generic actions
 - How to use VSCode to write [Golang](docs/DEPLOY.md#vscode) actions
 - How to [Build](docs/BUILD.md#building) the runtime, with development notes
