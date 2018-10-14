@@ -72,7 +72,7 @@ OSX: `brew install zip coreutils`
 
 **NOTE**: Because tests build and cache some binary files, perform a `git clean -fx` and **do not share folders between linux and osx** because binaries are in different format...
 
-You can also run the tests in go, without using `gradle` with 
+You can also run the tests in go, without using `gradle` with
 
 ```
 cd openwhisk

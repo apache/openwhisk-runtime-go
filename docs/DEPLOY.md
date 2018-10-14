@@ -27,10 +27,10 @@ THere are two images provided: the `actionloop` and the `actionloop-golang-v1.11
 
 The runtime `actionlooop` accepts:
 
-- single file executable 
+- single file executable
 - a zip file containing an executables
 
-If the input is a single file, it can be either a in ELF format for architecture AMD64 implementing the ActionLoop protocol. 
+If the input is a single file, it can be either a in ELF format for architecture AMD64 implementing the ActionLoop protocol.
 
 It can also be a script, identified by the `#!` hash-bang path at the beginning. The default `actionloop` can execute `bash` shell scripts and can use the `jq` command to parse JSON files and the `curl` command to invoke other actions.
 
@@ -43,14 +43,11 @@ If the file is a zipped file, it must contain in the top level (*not* in a subdi
 The runtime `actionloop-golang-v1.11` accepts:
 
 - executable binaries implementing the ActionLoop protocol as Linux ELF executable compiled for the AMD64 architecture (as the `actionloop` runtme)
-
 - zip files containing a binary executable named `exec` in the top level, and it must be again a Linux ELF executable compiled for the AMD64 architecture
+- a single file action that is not an executable binary will be interpreted as source code and it will be compiled in a binary as described in the document about [actions](ACTION.md)
+- a zip file not containing in the top level a binary file `exec` will  be interpreted as a collection of zip files, and it will be compiled in a binary as described in the document about [actions](ACTION.md)
 
-- a single file action that is not an executable binary will be interpreted as source code, and it will be compiled in a binary as described in the document about [actions](ACTION.md). 
-
-- a zip file not containing in the top level a binary file `exec` will  be interpreted as a collection of zip files, and it will be compiled in a binary as described in the document about [actions](ACTION.md). 
-
-Please note in the separate the rules about the name of the main function (that defaults to `main.Main`), and the rules about how to overwrite the `main.main` 
+Please note in the separate the rules about the name of the main function (that defaults to `main.Main`), and the rules about how to overwrite the `main.main`.
 
 ## Using packages and vendor folder
 
@@ -91,14 +88,12 @@ When you need to use third part libraries, the runtime does not download them fr
 
 *NOTE* the `vendor` folder does not work at the top level, you have to use a `src` folder and a package folder to have also the vendor folder.
 
-If you want for example use the library `github.com/sirupsen/logrus` to manage your logs (a widely used drop-in replacement for the standard `log` package), you have to include it in your source code *in a sub package*. 
+If you want for example use the library `github.com/sirupsen/logrus` to manage your logs (a widely used drop-in replacement for the standard `log` package), you have to include it in your source code *in a sub package*.
 
 For example consider you have in the file `src/hello/hello.go` the import:
 
 ```
-import (
-	"github.com/sirupsen/logrus"
-)
+import "github.com/sirupsen/logrus"
 ```
 
 To create a vendor folder, you need to

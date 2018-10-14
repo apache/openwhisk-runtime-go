@@ -16,13 +16,13 @@
 # limitations under the License.
 #
 -->
-# Writing actions for the Golang and ActionLoop runtime 
+# Writing actions for the Golang and ActionLoop runtime
 
 <a name="golang"/>
 
 ## How to write Go Actions
 
-The `actionloop-golang-v1.11` runtime can execute actions written in the Go programming language in OpenWhisk, either precompiled binary or compiling sources on the fly. 
+The `actionloop-golang-v1.11` runtime can execute actions written in the Go programming language in OpenWhisk, either precompiled binary or compiling sources on the fly.
 
 ### Entry Point
 
@@ -40,7 +40,7 @@ The expected signature for a `main` function is:
 
 `func Main(event map[string]interface{}) map[string]interface{}`
 
-So a very simple `hello world` function would be: 
+So a very simple `hello world` function would be:
 
 ```go
 package main
@@ -63,7 +63,7 @@ func Main(obj map[string]interface{}) map[string]interface{} {
 }
 ```
 
-You can also have multiple source files in an action, packages and vendor folders.  Check the [deployment](DEPLOYMENT.md) document for more details how to package and deploy actions. 
+You can also have multiple source files in an action, packages and vendor folders.  Check the [deployment](DEPLOYMENT.md) document for more details how to package and deploy actions.
 
 <a name="generic"/>
 
@@ -73,7 +73,7 @@ The `actionloop` runtime can execute  generic Linux executable in an efficient w
 
 <a name="actionloop">
 
-### The Action Loop Protocol 
+### The Action Loop Protocol
 
 The protocol can be specified informally as follow.
 
@@ -93,19 +93,16 @@ The protocol can be specified informally as follow.
 ```
 
 Note however that more values could be provided in future.
-Usually this JSON is read and the values are stored in environment variables, converted to upper case the key and  and adding the prefix `__OW_`. 
+Usually this JSON is read and the values are stored in environment variables, converted to upper case the key and  and adding the prefix `__OW_`.
 
 - The payload of the request is stored in the key `value`. The action should read the field `value` assuming it is a JSON object (note, not an array, nor a string or number) and parse it.
-
-- The action can now perform its tasks as appropriate. The action can produce log writing  in standard output (file descriptor 1) and standard error (file descriptor 3) . Note that those corresponds to file descriptors 1 and 2. 
-
+- The action can now perform its tasks as appropriate. The action can produce log writing  in standard output (file descriptor 1) and standard error (file descriptor 3) . Note that those corresponds to file descriptors 1 and 2.
 - The action will receive also file descriptor 3 for returning results. The result of the action must be a single line (without embedding newlines - newlines in strings must be quoted) written in file descriptor 3.
-
 - The action should not exit now, but continue the loop, reading the next line and processing as described before, continuing forever.
 
 ### Using shell scripts
 
-The `actionloop` image works actually with executable in Linux sense, so also scripts are acceptable. 
+The `actionloop` image works actually with executable in Linux sense, so also scripts are acceptable.
 
 In the current actionloop image there is `bash` and the `jq` command, so you can for example implement the actionloop with a shell script like this:
 
@@ -131,16 +128,16 @@ Note the `actionloop` image will accept any source and will try to run it (if it
 
 ### Providing your own ActionLoop implementation
 
-By default the runtime expects you provide a main function that will serve one request, and will add a default implementation of the ActionLoop protocol when compiling. 
+By default the runtime expects you provide a main function that will serve one request, and will add a default implementation of the ActionLoop protocol when compiling.
 
 You can however overwrite the default protocol and provide your how implementation of the ActionLoop. If you do so, you will have to take care of opening file descriptors, reading input, parse JSON and set environment variables.
 
 To overwrite the default ActionLoop you can do this either sending a single file source actino or a zip action.
 
-If you send a single file, you have to provide your own implementation adding a function `func main()` in the `main` package. 
+If you send a single file, you have to provide your own implementation adding a function `func main()` in the `main` package.
 
 If you send a zip file, you have to provide your implementation in a file called `exec` (without extension `.go`!) placed in the top level of the zip file.
 
-If you provide your own `main.main()`, the default `main` will not be generated. 
+If you provide your own `main.main()`, the default `main` will not be generated.
 
 An example named `golang-main-standalone` is provided.
