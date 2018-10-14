@@ -19,6 +19,7 @@
 #  Developers Guide for Runtime itself
 
 <a name="building"/>
+
 ## How to Build and run tests
 
 You need a Linux or an OSX environment, with Java and Docker installed to build the sources.
@@ -53,6 +54,7 @@ To run tests:
 ./gradlew test --info
 ```
 <a name="development"/>
+
 # Local Development
 
 If you want to develop the proxy and run tests natively, you can do it on Linux or OSX. Development has been tested on Ubuntu Linux (14.04) and OSX 10.13. Probably other distributions work, maybe even Windows with WSL, but since it is not tested YMMMV.

@@ -22,6 +22,7 @@
 THere are two images provided: the `actionloop` and the `actionloop-golang-v1.11` available. Each image accept different input in the deployment.
 
 <a name="actionloop">
+
 ## Actionloop runtime
 
 The runtime `actionlooop` accepts:
@@ -36,6 +37,7 @@ It can also be a script, identified by the `#!` hash-bang path at the beginning.
 If the file is a zipped file, it must contain in the top level (*not* in a subdirectory) an file named `exec`. This file must be in the same format as a single binary, either a binary or a script.
 
 <a name="golang">
+
 ## Golang runtime
 
 The runtime `actionloop-golang-v1.11` accepts:
@@ -127,9 +129,10 @@ Check the example `golang-hello-vendor`.
 Note you do not need to store the `vendor` folder in the version control system as it can be regenerated (only the manifest files), but you need to include the entire vendor folder when you deploy the action.
 
 <a name="vscode">
+
 ### Using VsCode
 
-If you are using (VsCode)(https://code.visualstudio.com/) as your Go development environment with the [VoCode Go](https://marketplace.visualstudio.com/items?itemName=ms-vscode.Go) support, and you want to get rid of errors and have it working properly, you need to configure it to support the suggested:
+If you are using [VsCode[(https://code.visualstudio.com/) as your Go development environment with the [VsCode Go](https://marketplace.visualstudio.com/items?itemName=ms-vscode.Go) support, and you want to get rid of errors and have it working properly, you need to configure it to support the suggested:
 
 - you need to have a `src` folder in your source
 - you need either to open the `src` folder as the top level source or add it as a folder in the workspace (not just have it as a subfolder)
@@ -138,6 +141,7 @@ If you are using (VsCode)(https://code.visualstudio.com/) as your Go development
 Using this option, the GOPATH will be set to the parent directory of your `src` folder and you will not have errors in your imports.
 
 <a name="precompile"/>
+
 ## Precompiling Go Sources Offline
 
 Compiling sources on the image can take some time when the images is initialized. You can speed up precompiling the sources using the image `actionloop-golang-v1.11` as an offline compiler. You need `docker` for doing that.

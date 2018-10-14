@@ -66,11 +66,12 @@ func Main(obj map[string]interface{}) map[string]interface{} {
 You can also have multiple source files in an action, packages and vendor folders.  Check the [deployment](DEPLOYMENT.md) document for more details how to package and deploy actions. 
 
 <a name="generic"/>
+
 ## Using it with generic Binaries
 
 The `actionloop` runtime can execute  generic Linux executable in an efficient way. The actions should work reading input line by line, perform its work and produce output also line by line. In more detail it should respect the following protocol.
 
-<a name="actionloopgo">
+<a name="actionloop">
 
 ### The Action Loop Protocol 
 
