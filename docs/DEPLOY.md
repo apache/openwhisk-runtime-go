@@ -46,9 +46,9 @@ The runtime `actionloop-golang-v1.11` accepts:
 
 - zip files containing a binary executable named `exec` in the top level, and it must be again a Linux ELF executable compiled for the AMD64 architecture
 
-- a single file action that is not an executable binary will be interpreted as source code, and it will be compiled in a binary as described in the document about [actions](ACTIONS.md). 
+- a single file action that is not an executable binary will be interpreted as source code, and it will be compiled in a binary as described in the document about [actions](ACTION.md). 
 
-- a zip file not containing in the top level a binary file `exec` will  be interpreted as a collection of zip files, and it will be compiled in a binary as described in the document about [actions](ACTIONS.md). 
+- a zip file not containing in the top level a binary file `exec` will  be interpreted as a collection of zip files, and it will be compiled in a binary as described in the document about [actions](ACTION.md). 
 
 Please note in the separate the rules about the name of the main function (that defaults to `main.Main`), and the rules about how to overwrite the `main.main` 
 
