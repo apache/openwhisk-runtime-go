@@ -19,6 +19,7 @@
 # Writing actions for the Golang and ActionLoop runtime 
 
 <a name="golang"/>
+
 ## How to write Go Actions
 
 The `actionloop-golang-v1.11` runtime can execute actions written in the Go programming language in OpenWhisk, either precompiled binary or compiling sources on the fly. 
@@ -69,6 +70,8 @@ You can also have multiple source files in an action, packages and vendor folder
 
 The `actionloop` runtime can execute  generic Linux executable in an efficient way. The actions should work reading input line by line, perform its work and produce output also line by line. In more detail it should respect the following protocol.
 
+<a name="actionloopgo">
+
 ### The Action Loop Protocol 
 
 The protocol can be specified informally as follow.
@@ -76,7 +79,8 @@ The protocol can be specified informally as follow.
 - Read one line from standard input (file descriptor 0).
 - Parse the line as a JSON object. Currently the object will be in currently in the format:
 
-```{
+```
+{
  "value": JSON,
  "namespace": String,
  "action_name": String,
@@ -84,7 +88,8 @@ The protocol can be specified informally as follow.
  "api_key": String,
  "activation_id": String,
  "deadline": Number
-}```
+}
+```
 
 Note however that more values could be provided in future.
 Usually this JSON is read and the values are stored in environment variables, converted to upper case the key and  and adding the prefix `__OW_`. 
@@ -121,8 +126,9 @@ Note here we are just interested in the payload, but in general you may also wan
 
 Note the `actionloop` image will accept any source and will try to run it (if it is possible), while the `actionloop-golang-v1.11`  will instead try to compile the sources assuming it is Golang instead.
 
-<a href="#actionloopgo">
-### Providing your own ActionLoop protocol
+<a name="actionloopgo">
+
+### Providing your own ActionLoop implementation
 
 By default the runtime expects you provide a main function that will serve one request, and will add a default implementation of the ActionLoop protocol when compiling. 
 
