@@ -154,7 +154,7 @@ object GoResourceHelpers {
     }
 
     // prepare sources, then compile them
-    // return the exe File  and the output dir Path
+    // return the zip File
     private def compile(image: String,
                         sources: Seq[(Seq[String], String)],
                         main: String) = {
@@ -168,7 +168,7 @@ object GoResourceHelpers {
       // DO NOT CREATE IT IN ADVANCE or you will get a permission denied
       val binDir = tmpDirectoryFile("bin")
       binDir.mkdirs()
-      val bin = new File(binDir, main)
+      val zip = new File(binDir, main+".zip")
 
       // command to compile
       val cmd = s"${dockerBin} run -i ${image} -compile ${main}"
@@ -177,38 +177,26 @@ object GoResourceHelpers {
       //println(s"${cmd}\n<${src}\n>${bin}")
 
       import sys.process._
-      (src #> cmd #> bin).!
+      (src #> cmd #> zip).!
 
       // result
-      bin -> binDir.toPath
-
+      zip
     }
 
-    def mkBase64Exe(image: String,
-                    sources: Seq[(Seq[String] /*lines*/, String /*name*/ )],
-                    main: String) = {
-      val (exe, dir) = compile(image, sources, main)
-      //println(s"exe=${exe.getAbsolutePath}")
-      ResourceHelpers.readAsBase64(exe.toPath)
-    }
 
     def mkBase64Zip(image: String,
                     sources: Seq[(Seq[String], String)],
                     main: String) = {
-      val (exe, dir) = compile(image, sources, main)
-      val archive = makeZipFromDir(dir)
-      //println(s"zip=${archive.toFile.getAbsolutePath}")
-      ResourceHelpers.readAsBase64(archive)
+      val zip = compile(image, sources, main)
+      ResourceHelpers.readAsBase64(zip.toPath)
     }
 
-    def mkBase64Src(sources: Seq[(Seq[String], String)], main: String) = {
+    def mkBase64Src(sources: Seq[(Seq[String], String)]) = {
       val (srcDir, srcAbsPaths) = writeSourcesToHomeTmpDirectory(sources)
-      val file = new File(srcDir.toFile, main)
-      //println(file)
-      ResourceHelpers.readAsBase64(file.toPath)
+      ResourceHelpers.readAsBase64(srcAbsPaths.head)
     }
 
-    def mkBase64SrcZip(sources: Seq[(Seq[String], String)], main: String) = {
+    def mkBase64SrcZip(sources: Seq[(Seq[String], String)]) = {
       val (srcDir, srcAbsPaths) = writeSourcesToHomeTmpDirectory(sources)
       val archive = makeZipFromDir(srcDir)
       //println(s"zip=${archive.toFile.getAbsolutePath}")

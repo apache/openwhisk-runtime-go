@@ -19,15 +19,11 @@ package main
 
 import (
 	"fmt"
+	"hello"
 )
 
-func Hello(obj map[string]interface{}) map[string]interface{} {
-	name, ok := obj["name"].(string)
-	if !ok {
-		name = "Stranger"
-	}
-	fmt.Printf("name=%s\n", name)
-	msg := make(map[string]interface{})
-	msg["hello"] = "Hello, " + name + "!"
-	return msg
+// Main forwading to Hello
+func Hello(args map[string]interface{}) map[string]interface{} {
+	fmt.Println("Entering Hello")
+	return hello.Hello(args)
 }

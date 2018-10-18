@@ -14,20 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package main
+package hello
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
-func Hello(obj map[string]interface{}) map[string]interface{} {
-	name, ok := obj["name"].(string)
-	if !ok {
-		name = "Stranger"
-	}
-	fmt.Printf("name=%s\n", name)
-	msg := make(map[string]interface{})
-	msg["hello"] = "Hello, " + name + "!"
-	return msg
+func ExampleHello() {
+	var input = make(map[string]interface{})
+	input["name"] = "Mike"
+	output := Hello(input)
+	json, _ := json.Marshal(output)
+	fmt.Printf("%s", json)
+	// Output:
+	// Hello, Mike
+	// {"golang-main-package":"Hello, Mike"}
+}
+
+func ExampleHello_noName() {
+	var input = make(map[string]interface{})
+	output := Hello(input)
+	json, _ := json.Marshal(output)
+	fmt.Printf("%s", json)
+	// Output:
+	// Hello, world
+	// {"golang-main-package":"Hello, world"}
 }

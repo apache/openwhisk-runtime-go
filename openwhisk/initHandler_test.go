@@ -89,7 +89,6 @@ func Example_zipinit_nocompiler() {
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
 }
 
-/* commented out test for timing problems*/
 func Example_shell_nocompiler() {
 	ts, cur, log := startTestServer("")
 	doRun(ts, "")
@@ -138,24 +137,20 @@ func Example_main_zipinit_nocompiler() {
 	ts, cur, log := startTestServer("")
 	doRun(ts, "")
 	doInit(ts, initBinary("_test/hello_greeting.zip", "greeting"))
-	doInit(ts, initBinary("_test/hello_greeting1.zip", "greeting"))
 	doRun(ts, "")
 	stopTestServer(ts, cur, log)
 
 	ts, cur, log = startTestServer("")
 	doInit(ts, initBinary("_test/hello_message.zip", "message"))
-	doInit(ts, initBinary("_test/hello_message1.zip", "message"))
 	doRun(ts, "")
 	stopTestServer(ts, cur, log)
 	// Output:
 	// 500 {"error":"no action defined yet"}
-	// 400 {"error":"cannot start action: command exited"}
 	// 200 {"ok":true}
 	// 200 {"greetings":"Hello, Mike"}
 	// Hello, Mike
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
-	// 400 {"error":"cannot start action: command exited"}
 	// 200 {"ok":true}
 	// 200 {"message":"Hello, Mike!"}
 	// name=Mike

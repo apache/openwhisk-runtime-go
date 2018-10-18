@@ -17,6 +17,8 @@
 package main
 
 import (
+	"archive/zip"
+	"bytes"
 	"flag"
 	"io/ioutil"
 	"log"
@@ -31,29 +33,37 @@ var debug = flag.Bool("debug", false, "enable debug output")
 // flag to require on-the-fly compilation
 var compile = flag.String("compile", "", "compile, reading in standard input the specified function, and producing the result in stdout")
 
+// fatal if error
+func fatalIf(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 // use the runtime as a compiler "on-the-fly"
 func extractAndCompile(ap *openwhisk.ActionProxy) {
-	// read the std in
+
+	// read the std input
 	in, err := ioutil.ReadAll(os.Stdin)
-	if err != nil {
-		log.Printf(err.Error())
-		return
-	}
+	fatalIf(err)
 
 	// extract and compile it
 	file, err := ap.ExtractAndCompile(&in, *compile)
-	if err != nil {
-		log.Printf(err.Error())
-		return
-	}
+	fatalIf(err)
 
-	// read the file and write it to stdout
-	out, err := ioutil.ReadFile(file)
-	_, err = os.Stdout.Write(out)
-	if err != nil {
-		log.Printf(err.Error())
-		return
-	}
+	// read the file, zip it and write it to stdout
+	buf := new(bytes.Buffer)
+	zwr := zip.NewWriter(buf)
+	zf, err := zwr.Create("exec")
+	fatalIf(err)
+	filedata, err := ioutil.ReadFile(file)
+	fatalIf(err)
+	_, err = zf.Write(filedata)
+	fatalIf(err)
+	fatalIf(zwr.Flush())
+	fatalIf(zwr.Close())
+	_, err = os.Stdout.Write(buf.Bytes())
+	fatalIf(err)
 }
 
 func main() {

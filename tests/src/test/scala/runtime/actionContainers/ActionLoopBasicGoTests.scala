@@ -109,7 +109,7 @@ class ActionLoopBasicGoTests
 
   override val testEntryPointOtherThanMain = TestConfig(
     """|package main
-       |func niam(args map[string]interface{}) map[string]interface{} {
+       |func Niam(args map[string]interface{}) map[string]interface{} {
        | return args
        |}
     """.stripMargin,

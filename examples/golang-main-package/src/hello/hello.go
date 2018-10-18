@@ -15,19 +15,24 @@
  * limitations under the License.
  */
 
-package main
+package hello
 
 import (
 	"fmt"
 )
 
-func Hello(obj map[string]interface{}) map[string]interface{} {
-	name, ok := obj["name"].(string)
-	if !ok {
-		name = "Stranger"
+// Hello receive an event in format
+// { "name": "Mike"}
+// and returns a greeting in format
+// { "greetings": "Hello, Mike"}
+func Hello(args map[string]interface{}) map[string]interface{} {
+	res := make(map[string]interface{})
+	greetings := "world"
+	name, ok := args["name"].(string)
+	if ok {
+		greetings = name
 	}
-	fmt.Printf("name=%s\n", name)
-	msg := make(map[string]interface{})
-	msg["hello"] = "Hello, " + name + "!"
-	return msg
+	res["golang-main-package"] = "Hello, " + greetings
+	fmt.Printf("Hello, %s\n", greetings)
+	return res
 }

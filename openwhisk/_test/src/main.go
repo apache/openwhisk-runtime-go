@@ -17,9 +17,13 @@
 
 package main
 
+import (
+	"fmt"
+	"hello"
+)
 
-func main() {
-	f := bufio.NewWriter(os.Stdout)
-	defer f.Flush()
-	f.Write([]byte("hi\n"))
+// Main forwading to Hello
+func Main(args map[string]interface{}) map[string]interface{} {
+	fmt.Println("Main")
+	return hello.Hello(args)
 }

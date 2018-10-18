@@ -70,7 +70,7 @@ class ActionLoopContainerTests
 
   it should "deploy a shell script" in {
     val script = shCodeHello("main")
-    val mesg = ExeBuilder.mkBase64Src(script, "main")
+    val mesg = ExeBuilder.mkBase64Src(script)
     withActionLoopContainer { c =>
       val payload = initPayload(mesg)
       c.init(payload)._1 should be(200)
@@ -79,10 +79,10 @@ class ActionLoopContainerTests
   }
 
   it should "deploy a zip based script" in {
-    val scr = ExeBuilder.mkBase64SrcZip(shCodeHello("main"), "main")
+    val scr = ExeBuilder.mkBase64SrcZip(shCodeHello("exec"))
     withActionLoopContainer { c =>
       c.init(initPayload(scr))._1 should be(200)
-      c.run(helloMsg()) should be(okMsg("main", "Hello, Demo"))
+      c.run(helloMsg()) should be(okMsg("exec", "Hello, Demo"))
     }
   }
 }

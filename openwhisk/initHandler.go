@@ -116,7 +116,7 @@ func (ap *ActionProxy) initHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// start an action
-	err = ap.StartLatestAction(main)
+	err = ap.StartLatestAction()
 	if err != nil {
 		sendError(w, http.StatusBadRequest, "cannot start action: "+err.Error())
 		return
@@ -134,16 +134,12 @@ func (ap *ActionProxy) ExtractAndCompile(buf *[]byte, main string) (string, erro
 	}
 
 	// extract action
-	file, err := ap.ExtractAction(buf, main, suffix)
+	file, err := ap.ExtractAction(buf, suffix)
 	if err != nil {
 		return "", err
 	}
 	if file == "" {
 		return "", fmt.Errorf("empty filename")
-	}
-	// no compiler, we are done
-	if ap.compiler == "" {
-		return file, nil
 	}
 
 	// some path surgery
@@ -151,11 +147,17 @@ func (ap *ActionProxy) ExtractAndCompile(buf *[]byte, main string) (string, erro
 	parent := filepath.Dir(dir)
 	srcDir := filepath.Join(parent, "src")
 	binDir := filepath.Join(parent, "bin")
-	binFile := filepath.Join(binDir, main)
+	binFile := filepath.Join(binDir, "exec")
 	os.Mkdir(binDir, 0755)
 
 	// if the file is already compiled just move it from src to bin
-	if isCompiled(file, main) {
+	if isCompiled(file) {
+		os.Rename(file, binFile)
+		return binFile, nil
+	}
+
+	// no compiler, move it anyway
+	if ap.compiler == "" {
 		os.Rename(file, binFile)
 		return binFile, nil
 	}
@@ -166,7 +168,7 @@ func (ap *ActionProxy) ExtractAndCompile(buf *[]byte, main string) (string, erro
 	if err != nil {
 		return "", err
 	}
-	if !isCompiled(binFile, main) {
+	if !isCompiled(binFile) {
 		return "", fmt.Errorf("cannot compile")
 	}
 	return binFile, nil

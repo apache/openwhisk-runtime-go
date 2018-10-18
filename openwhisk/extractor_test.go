@@ -30,7 +30,7 @@ func TestExtractActionTest_exec(t *testing.T) {
 	// cleanup
 	assert.Nil(t, os.RemoveAll("./action/x1"))
 	file, _ := ioutil.ReadFile("_test/exec")
-	ap.ExtractAction(&file, "exec", "bin")
+	ap.ExtractAction(&file, "bin")
 	assert.Nil(t, exists("./action/x1", "bin/exec"))
 }
 
@@ -40,7 +40,7 @@ func TestExtractActionTest_exe(t *testing.T) {
 	assert.Nil(t, os.RemoveAll("./action/x2"))
 	// match  exe
 	file, _ := ioutil.ReadFile("_test/exec")
-	ap.ExtractAction(&file, "exec", "bin")
+	ap.ExtractAction(&file, "bin")
 	assert.Equal(t, detect("./action/x2", "bin/exec"), "elf")
 }
 
@@ -51,7 +51,7 @@ func TestExtractActionTest_zip(t *testing.T) {
 	assert.Nil(t, os.RemoveAll("./action/x3"))
 	// match  exe
 	file, _ := ioutil.ReadFile("_test/exec.zip")
-	ap.ExtractAction(&file, "exec", "bin")
+	ap.ExtractAction(&file, "bin")
 	assert.Equal(t, detect("./action/x3", "bin/exec"), "elf")
 	assert.Nil(t, exists("./action/x3", "bin/etc"))
 	assert.Nil(t, exists("./action/x3", "bin/dir/etc"))
@@ -61,7 +61,7 @@ func TestExtractAction_script(t *testing.T) {
 	log, _ := ioutil.TempFile("", "log")
 	ap := NewActionProxy("./action/x4", "", log, log)
 	buf := []byte("#!/bin/sh\necho ok")
-	_, err := ap.ExtractAction(&buf, "exec", "bin")
+	_, err := ap.ExtractAction(&buf, "bin")
 	//fmt.Print(err)
 	assert.Nil(t, err)
 }

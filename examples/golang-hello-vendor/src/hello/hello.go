@@ -15,19 +15,29 @@
  * limitations under the License.
  */
 
-package main
+package hello
 
 import (
-	"fmt"
+	"os"
+
+	"github.com/sirupsen/logrus"
 )
 
-func Hello(obj map[string]interface{}) map[string]interface{} {
-	name, ok := obj["name"].(string)
-	if !ok {
-		name = "Stranger"
+var log = logrus.New()
+
+// Hello receive an event in format
+// { "name": "Mike"}
+// and returns a greeting in format
+// { "greetings": "Hello, Mike"}
+func Hello(args map[string]interface{}) map[string]interface{} {
+	log.Out = os.Stdout
+	res := make(map[string]interface{})
+	greetings := "world"
+	name, ok := args["name"].(string)
+	if ok {
+		greetings = name
 	}
-	fmt.Printf("name=%s\n", name)
-	msg := make(map[string]interface{})
-	msg["hello"] = "Hello, " + name + "!"
-	return msg
+	res["golang-hello-vendor"] = "Hello, " + greetings
+	log.WithFields(logrus.Fields{"greetings": greetings}).Info("Hello")
+	return res
 }

@@ -44,7 +44,7 @@ class ActionLoopGoContainerTests
   behavior of image
 
   def helloGo(main: String, pkg: String = "main") = {
-    val func = if (main == "main") "Main" else main
+    val func = main.capitalize
     s"""|package ${pkg}
         |
         |import "fmt"
@@ -63,7 +63,7 @@ class ActionLoopGoContainerTests
   }
 
   private def helloSrc(main: String) = Seq(
-    Seq(s"${main}") -> helloGo(main)
+    Seq(s"${main}.go") -> helloGo(main)
   )
 
   private def helloMsg(name: String = "Demo") =
@@ -80,7 +80,7 @@ class ActionLoopGoContainerTests
   }
 
   it should "accept a binary main" in {
-    val exe = ExeBuilder.mkBase64Exe(goCompiler, helloSrc("main"), "main")
+    val exe = ExeBuilder.mkBase64Zip(goCompiler, helloSrc("main"), "main")
 
     withActionLoopContainer { c =>
       c.init(initPayload(exe))._1 shouldBe (200)
@@ -88,34 +88,9 @@ class ActionLoopGoContainerTests
     }
   }
 
-  //def pr(x: Any) = { println(x) ; x}
-
-  it should "accept a zipped main binary" in {
-    val zip = ExeBuilder.mkBase64Zip(goCompiler, helloSrc("main"), "main")
-    withActionLoopContainer { c =>
-      c.init(initPayload(zip))._1 should be(200)
-      c.run(helloMsg()) should be(okMsg("main-main", "Hello, Demo!"))
-    }
-  }
-
-  it should "accept a binary not-main" in {
-    val exe = ExeBuilder.mkBase64Exe(goCompiler, helloSrc("hello"), "hello")
-    withActionLoopContainer { c =>
-      c.init(initPayload(exe, "hello"))._1 shouldBe (200)
-      c.run(helloMsg()) should be(okMsg("main-hello", "Hello, Demo!"))
-    }
-  }
-
-  it should "accept a zipped binary not-main" in {
-    val zip = ExeBuilder.mkBase64Zip(goCompiler, helloSrc("hello"), "hello")
-    withActionLoopContainer { c =>
-      c.init(initPayload(zip, "hello"))._1 shouldBe (200)
-      c.run(helloMsg()) should be(okMsg("main-hello", "Hello, Demo!"))
-    }
-  }
 
   it should "accept a src main action " in {
-    var src = ExeBuilder.mkBase64Src(helloSrc("main"), "main")
+    var src = ExeBuilder.mkBase64Src(helloSrc("main"))
     withActionLoopContainer { c =>
       c.init(initPayload(src))._1 shouldBe (200)
       c.run(helloMsg()) should be(okMsg("main-main", "Hello, Demo!"))
@@ -123,7 +98,7 @@ class ActionLoopGoContainerTests
   }
 
   it should "accept a src not-main action " in {
-    var src = ExeBuilder.mkBase64Src(helloSrc("hello"), "hello")
+    var src = ExeBuilder.mkBase64Src(helloSrc("hello"))
     withActionLoopContainer { c =>
       c.init(initPayload(src, "hello"))._1 shouldBe (200)
       c.run(helloMsg()) should be(okMsg("main-hello", "Hello, Demo!"))
@@ -131,7 +106,7 @@ class ActionLoopGoContainerTests
   }
 
   it should "accept a zipped src main action" in {
-    var src = ExeBuilder.mkBase64SrcZip(helloSrc("main"), "main")
+    var src = ExeBuilder.mkBase64SrcZip(helloSrc("main"))
     withActionLoopContainer { c =>
       c.init(initPayload(src))._1 shouldBe (200)
       c.run(helloMsg()) should be(okMsg("main-main", "Hello, Demo!"))
@@ -139,7 +114,7 @@ class ActionLoopGoContainerTests
   }
 
   it should "accept a zipped src not-main action" in {
-    var src = ExeBuilder.mkBase64SrcZip(helloSrc("hello"), "hello")
+    var src = ExeBuilder.mkBase64SrcZip(helloSrc("hello"))
     withActionLoopContainer { c =>
       c.init(initPayload(src, "hello"))._1 shouldBe (200)
       c.run(helloMsg()) should be(okMsg("main-hello", "Hello, Demo!"))
@@ -150,7 +125,7 @@ class ActionLoopGoContainerTests
     var src = ExeBuilder.mkBase64SrcZip(
       Seq(
         Seq("hello", "hello.go") -> helloGo("Hello", "hello"),
-        Seq("main") ->
+        Seq("main.go") ->
           """
           |package main
           |import "hello"
@@ -158,8 +133,7 @@ class ActionLoopGoContainerTests
           | return hello.Hello(args)
           |}
         """.stripMargin
-      ),
-      "main"
+      )
     )
     withActionLoopContainer { c =>
       c.init(initPayload(src))._1 shouldBe (200)

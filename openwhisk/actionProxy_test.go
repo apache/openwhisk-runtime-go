@@ -50,8 +50,8 @@ func TestStartLatestAction_emit1(t *testing.T) {
 	ap := NewActionProxy("./action/t2", "", logf, logf)
 	// start the action that emits 1
 	buf := []byte("#!/bin/sh\nwhile read a; do echo 1 >&3 ; done\n")
-	ap.ExtractAction(&buf, "main", "bin")
-	ap.StartLatestAction("main")
+	ap.ExtractAction(&buf, "bin")
+	ap.StartLatestAction()
 	ap.theExecutor.io <- []byte("x")
 	res := <-ap.theExecutor.io
 	assert.Equal(t, res, []byte("1\n"))
@@ -64,8 +64,8 @@ func TestStartLatestAction_terminate(t *testing.T) {
 	ap := NewActionProxy("./action/t3", "", logf, logf)
 	// now start an action that terminate immediately
 	buf := []byte("#!/bin/sh\ntrue\n")
-	ap.ExtractAction(&buf, "main", "bin")
-	ap.StartLatestAction("main")
+	ap.ExtractAction(&buf, "bin")
+	ap.StartLatestAction()
 	assert.Nil(t, ap.theExecutor)
 }
 
@@ -75,8 +75,8 @@ func TestStartLatestAction_emit2(t *testing.T) {
 	ap := NewActionProxy("./action/t4", "", logf, logf)
 	// start the action that emits 2
 	buf := []byte("#!/bin/sh\nwhile read a; do echo 2 >&3 ; done\n")
-	ap.ExtractAction(&buf, "main", "bin")
-	ap.StartLatestAction("main")
+	ap.ExtractAction(&buf, "bin")
+	ap.StartLatestAction()
 	ap.theExecutor.io <- []byte("z")
 	assert.Equal(t, <-ap.theExecutor.io, []byte("2\n"))
 	/**/

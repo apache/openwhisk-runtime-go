@@ -68,7 +68,7 @@ func NewActionProxy(baseDir string, compiler string, outFile *os.File, errFile *
 // the more recently uplodaded
 // action if valid, otherwise remove it
 // and fallback to the previous, if any
-func (ap *ActionProxy) StartLatestAction(main string) error {
+func (ap *ActionProxy) StartLatestAction() error {
 
 	// find the action if any
 	highestDir := highestDir(ap.baseDir)
@@ -82,7 +82,7 @@ func (ap *ActionProxy) StartLatestAction(main string) error {
 	curExecutor := ap.theExecutor
 
 	// try to launch the action
-	executable := fmt.Sprintf("%s/%d/bin/%s", ap.baseDir, highestDir, main)
+	executable := fmt.Sprintf("%s/%d/bin/exec", ap.baseDir, highestDir)
 	os.Chmod(executable, 0755)
 	newExecutor := NewExecutor(ap.outFile, ap.errFile, executable)
 	Debug("starting %s", executable)
@@ -108,7 +108,6 @@ func (ap *ActionProxy) StartLatestAction(main string) error {
 }
 
 func (ap *ActionProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	//fmt.Println(r.URL.Path)
 	switch r.URL.Path {
 	case "/init":
 		ap.initHandler(w, r)
