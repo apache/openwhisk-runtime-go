@@ -31,6 +31,7 @@ Available examples:
 - [Simple Golang action](golang-main-single) main is `main.Main`
 - [Simple Golang action](golang-hello-single) main is `main.Hello`
 - [Golang action with a subpackage](golang-main-package) main is `main.Main` invoking a `hello.Hello`
+- [Golang action with a vendor folder](golang-main-vendor) main is `main.Main` using a dependency `github.com/rs/zerolog`
 - [Golang action with a subpackage and vendor folder](golang-hello-vendor) main is `main.Hello` invoking a `hello.Hello` using a dependency `github.com/sirupsen/logrus`
 - [Standalone Golang Action](golang-main-standalone) main is `main.main`, implements the ActionLoop directly
 - [Simple Bash action](bash-hello) a simple bash script action implementing the ActionLoop directly

@@ -168,7 +168,8 @@ func (ap *ActionProxy) ExtractAndCompile(buf *[]byte, main string) (string, erro
 	if err != nil {
 		return "", err
 	}
-	if !isCompiled(binFile) {
+	// check only if the file exist
+	if _, err := os.Stat(binFile); os.IsNotExist(err) {
 		return "", fmt.Errorf("cannot compile")
 	}
 	return binFile, nil

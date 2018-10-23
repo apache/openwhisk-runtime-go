@@ -14,7 +14,7 @@ deploy: package.done $(BINZIP)
 	$(WSK) action update $(PACKAGE)/$(NAME) $(BINZIP) --main $(MAIN) --docker $(OW_RUNTIME)
 
 devel: package.done $(SRCZIP)
-	$(WSK) action update $(PACKAGE)/$(NAME) $(SRCZIP) --main $(MAIN) --docker $(OW_RUNTIME)
+	$(WSK) action update $(PACKAGE)/$(NAME) $(SRCZIP) --main $(MAIN) --docker $(OW_COMPILER)
 
 src/%/vendor:
 	cd $(@D) ; GOPATH=$$PWD/../.. dep ensure
@@ -26,8 +26,8 @@ $(SRCZIP): $(SRCS) $(VENDORS)
 	cd src ; zip ../$(SRCZIP) -r *
 
 clean:
-	wsk action delete $(PACKAGE)/$(NAME)
-	rm  $(BINZIP) $(SRCZIP) package.done
+	-$(WSK)action delete $(PACKAGE)/$(NAME)
+	-rm $(BINZIP) $(SRCZIP) package.done
 
 test: test.json
 	$(WSK) action invoke test/$(NAME) -r

@@ -43,6 +43,8 @@ def sources(launcher, source_dir, main):
     # copy the launcher fixing the main
     if not has_main:
         dst = "%s/main__.go" % source_dir
+        if os.path.isdir("%s/main" % source_dir):
+            dst = "%s/main/main__.go" % source_dir
         with codecs.open(dst, 'w', 'utf-8') as d:
             with codecs.open(launcher, 'r', 'utf-8') as e:
                 code = e.read()
@@ -55,6 +57,8 @@ def build(parent, source_dir, target):
       "PATH": os.environ["PATH"],
       "GOPATH": os.path.abspath(parent)
     }
+    if os.path.isdir("%s/main" % source_dir):
+        source_dir += "/main"
     p = subprocess.Popen(
         ["go", "build", "-i", "-ldflags=-s -w",  "-o", target],
         stdout=subprocess.PIPE,
