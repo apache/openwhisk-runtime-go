@@ -17,7 +17,7 @@ devel: package.done $(SRCZIP)
 	$(WSK) action update $(PACKAGE)/$(NAME) $(SRCZIP) --main $(MAIN) --docker $(OW_RUNTIME)
 
 src/%/vendor:
-	cd $(@D) ; dep ensure
+	cd $(@D) ; GOPATH=$$PWD/../.. dep ensure
 
 $(BINZIP): $(SRCS) $(VENDORS)
 	cd src ; zip - -r * | docker run -i $(OW_COMPILER) -compile $(MAIN) >../$(BINZIP)
