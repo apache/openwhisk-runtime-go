@@ -100,7 +100,7 @@ To create a vendor folder, you need to
 
 - install the [dep](https://github.com/golang/dep) tool
 - cd to the `src/hello` folder (*not* the `src` folder)
-- run `dep init` the first time (it will create 2 manifest files `Gopkg.lock` and `Gopkg.toml`) or `dep ensure` if you already have the manifest files.
+- run `GOPATH=$PWD/../.. dep init` the first time (it will create 2 manifest files `Gopkg.lock` and `Gopkg.toml`) or `dep ensure` if you already have the manifest files.
 
 The layout will be something like this:
 
@@ -122,6 +122,8 @@ golang-hello-vendor
 Check the example `golang-hello-vendor`.
 
 Note you do not need to store the `vendor` folder in the version control system as it can be regenerated (only the manifest files), but you need to include the entire vendor folder when you deploy the action.
+
+If you need to use vendor folder in the main package, you need to create a directory `main` and place all the source code that would normally go in the top level, in the `main` folder instead.  A vendor folder in the top level *does not work*.
 
 <a name="vscode">
 

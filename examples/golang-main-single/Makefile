@@ -18,8 +18,8 @@ $(ZIP): $(SRC)
 	docker run -i $(OW_COMPILER) -compile $(MAIN) <$(SRC) >$(ZIP)
 
 clean:
-	wsk action delete $(PACKAGE)/$(NAME)
-	rm $(ZIP) package.done
+	-$(WSK) action delete $(PACKAGE)/$(NAME)
+	-rm $(ZIP) package.done
 
 test: test.json
 	$(WSK) action invoke test/$(NAME) -r

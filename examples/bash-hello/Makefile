@@ -15,7 +15,7 @@ test: test.json
 	$(WSK) action invoke $(PACKAGE)/$(NAME) -P test.json -r
 
 clean:
-	$(WSK) action delete $(PACKAGE)/$(NAME)
+	-$(WSK) action delete $(PACKAGE)/$(NAME)
 
 package.done:
 	$(WSK) package update $(PACKAGE)

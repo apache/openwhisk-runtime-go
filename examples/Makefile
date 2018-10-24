@@ -1,32 +1,34 @@
 # prefix
-
-USER=msciab     	# devel
-#USER=openwhisk		# deploy
+IMAGES?=openwhisk     	
 
 all: .PHONY
-.PHONY: bash-hello golang-hello-single golang-main-single golang-main-standalone golang-main-package golang-hello-vendor 
 
 bash-hello:
-	OW_USER=$(USER) make deploy test -C bash-hello
+	cd $@ && OW_USER=$(IMAGES) make clean deploy test
 
 golang-main-single:
-	OW_USER=$(USER) make deploy test -C $@
-	OW_USER=$(USER) make deploy test -C $@
+	cd $@ && OW_USER=$(IMAGES) make clean devel test
+	cd $@ && OW_USER=$(IMAGES) make clean deploy test
 
 golang-hello-single:
-	OW_USER=$(USER) make deploy test -C $@
-	OW_USER=$(USER) make deploy test -C $@
+	cd $@ && OW_USER=$(IMAGES) make clean devel test
+	cd $@ && OW_USER=$(IMAGES) make clean deploy test
 
 golang-main-standalone:
-	OW_USER=$(USER) make deploy test -C $@
-	OW_USER=$(USER) make deploy test -C $@
+	cd $@ && OW_USER=$(IMAGES) make clean devel test
+	cd $@ && OW_USER=$(IMAGES) make clean deploy test
 
 golang-main-package:
-	OW_USER=$(USER) make deploy test -C $@
-	OW_USER=$(USER) make deploy test -C $@
+	cd $@ && OW_USER=$(IMAGES) make clean devel test
+	cd $@ && OW_USER=$(IMAGES) make clean deploy test
+
+golang-main-vendor:
+	cd $@ && OW_USER=$(IMAGES) make clean devel test
+	cd $@ && OW_USER=$(IMAGES) make clean deploy test
 
 golang-hello-vendor:
-	OW_USER=$(USER) make deploy test -C $@
-	OW_USER=$(USER) make deploy test -C $@
+	cd $@ && OW_USER=$(IMAGES) make clean devel test
+	cd $@ && OW_USER=$(IMAGES) make clean deploy test
 
+.PHONY: bash-hello golang-hello-single golang-main-single golang-main-standalone golang-main-package golang-main-vendor golang-hello-vendor 
 
