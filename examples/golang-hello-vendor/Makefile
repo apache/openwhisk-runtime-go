@@ -27,7 +27,7 @@ $(SRCZIP): $(SRCS) $(VENDORS)
 
 clean:
 	-$(WSK)action delete $(PACKAGE)/$(NAME)
-	-rm $(BINZIP) $(SRCZIP) package.done
+	-rm $(BINZIP) $(SRCZIP) package.done test.json
 
 test: test.json
 	$(WSK) action invoke test/$(NAME) -r

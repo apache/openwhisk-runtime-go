@@ -4,7 +4,7 @@ OW_COMPILER?=$(OW_USER)/actionloop-golang-v1.11
 WSK?=wsk
 MAIN=main
 PACKAGE=test
-SRCS=src/main/main.go 
+SRCS=src/main/main.go
 VENDORS=src/main/vendor
 NAME=golang-$(MAIN)-vendor
 BINZIP=$(MAIN)-bin.zip
@@ -27,7 +27,7 @@ $(SRCZIP): $(SRCS) $(VENDORS)
 
 clean:
 	-$(WSK) action delete $(PACKAGE)/$(NAME)
-	-rm $(BINZIP) $(SRCZIP) package.done
+	-rm $(BINZIP) $(SRCZIP) package.done test.json
 
 test: test.json
 	$(WSK) action invoke test/$(NAME) -r
