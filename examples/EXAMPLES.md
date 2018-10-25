@@ -35,3 +35,9 @@ Available examples:
 - [Golang action with a subpackage and vendor folder](golang-hello-vendor) main is `main.Hello` invoking a `hello.Hello` using a dependency `github.com/sirupsen/logrus`
 - [Standalone Golang Action](golang-main-standalone) main is `main.main`, implements the ActionLoop directly
 - [Simple Bash action](bash-hello) a simple bash script action implementing the ActionLoop directly
+
+Tested on:
+
+- Windows, with Git Bash, Docker for Windows, Go version 1.11, make from ezwinports, zip.exe
+
+
