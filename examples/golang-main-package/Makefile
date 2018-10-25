@@ -13,7 +13,7 @@ deploy: package.done $(BINZIP)
 	$(WSK) action update $(PACKAGE)/$(NAME) $(BINZIP) --main $(MAIN) --docker $(OW_RUNTIME)
 
 devel: package.done $(SRCZIP)
-	$(WSK) action update $(PACKAGE)/$(NAME) $(SRCZIP) --main $(MAIN) --docker $(OW_RUNTIME)
+	$(WSK) action update $(PACKAGE)/$(NAME) $(SRCZIP) --main $(MAIN) --docker $(OW_COMPILER)
 
 $(BINZIP): $(SRCS)
 	cd src ; zip - -r * | docker run -i $(OW_COMPILER) -compile $(MAIN) >../$(BINZIP)
@@ -23,7 +23,7 @@ $(SRCZIP): $(SRCS)
 
 clean:
 	-$(WSK) action delete $(PACKAGE)/$(NAME)
-	-rm  $(BINZIP) $(SRCZIP) package.done
+	-rm  $(BINZIP) $(SRCZIP) package.done test.json
 
 test: test.json
 	$(WSK) action invoke test/$(NAME) -r

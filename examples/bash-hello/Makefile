@@ -16,6 +16,7 @@ test: test.json
 
 clean:
 	-$(WSK) action delete $(PACKAGE)/$(NAME)
+	-rm package.done test.json
 
 package.done:
 	$(WSK) package update $(PACKAGE)

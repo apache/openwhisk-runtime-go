@@ -19,7 +19,7 @@ $(ZIP): $(SRC)
 
 clean:
 	-$(WSK) action delete $(PACKAGE)/$(NAME)
-	-rm $(ZIP) package.done
+	-rm $(ZIP) package.done test.json
 
 test: test.json
 	$(WSK) action invoke test/$(NAME) -r
