@@ -25,8 +25,8 @@ Tested on:
 - dep version 0.5.0 (check the version)
 - Go version 1.11.1
 - GNU Make 3.81
-- Linux Ubuntu 16.04
-- Mac OSX 10.13 
+- Linux Ubuntu 14.04
+- Mac OSX 10.13
 - Windows, with Git Bash, Docker for Windows, make from ezwinports, zip.exe
 
 Each examples has a  Makefile with 4 targets:
