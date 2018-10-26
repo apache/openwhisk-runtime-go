@@ -18,7 +18,17 @@
 -->
 # Examples
 
+
 This is a collection of examples.
+Tested on:
+
+- dep version 0.5.0 (check the version `dep version`)
+- Go version 1.11.1
+- GNU Make 3.81
+- Linux Ubuntu 14.04
+- Mac OSX 10.13
+- Windows, with Git Bash, Docker for Windows, make from ezwinports, zip.exe
+
 Each examples has a  Makefile with 4 targets:
 
 - `make deploy` (or just make) deploys the action, precompiling it
@@ -35,3 +45,6 @@ Available examples:
 - [Golang action with a subpackage and vendor folder](golang-hello-vendor) main is `main.Hello` invoking a `hello.Hello` using a dependency `github.com/sirupsen/logrus`
 - [Standalone Golang Action](golang-main-standalone) main is `main.main`, implements the ActionLoop directly
 - [Simple Bash action](bash-hello) a simple bash script action implementing the ActionLoop directly
+
+
+

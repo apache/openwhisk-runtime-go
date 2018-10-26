@@ -4,8 +4,8 @@ OW_COMPILER?=$(OW_USER)/actionloop-golang-v1.11
 WSK?=wsk
 MAIN=main
 PACKAGE=test
-SRCS=src/main/main.go
-VENDORS=src/main/vendor
+SRCS=src/$(MAIN)/$(MAIN).go
+VENDORS=src/$(MAIN)/vendor
 NAME=golang-$(MAIN)-vendor
 BINZIP=$(MAIN)-bin.zip
 SRCZIP=$(MAIN)-src.zip
@@ -17,10 +17,10 @@ devel: package.done $(SRCZIP)
 	$(WSK) action update $(PACKAGE)/$(NAME) $(SRCZIP) --main $(MAIN) --docker $(OW_COMPILER)
 
 src/%/vendor:
-	cd $(@D) ; GOPATH=$$(realpath $$PWD/../..) dep ensure
+	cd $(@D) ; DEPPROJECTROOT=$(realpath $(@D)/../..) dep ensure
 
-$(BINZIP): $(SRCS) $(VENDORS)
-	cd src ; zip - -r * | docker run -i $(OW_COMPILER) -compile $(MAIN) >../$(BINZIP)
+$(BINZIP): $(SRCS) $(VENDORS) $(SRCZIP)
+	docker run -i $(OW_COMPILER) -compile $(MAIN) <$(SRCZIP) >$(BINZIP)
 
 $(SRCZIP): $(SRCS) $(VENDORS)
 	cd src ; zip ../$(SRCZIP) -r *
