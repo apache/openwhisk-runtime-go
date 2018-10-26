@@ -22,7 +22,7 @@
 This is a collection of examples.
 Tested on:
 
-- dep version 0.5.0 (check the version)
+- dep version 0.5.0 (check the version `dep version`)
 - Go version 1.11.1
 - GNU Make 3.81
 - Linux Ubuntu 14.04
