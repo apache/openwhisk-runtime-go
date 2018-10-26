@@ -17,7 +17,7 @@ devel: package.done $(SRCZIP)
 	$(WSK) action update $(PACKAGE)/$(NAME) $(SRCZIP) --main $(MAIN) --docker $(OW_COMPILER)
 
 src/%/vendor:
-	cd $(@D) ; GOPATH=$(realpath .) dep ensure
+	cd $(@D) ; DEPPROJECTROOT=$(realpath $$PWD/../..) dep ensure
 
 $(BINZIP): $(SRCS) $(VENDORS) $(SRCZIP)
 	docker run -i $(OW_COMPILER) -compile $(MAIN) <$(SRCZIP) >$(BINZIP)
