@@ -44,14 +44,14 @@ type Executor struct {
 	_output *bufio.Reader
 	_logout *bufio.Reader
 	_logerr *bufio.Reader
-	_outbuf *os.File
-	_errbuf *os.File
+	_outbuf *bufio.Writer
+	_errbuf *bufio.Writer
 }
 
 // NewExecutor creates a child subprocess using the provided command line,
 // writing the logs in the given file.
 // You can then start it getting a communication channel
-func NewExecutor(outbuf *os.File, errbuf *os.File, command string, args ...string) (proc *Executor) {
+func NewExecutor(logout *os.File, logerr *os.File, command string, args ...string) (proc *Executor) {
 	cmd := exec.Command(command, args...)
 	cmd.Env = []string{
 		"__OW_API_HOST=" + os.Getenv("__OW_API_HOST"),
@@ -85,6 +85,8 @@ func NewExecutor(outbuf *os.File, errbuf *os.File, command string, args ...strin
 	pout := bufio.NewReader(pipeOut)
 	sout := bufio.NewReader(stdout)
 	serr := bufio.NewReader(stderr)
+	outbuf := bufio.NewWriter(logout)
+	errbuf := bufio.NewWriter(logerr)
 
 	return &Executor{
 		make(chan []byte),
@@ -129,17 +131,19 @@ func (proc *Executor) run() {
 	Debug("run: end")
 }
 
-func drain(ch chan string, out *os.File) {
+func drain(ch chan string, out *bufio.Writer) {
 	for loop := true; loop; {
 		runtime.Gosched()
 		select {
 		case buf := <-ch:
 			fmt.Fprint(out, buf)
+			out.Flush()
 		case <-time.After(DefaultTimeoutDrain):
 			loop = false
 		}
 	}
 	fmt.Fprintln(out, OutputGuard)
+	out.Flush()
 }
 
 // manage copying stdout and stder in output
@@ -152,15 +156,16 @@ func (proc *Executor) logger() {
 	chErr := make(chan string)
 	go _collect(chErr, proc._logerr)
 
-	// wait for the signal
+	// loop draining the loop until asked to exit
 	for <-proc.log {
-		// flush stdout
+		// drain stdout
+		Debug("draining stdout")
 		drain(chOut, proc._outbuf)
-		// flush stderr
+		// drain stderr
+		Debug("draining stderr")
 		drain(chErr, proc._errbuf)
+		proc.log <- true
 	}
-	proc._outbuf.Sync()
-	proc._errbuf.Sync()
 	Debug("logger: end")
 }
 

@@ -51,19 +51,18 @@ func ExampleNewExecutor_bc() {
 	proc := NewExecutor(log, log, "_test/bc.sh")
 	err := proc.Start()
 	fmt.Println(err)
-	//proc.log <- true
 	proc.io <- []byte("2+2")
 	fmt.Printf("%s", <-proc.io)
+	proc.log <- true
+	<-proc.log
 	// and now, exit detection
 	proc.io <- []byte("quit")
-	proc.log <- true
 	select {
 	case in := <-proc.io:
 		fmt.Printf("%s", in)
 	case <-proc.exit:
 		fmt.Println("exit")
 	}
-	waitabit()
 	proc.Stop()
 	dump(log)
 	// Output:
@@ -82,9 +81,8 @@ func ExampleNewExecutor_hello() {
 	proc.io <- []byte(`{"value":{"name":"Mike"}}`)
 	fmt.Printf("%s", <-proc.io)
 	proc.log <- true
-	waitabit()
+	<-proc.log
 	proc.Stop()
-	waitabit()
 	_, ok := <-proc.io
 	fmt.Printf("io %v\n", ok)
 	dump(log)
@@ -111,10 +109,9 @@ func ExampleNewExecutor_term() {
 		exited = true
 	}
 	proc.log <- true
+	<-proc.log
 	fmt.Printf("exit %v\n", exited)
-	waitabit()
 	proc.Stop()
-	waitabit()
 	_, ok := <-proc.io
 	fmt.Printf("io %v\n", ok)
 	dump(log)

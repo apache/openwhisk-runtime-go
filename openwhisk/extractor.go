@@ -27,7 +27,7 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/h2non/filetype"
+	"gopkg.in/h2non/filetype.v1"
 )
 
 func unzip(src []byte, dest string) error {
