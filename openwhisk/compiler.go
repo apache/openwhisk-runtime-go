@@ -24,7 +24,7 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/h2non/filetype"
+	"gopkg.in/h2non/filetype.v1"
 )
 
 // this is only to let test run on OSX

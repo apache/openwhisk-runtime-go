@@ -64,8 +64,9 @@ func (ap *ActionProxy) runHandler(w http.ResponseWriter, r *http.Request) {
 	body = bytes.Replace(body, []byte("\n"), []byte(""), -1)
 
 	// execute the action
-	// and check for early termination
 	ap.theExecutor.io <- body
+
+	// check for early termination
 	var response []byte
 	var exited bool
 	select {
@@ -75,6 +76,10 @@ func (ap *ActionProxy) runHandler(w http.ResponseWriter, r *http.Request) {
 		exited = true
 	}
 
+	// flush the logs sending the activation message at the end
+	ap.theExecutor.log <- true
+	<-ap.theExecutor.log
+
 	// check for early termination
 	if exited {
 		Debug("WARNING! Command exited")
@@ -83,9 +88,6 @@ func (ap *ActionProxy) runHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	DebugLimit("received:", response, 120)
-
-	// flush the logs sending the activation message at the end
-	ap.theExecutor.log <- true
 
 	// check if the answer is an object map
 	var objmap map[string]*json.RawMessage

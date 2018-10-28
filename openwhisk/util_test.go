@@ -35,7 +35,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/h2non/filetype"
+	"gopkg.in/h2non/filetype.v1"
 )
 
 func startTestServer(compiler string) (*httptest.Server, string, *os.File) {
@@ -157,7 +157,8 @@ func exists(dir, filename string) error {
 var pseudoElfForMacType = filetype.NewType("elf", "darwin/mach")
 
 func pseudoElfForMacMatcher(buf []byte) bool {
-	return len(buf) > 4 && buf[0] == 0xcf && buf[1] == 0xfa && buf[2] == 0xed && buf[3] == 0xfe
+	return len(buf) > 4 && ((buf[0] == 0xcf && buf[1] == 0xfa && buf[2] == 0xed && buf[3] == 0xfe) ||
+		(buf[0] == 0xce && buf[1] == 0xfa && buf[2] == 0xed && buf[3] == 0xfe))
 }
 
 func detect(dir, filename string) string {
@@ -177,7 +178,7 @@ func removeLineNr(out string) string {
 	return re.ReplaceAllString(out, "::")
 }
 func TestMain(m *testing.M) {
-	//Debugging = true // enable debug
+	// Debugging = true // enable debug
 	// silence those annoying logs
 	if !Debugging {
 		log.SetOutput(ioutil.Discard)

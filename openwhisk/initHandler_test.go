@@ -105,6 +105,8 @@ func Example_shell_nocompiler() {
 	// 500 {"error":"no action defined yet"}
 	// msg=hello Mike
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
+	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
+	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
 	// Goodbye!
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
 }
