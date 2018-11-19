@@ -19,7 +19,7 @@
 
 # Deployment options
 
-THere are two images provided: the `actionloop` and the `actionloop-golang-v1.11` available. Each image accept different input in the deployment.
+There are two images provided: the `actionloop` and the `actionloop-golang-v1.11` available. Each image accept different input in the deployment.
 
 <a name="actionloop">
 

@@ -16,21 +16,32 @@
 # limitations under the License.
 #
 -->
-# Apache OpenWhisk Runtime for Go (and Generic executables)
+# Apache OpenWhisk Runtimes for Go
 
 [![Build Status](https://travis-ci.org/apache/incubator-openwhisk-runtime-go.svg?branch=master)](https://travis-ci.org/apache/incubator-openwhisk-runtime-go)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Join Slack](https://img.shields.io/badge/join-slack-9B69A0.svg)](http://slack.openwhisk.org/)
 
-This is an OpenWhisk runtime for Golang and Generic executables.
+This repsotiroy containst both the OpenWhisk runtime for Golang Actions, as well as a runtime for Generic executables.
 
 - If you are in a hurry, check the [examples](examples/EXAMPLES.md)
 - Writing Actions for the runtime in [Golang](docs/ACTION.md#golang)
 - How to deploy your [Golang](docs/DEPLOY.md#golang) sources
 - Precompiling [Golang](docs/DEPLOY.md#precompile) actions
-- Writing [Generic](docs/ACTION.md#generic) actions,  in bash or as a generic linux binary
-- Deployment for [Generic](docs/DEPLOY.md#generic)   actions
-- The [ActionLoop](docs/ACTION.md#actionloop) protocol for generic actions
 - How to use VSCode to write [Golang](docs/DEPLOY.md#vscode) actions
 - How to [Build](docs/BUILD.md#building) the runtime, with development notes
 
+## Actionloop runtime
+
+### Using the Go runtime for Generic executables
+
+- Writing [Generic](docs/ACTION.md#generic) actions, in bash or as a generic linux binary
+- Deployment for [Generic](docs/DEPLOY.md#generic) actions
+- The [ActionLoop](docs/ACTION.md#actionloop) protocol for generic actions
+
+# License
+[Apache 2.0](LICENSE.txt)
+
+# Disclaimer
+
+Apache OpenWhisk Runtime Java is an effort undergoing incubation at The Apache Software Foundation (ASF), sponsored by the Apache Incubator. Incubation is required of all newly accepted projects until a further review indicates that the infrastructure, communications, and decision making process have stabilized in a manner consistent with other successful ASF projects. While incubation status is not necessarily a reflection of the completeness or stability of the code, it does indicate that the project has yet to be fully endorsed by the ASF.
