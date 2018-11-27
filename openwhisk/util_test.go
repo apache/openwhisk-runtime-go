@@ -187,8 +187,8 @@ func TestMain(m *testing.M) {
 	// increase timeouts for init
 	DefaultTimeoutStart = 1000 * time.Millisecond
 	// build some test stuff
-	//sys("_test/build.sh")
-	//sys("_test/zips.sh")
+	sys("_test/build.sh")
+	sys("_test/zips.sh")
 	// go ahead
 	code := m.Run()
 	os.Exit(code)
