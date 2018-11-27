@@ -185,12 +185,10 @@ func TestMain(m *testing.M) {
 	}
 
 	// increase timeouts for init
-	DefaultTimeoutInit = 1000 * time.Millisecond
-	// timeout for drain - shoud less (or you can get stuck on stdout without getting the stderr)
-	DefaultTimeoutDrain = 100 * time.Millisecond
+	DefaultTimeoutStart = 1000 * time.Millisecond
 	// build some test stuff
-	sys("_test/build.sh")
-	sys("_test/zips.sh")
+	//sys("_test/build.sh")
+	//sys("_test/zips.sh")
 	// go ahead
 	code := m.Run()
 	os.Exit(code)

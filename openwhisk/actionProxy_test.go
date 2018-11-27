@@ -52,8 +52,7 @@ func TestStartLatestAction_emit1(t *testing.T) {
 	buf := []byte("#!/bin/sh\nwhile read a; do echo 1 >&3 ; done\n")
 	ap.ExtractAction(&buf, "bin")
 	ap.StartLatestAction()
-	ap.theExecutor.io <- []byte("x")
-	res := <-ap.theExecutor.io
+	res, _ := ap.theExecutor.Interact([]byte("x"))
 	assert.Equal(t, res, []byte("1\n"))
 	ap.theExecutor.Stop()
 }
@@ -77,8 +76,8 @@ func TestStartLatestAction_emit2(t *testing.T) {
 	buf := []byte("#!/bin/sh\nwhile read a; do echo 2 >&3 ; done\n")
 	ap.ExtractAction(&buf, "bin")
 	ap.StartLatestAction()
-	ap.theExecutor.io <- []byte("z")
-	assert.Equal(t, <-ap.theExecutor.io, []byte("2\n"))
+	res, _ := ap.theExecutor.Interact([]byte("z"))
+	assert.Equal(t, res, []byte("2\n"))
 	/**/
 	ap.theExecutor.Stop()
 }
