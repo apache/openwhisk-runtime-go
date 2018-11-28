@@ -1,13 +1,12 @@
 IMG?=whisk/actionloop-golang-v1.11
 IMG2?=whisk/actionloop
 
-define TEST_LUA
-wrk.method = "POST"
-wrk.body = '{"value":{"name":"Mike"}}'
-wrk.headers["Content-Type"] = "application/json"
-endef
-
 all: golang bash
+
+test.lua:
+	echo 'wrk.method = "POST"'>test.lua
+	echo "wrk.body = '{\"value\":{\"name\":\"Mike\"}}'">>test.lua
+	echo 'wrk.headers["Content-Type"] = "application/json"'>>test.lua
 
 golang: test.lua
 	docker run -d --name under-test --rm -p 8080:8080 $(IMG)
@@ -20,8 +19,5 @@ bash: test.lua
 	invoke init main.sh
 	wrk -t1 -c1 -stest.lua http://localhost:8080/run
 	docker kill under-test
-
-test.lua:
-	echo "$$TEST_LUA" >> $@
 
 .PHONY: all golang bash
