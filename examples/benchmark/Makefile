@@ -10,13 +10,13 @@ test.lua:
 
 golang: test.lua
 	docker run -d --name under-test --rm -p 8080:8080 $(IMG)
-	invoke init main.go
+	bash init.sh main.go
 	wrk -t1 -c1 -stest.lua http://localhost:8080/run
 	docker kill under-test
 
 bash: test.lua
 	docker run -d --name under-test --rm -p 8080:8080 $(IMG2)
-	invoke init main.sh
+	bash init.sh main.sh
 	wrk -t1 -c1 -stest.lua http://localhost:8080/run
 	docker kill under-test
 
