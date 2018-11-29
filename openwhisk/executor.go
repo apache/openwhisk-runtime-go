@@ -23,29 +23,22 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"runtime"
 	"time"
 )
 
-// DefaultTimeoutInit to wait for a process to start
-var DefaultTimeoutInit = 5 * time.Millisecond
+// OutputGuard constant string
+const OutputGuard = "XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX\n"
 
-// DefaultTimeoutDrain to wait for draining logs
-var DefaultTimeoutDrain = 5 * time.Millisecond
+// DefaultTimeoutStart to wait for a process to start
+var DefaultTimeoutStart = 5 * time.Millisecond
 
 // Executor is the container and the guardian  of a child process
 // It starts a command, feeds input and output, read logs and control its termination
 type Executor struct {
-	io      chan []byte
-	log     chan bool
-	exit    chan error
-	_cmd    *exec.Cmd
-	_input  io.WriteCloser
-	_output *bufio.Reader
-	_logout *bufio.Reader
-	_logerr *bufio.Reader
-	_outbuf *bufio.Writer
-	_errbuf *bufio.Writer
+	cmd    *exec.Cmd
+	input  io.WriteCloser
+	output *bufio.Reader
+	exited chan bool
 }
 
 // NewExecutor creates a child subprocess using the provided command line,
@@ -53,188 +46,85 @@ type Executor struct {
 // You can then start it getting a communication channel
 func NewExecutor(logout *os.File, logerr *os.File, command string, args ...string) (proc *Executor) {
 	cmd := exec.Command(command, args...)
+	cmd.Stdout = logout
+	cmd.Stderr = logerr
 	cmd.Env = []string{
 		"__OW_API_HOST=" + os.Getenv("__OW_API_HOST"),
 	}
+	Debug("env: %v", cmd.Env)
 	if Debugging {
 		cmd.Env = append(cmd.Env, "OW_DEBUG=/tmp/action.log")
 	}
-	Debug("env: %v", cmd.Env)
-
-	stdin, err := cmd.StdinPipe()
+	input, err := cmd.StdinPipe()
 	if err != nil {
 		return nil
 	}
-
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		return nil
-	}
-
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		return nil
-	}
-
 	pipeOut, pipeIn, err := os.Pipe()
 	if err != nil {
 		return nil
 	}
 	cmd.ExtraFiles = []*os.File{pipeIn}
-
-	pout := bufio.NewReader(pipeOut)
-	sout := bufio.NewReader(stdout)
-	serr := bufio.NewReader(stderr)
-	outbuf := bufio.NewWriter(logout)
-	errbuf := bufio.NewWriter(logerr)
-
+	output := bufio.NewReader(pipeOut)
 	return &Executor{
-		make(chan []byte),
-		make(chan bool),
-		make(chan error),
 		cmd,
-		stdin,
-		pout,
-		sout,
-		serr,
-		outbuf,
-		errbuf,
+		input,
+		output,
+		make(chan bool),
 	}
 }
 
-// collect log from a stream
-func _collect(ch chan string, reader *bufio.Reader) {
-	for {
-		buf, err := reader.ReadBytes('\n')
-		if err != nil {
-			break
-		}
-		ch <- string(buf)
-	}
+// Interact interacts with the underlying process
+func (proc *Executor) Interact(in []byte) ([]byte, error) {
+	// input to the subprocess
+	proc.input.Write(in)
+	proc.input.Write([]byte("\n"))
+	out, err := proc.output.ReadBytes('\n')
+	proc.cmd.Stdout.Write([]byte(OutputGuard))
+	proc.cmd.Stderr.Write([]byte(OutputGuard))
+	return out, err
 }
 
-// loop over the command executing
-// returning when the command exits
-func (proc *Executor) run() {
-	Debug("run: start")
-	err := proc._cmd.Start()
-	if err != nil {
-		proc.exit <- err
-		Debug("run: early exit")
-		proc._cmd = nil // do not kill
-		return
+// Exited checks if the underlying command exited
+func (proc *Executor) Exited() bool {
+	select {
+	case <-proc.exited:
+		return true
+	default:
+		return false
 	}
-	Debug("pid: %d", proc._cmd.Process.Pid)
-	// wait for the exit
-	proc.exit <- proc._cmd.Wait()
-	proc._cmd = nil // do not kill
-	Debug("run: end")
-}
-
-func drain(ch chan string, out *bufio.Writer) {
-	for loop := true; loop; {
-		runtime.Gosched()
-		select {
-		case buf := <-ch:
-			fmt.Fprint(out, buf)
-			out.Flush()
-		case <-time.After(DefaultTimeoutDrain):
-			loop = false
-		}
-	}
-	fmt.Fprintln(out, OutputGuard)
-	out.Flush()
-}
-
-// manage copying stdout and stder in output
-// with log guards
-func (proc *Executor) logger() {
-	Debug("logger: start")
-	// poll stdout and stderr
-	chOut := make(chan string)
-	go _collect(chOut, proc._logout)
-	chErr := make(chan string)
-	go _collect(chErr, proc._logerr)
-
-	// loop draining the loop until asked to exit
-	for <-proc.log {
-		// drain stdout
-		Debug("draining stdout")
-		drain(chOut, proc._outbuf)
-		// drain stderr
-		Debug("draining stderr")
-		drain(chErr, proc._errbuf)
-		proc.log <- true
-	}
-	Debug("logger: end")
-}
-
-// main service function
-// writing in input
-// and reading in output
-// using the provide channels
-func (proc *Executor) service() {
-	Debug("service: start")
-	for {
-		in := <-proc.io
-		if len(in) == 0 {
-			Debug("terminated upon request")
-			break
-		}
-		// input to the subprocess
-		DebugLimit(">>>", in, 120)
-		proc._input.Write(in)
-		proc._input.Write([]byte("\n"))
-		Debug("done")
-
-		// ok now give a chance to run to goroutines
-		runtime.Gosched()
-
-		// input to the subprocess
-		out, err := proc._output.ReadBytes('\n')
-		if err != nil {
-			break
-		}
-		DebugLimit("<<<", out, 120)
-		proc.io <- out
-		if len(out) == 0 {
-			Debug("empty input - exiting")
-			break
-		}
-	}
-	Debug("service: end")
 }
 
 // Start execution of the command
+// wait a bit to check if the command exited
 // returns an error if the program fails
 func (proc *Executor) Start() error {
 	// start the underlying executable
-	// check if died
-	go proc.run()
-	select {
-	case <-proc.exit:
-		// oops, it died
+	Debug("Start:")
+	err := proc.cmd.Start()
+	if err != nil {
+		Debug("run: early exit")
+		proc.cmd = nil // no need to kill
 		return fmt.Errorf("command exited")
-	case <-time.After(DefaultTimeoutInit):
-		// ok let's process it
-		go proc.service()
-		go proc.logger()
 	}
-	return nil
+	Debug("pid: %d", proc.cmd.Process.Pid)
+	go func() {
+		proc.cmd.Wait()
+		proc.exited <- true
+	}()
+	select {
+	case <-proc.exited:
+		return fmt.Errorf("command exited")
+	case <-time.After(DefaultTimeoutStart):
+		return nil
+	}
 }
 
 // Stop will kill the process
 // and close the channels
 func (proc *Executor) Stop() {
 	Debug("stopping")
-	if proc._cmd != nil {
-		proc.log <- false
-		proc.io <- []byte("")
-		proc._cmd.Process.Kill()
-		<-proc.exit
-		proc._cmd = nil
+	if proc.cmd != nil {
+		proc.cmd.Process.Kill()
+		proc.cmd = nil
 	}
-	close(proc.io)
-	close(proc.exit)
-	close(proc.log)
 }

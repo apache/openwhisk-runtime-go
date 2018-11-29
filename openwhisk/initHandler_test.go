@@ -94,20 +94,18 @@ func Example_shell_nocompiler() {
 	doRun(ts, "")
 	doInit(ts, initBinary("_test/hello.sh", ""))
 	doRun(ts, "")
-	doRun(ts, `{"name":"*"}`)
-	doRun(ts, "")
+	doRun(ts, `{"name":"world"}`)
 	stopTestServer(ts, cur, log)
 	// Output:
 	// 500 {"error":"no action defined yet"}
 	// 200 {"ok":true}
 	// 200 {"hello": "Mike"}
-	// 400 {"error":"command exited"}
-	// 500 {"error":"no action defined yet"}
+	// 200 {"hello": "world"}
 	// msg=hello Mike
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
+	// msg=hello world
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
-	// Goodbye!
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
 }
 
@@ -226,4 +224,5 @@ func Example_badinit_nocompiler() {
 	// 400 {"error":"cannot start action: command exited"}
 	// 400 {"error":"cannot start action: command exited"}
 	// 500 {"error":"no action defined yet"}
+	// hi
 }
