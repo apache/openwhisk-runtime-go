@@ -15,9 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-while read line
-do
-   name="$(echo $line | jq -r .value.name)"
-   echo msg="hello $name"
-   echo '{"hello": "'$name'"}' >&3
-done
+INIT=${1:?action}
+jq -n --rawfile file $INIT '{ "value": {"main":"main", "code":$file}}' >$INIT.json
+curl -XPOST -H "Content-Type: application/json" http://localhost:8080/init -d @$INIT.json

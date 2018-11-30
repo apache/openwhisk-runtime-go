@@ -51,24 +51,13 @@ func ExampleNewExecutor_bc() {
 	proc := NewExecutor(log, log, "_test/bc.sh")
 	err := proc.Start()
 	fmt.Println(err)
-	proc.io <- []byte("2+2")
-	fmt.Printf("%s", <-proc.io)
-	proc.log <- true
-	<-proc.log
-	// and now, exit detection
-	proc.io <- []byte("quit")
-	select {
-	case in := <-proc.io:
-		fmt.Printf("%s", in)
-	case <-proc.exit:
-		fmt.Println("exit")
-	}
+	res, _ := proc.Interact([]byte("2+2"))
+	fmt.Printf("%s", res)
 	proc.Stop()
 	dump(log)
 	// Output:
 	// <nil>
 	// 4
-	// exit
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
 }
@@ -78,48 +67,14 @@ func ExampleNewExecutor_hello() {
 	proc := NewExecutor(log, log, "_test/hello.sh")
 	err := proc.Start()
 	fmt.Println(err)
-	proc.io <- []byte(`{"value":{"name":"Mike"}}`)
-	fmt.Printf("%s", <-proc.io)
-	proc.log <- true
-	<-proc.log
+	res, _ := proc.Interact([]byte(`{"value":{"name":"Mike"}}`))
+	fmt.Printf("%s", res)
 	proc.Stop()
-	_, ok := <-proc.io
-	fmt.Printf("io %v\n", ok)
 	dump(log)
-	// Unordered output:
+	// Output:
 	// <nil>
 	// {"hello": "Mike"}
 	// msg=hello Mike
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
-	// io false
-}
-
-func ExampleNewExecutor_term() {
-	log, _ := ioutil.TempFile("", "log")
-	proc := NewExecutor(log, log, "_test/hello.sh")
-	err := proc.Start()
-	fmt.Println(err)
-	proc.io <- []byte(`{"value":{"name":"*"}}`)
-	var exited bool
-	select {
-	case <-proc.io:
-		exited = false
-	case <-proc.exit:
-		exited = true
-	}
-	proc.log <- true
-	<-proc.log
-	fmt.Printf("exit %v\n", exited)
-	proc.Stop()
-	_, ok := <-proc.io
-	fmt.Printf("io %v\n", ok)
-	dump(log)
-	// Unordered output:
-	// <nil>
-	// exit true
-	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
-	// Goodbye!
-	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
-	// io false
 }

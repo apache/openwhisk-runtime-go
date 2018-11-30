@@ -59,29 +59,20 @@ func (ap *ActionProxy) runHandler(w http.ResponseWriter, r *http.Request) {
 		sendError(w, http.StatusInternalServerError, fmt.Sprintf("no action defined yet"))
 		return
 	}
+	// check if the process exited
+	if ap.theExecutor.Exited() {
+		sendError(w, http.StatusInternalServerError, fmt.Sprintf("command exited"))
+		return
+	}
 
 	// remove newlines
 	body = bytes.Replace(body, []byte("\n"), []byte(""), -1)
 
 	// execute the action
-	ap.theExecutor.io <- body
+	response, err := ap.theExecutor.Interact(body)
 
 	// check for early termination
-	var response []byte
-	var exited bool
-	select {
-	case response = <-ap.theExecutor.io:
-		exited = false
-	case err = <-ap.theExecutor.exit:
-		exited = true
-	}
-
-	// flush the logs sending the activation message at the end
-	ap.theExecutor.log <- true
-	<-ap.theExecutor.log
-
-	// check for early termination
-	if exited {
+	if err != nil {
 		Debug("WARNING! Command exited")
 		ap.theExecutor = nil
 		sendError(w, http.StatusBadRequest, fmt.Sprintf("command exited"))
@@ -106,7 +97,7 @@ func (ap *ActionProxy) runHandler(w http.ResponseWriter, r *http.Request) {
 		f.Flush()
 	}
 
-	// diagnostic when writing problems
+	// diagnostic when you have writing problems
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, fmt.Sprintf("Error writing response: %v", err))
 		return
