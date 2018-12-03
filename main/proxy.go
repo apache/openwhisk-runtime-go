@@ -20,12 +20,16 @@ import (
 	"archive/zip"
 	"bytes"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 
 	"github.com/apache/incubator-openwhisk-runtime-go/openwhisk"
 )
+
+// flag to enable debug
+var version = flag.Bool("version", false, "show version")
 
 // flag to enable debug
 var debug = flag.Bool("debug", false, "enable debug output")
@@ -69,6 +73,12 @@ func extractAndCompile(ap *openwhisk.ActionProxy) {
 func main() {
 	flag.Parse()
 
+	// show version number
+	if *version {
+		fmt.Println("OpenWhisk ActionLoop Proxy", openwhisk.Version)
+		return
+	}
+
 	// debugging
 	if *debug {
 		// set debugging flag, propagated to the actions
@@ -86,7 +96,7 @@ func main() {
 	}
 
 	// start the balls rolling
-	openwhisk.Debug("OpenWhisk Go Proxy: starting")
+	openwhisk.Debug("OpenWhisk ActionLoop Proxy %s: starting", openwhisk.Version)
 	ap.Start(8080)
 
 }

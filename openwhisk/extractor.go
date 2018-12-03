@@ -26,8 +26,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-
-	"gopkg.in/h2non/filetype.v1"
 )
 
 func unzip(src []byte, dest string) error {
@@ -110,12 +108,8 @@ func (ap *ActionProxy) ExtractAction(buf *[]byte, suffix string) (string, error)
 	ap.currentDir++
 	newDir := fmt.Sprintf("%s/%d/%s", ap.baseDir, ap.currentDir, suffix)
 	os.MkdirAll(newDir, 0755)
-	kind, err := filetype.Match(*buf)
-	if err != nil {
-		return "", err
-	}
 	file := newDir + "/exec"
-	if kind.Extension == "zip" {
+	if IsZip(*buf) {
 		Debug("Extract Action, assuming a zip")
 		return file, unzip(*buf, newDir)
 	}

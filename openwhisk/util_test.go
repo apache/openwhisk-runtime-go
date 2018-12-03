@@ -34,8 +34,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"gopkg.in/h2non/filetype.v1"
 )
 
 func startTestServer(compiler string) (*httptest.Server, string, *os.File) {
@@ -153,20 +151,10 @@ func exists(dir, filename string) error {
 	return err
 }
 
-// definig a type to recognizing also mac executables
-var pseudoElfForMacType = filetype.NewType("elf", "darwin/mach")
-
-func pseudoElfForMacMatcher(buf []byte) bool {
-	return len(buf) > 4 && ((buf[0] == 0xcf && buf[1] == 0xfa && buf[2] == 0xed && buf[3] == 0xfe) ||
-		(buf[0] == 0xce && buf[1] == 0xfa && buf[2] == 0xed && buf[3] == 0xfe))
-}
-
-func detect(dir, filename string) string {
+func detectExecutable(dir, filename string) bool {
 	path := fmt.Sprintf("%s/%d/%s", dir, highestDir(dir), filename)
 	file, _ := ioutil.ReadFile(path)
-	filetype.AddMatcher(pseudoElfForMacType, pseudoElfForMacMatcher)
-	kind, _ := filetype.Match(file)
-	return kind.Extension
+	return IsExecutable(file, runtime.GOOS)
 }
 
 func waitabit() {
