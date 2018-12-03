@@ -28,7 +28,7 @@ import (
 	"github.com/apache/incubator-openwhisk-runtime-go/openwhisk"
 )
 
-// flag to enable debug
+// flag to show version
 var version = flag.Bool("version", false, "show version")
 
 // flag to enable debug
