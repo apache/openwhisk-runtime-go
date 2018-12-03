@@ -14,42 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package openwhisk
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath "cz.alenkacz:gradle-scalafmt:${gradle.scalafmt.version}"
-    }
-}
-
-plugins {
-    id 'com.github.blindpirate.gogradle' version '0.8.1'
-}
-
-dependencies {
-    golang {
-        build 'github.com/sirupsen/logrus@v1.1.0'
-        test 'github.com/stretchr/testify@v1.2.1'
-    }
-}
-
-
-subprojects {
-    apply plugin: 'scalafmt'
-    scalafmt.configFilePath = gradle.scalafmt.config
-}
-
-golang {
-  packagePath = 'github.com/apache/incubator-openwhisk-runtime-go'
-  goVersion = '1.11.2'
-}
-
-
-build.dependsOn vendor
-
-build {
-  targetPlatform = ['linux-amd64']
-  go 'build -o actionProxyLoop/proxy main/proxy.go'
-}
+// Version number - internal
+var Version = "1.0.1"

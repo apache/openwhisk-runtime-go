@@ -23,18 +23,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
-
-	"gopkg.in/h2non/filetype.v1"
 )
-
-// this is only to let test run on OSX
-// it only recognizes OSX Mach 64 bit executable
-// (magic number: facefeed + 64bit flag)
-var mach64Type = filetype.NewType("mach", "darwin/mach")
-
-func mach64Matcher(buf []byte) bool {
-	return len(buf) > 4 && buf[0] == 0xcf && buf[1] == 0xfa && buf[2] == 0xed && buf[3] == 0xfe
-}
 
 // check if the file exists and it is already compiled
 func isCompiled(file string) bool {
@@ -48,24 +37,9 @@ func isCompiled(file string) bool {
 		Debug(err.Error())
 		return false
 	}
-	// if this is mac add a matcher for mac
-	if runtime.GOOS == "darwin" {
-		filetype.AddMatcher(mach64Type, mach64Matcher)
-	}
 
-	kind, err := filetype.Match(buf)
-	Debug("isCompiled: %s kind=%s", file, kind)
-	if err != nil {
-		Debug(err.Error())
-		return false
-	}
-	if kind.Extension == "elf" {
-		return true
-	}
-	if kind.Extension == "mach" {
-		return true
-	}
-	return false
+	// check if it is an executable
+	return IsExecutable(buf, runtime.GOOS)
 }
 
 // CompileAction will compile an anction in source format invoking a compiler
