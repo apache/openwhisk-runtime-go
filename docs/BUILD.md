@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 -->
-#  Developers Guide for Runtime itself
+# Developers Guide for Runtime itself
 
 <a name="building"/>
 
@@ -26,16 +26,16 @@ You need a Linux or an OSX environment, with Java and Docker installed to build 
 
 Prerequisites for running build and tests with gradle:
 
-- docker
-- jdk
+-   docker
+-   jdk
 
-To compile go proxy *in amd64 architecture* for docker:
+To compile go proxy *in your local architecture* for docker:
 
 ```
-./gradlew build
+./gradlew goBuild
 ```
 
-To build the docker images, after compiling go proxy:
+To build the docker images (this will also compile the go proxy):
 
 ```
 ./gradlew distDocker
@@ -43,8 +43,8 @@ To build the docker images, after compiling go proxy:
 
 This will build the images:
 
-* `actionloop-golang-v1.11`: an image supporting  Go sources
-* `actionloop`: the base image, supporting generic executables ans shell script
+*   `actionloop-golang-v1.11`: an image supporting  Go sources
+*   `actionloop`: the base image, supporting generic executables and shell script
 
 The `actionloop` image can be used for supporting other compiled programming languages as long as they implement a `compile` script and the *action loop* protocol described below.
 
@@ -59,13 +59,13 @@ To run tests:
 
 If you want to develop the proxy and run tests natively, you can do it on Linux or OSX. Development has been tested on Ubuntu Linux (14.04) and OSX 10.13. Probably other distributions work, maybe even Windows with WSL, but since it is not tested YMMMV.
 
-You need to install, of course [go 1.11.0](https://golang.org/doc/install)
+You need to install, of course [go 1.11.x](https://golang.org/doc/install)
 
 Then you need a set of utilities used in tests:
 
-- bc
-- zip
-- realpath
+-   bc
+-   zip
+-   realpath
 
 Linux: `apt-get install bc zip realpath`
 OSX: `brew install zip coreutils`

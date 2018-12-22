@@ -43,13 +43,63 @@ subprojects {
 
 golang {
   packagePath = 'github.com/apache/incubator-openwhisk-runtime-go'
-  goVersion = '1.11.3'
+  goVersion = '1.11.4'
 }
 
+/*
+    The OpenWhiskPlatform class is a utility class to make the rest of what
+    happens with platforms a bit more understandable.  A "Platform" is a tuple
+    of an operating system and a processor.  Currently, the OpenWhisk CLI
+    supports three OS's:  Linux, Mac/Darwin, and Windows.  It supports x86
+    (32-bit or 64-bit) on all OS's.  On Linux, it also support System Z (s390x),
+    PowerPC (ppc64le), and ARM (32-bit and 64-bit) architectures.
+    Different contexts use different codings to refer to these architectures --
+    the class attempts to provide and interpret all needed codings.  Internal
+    storage is in "GO" format:
+        OS: linux, darwin, windows
+        Arch: 386, amd64, s390x, ppc64le, arm64
+ */
+class OpenWhiskPlatform {
+    String goOs
+    String goArch
 
-build.dependsOn vendor
+    /*
+        Create a platform for the local platform
+     */
+    OpenWhiskPlatform() {
+        this(System.properties['os.name'], System.properties['os.arch'])
+    }
 
-build {
-  targetPlatform = ['linux-amd64']
-  go 'build -o actionProxyLoop/proxy main/proxy.go'
+    OpenWhiskPlatform(String platformSpec) {
+        this(*platformSpec.split('-'))
+    }
+
+    OpenWhiskPlatform(String inOs, String inArch) {
+        goOs=inOs.toLowerCase()
+                 .replaceAll(~/^mac.*$/,'darwin')
+                 .replaceAll(~/^.*n[ui]x.*$/,'linux')
+        goArch=inArch.toLowerCase()
+                     .replaceAll('x86_64','amd64')
+                     .replaceAll('i386','386')
+                     .replaceAll('x86_32','386')
+                     .replaceAll('aarch64','arm64')
+    }
+
+    /**
+     * Return the Openwhisk OS for this Platform
+     */
+    String getOwOs() {
+        ((goOs == 'darwin') ? 'mac' : goOs)
+    }
+
+    String getGoPlatform() {
+        "${goOs}-${goArch}"
+    }
+}
+
+goBuild.dependsOn goVendor
+
+goBuild {
+   targetPlatform = ["linux-${(new OpenWhiskPlatform()).goArch}".toString()]
+   go 'build -o actionProxyLoop/proxy main/proxy.go'
 }
