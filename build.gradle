@@ -43,7 +43,7 @@ subprojects {
 
 golang {
   packagePath = 'github.com/apache/incubator-openwhisk-runtime-go'
-  goVersion = '1.11.3'
+  goVersion = '1.11.5'
 }
 
 
