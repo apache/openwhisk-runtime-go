@@ -15,5 +15,5 @@
  * limitations under the License.
  */
 
-ext.dockerImageName = 'actionloop'
+ext.dockerImageName = 'actionloop-v1.0.1'
 apply from: '../gradle/docker.gradle'

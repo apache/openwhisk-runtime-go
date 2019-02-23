@@ -51,5 +51,6 @@ build.dependsOn vendor
 
 build {
   targetPlatform = ['linux-amd64']
-  go 'build -o actionProxyLoop/proxy main/proxy.go'
+  go """build -o actionProxyLoop/proxy -ldflags '-extldflags "-static"'  main/proxy.go"""
 }
+ 
