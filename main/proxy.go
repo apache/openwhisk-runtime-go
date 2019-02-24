@@ -17,8 +17,6 @@
 package main
 
 import (
-	"archive/zip"
-	"bytes"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -55,18 +53,10 @@ func extractAndCompile(ap *openwhisk.ActionProxy) {
 	file, err := ap.ExtractAndCompile(&in, *compile)
 	fatalIf(err)
 
-	// read the file, zip it and write it to stdout
-	buf := new(bytes.Buffer)
-	zwr := zip.NewWriter(buf)
-	zf, err := zwr.Create("exec")
+	// zip and write output
+	zip, err = Zip(file)
 	fatalIf(err)
-	filedata, err := ioutil.ReadFile(file)
-	fatalIf(err)
-	_, err = zf.Write(filedata)
-	fatalIf(err)
-	fatalIf(zwr.Flush())
-	fatalIf(zwr.Close())
-	_, err = os.Stdout.Write(buf.Bytes())
+	_, err = os.Stdout.Write(zip)
 	fatalIf(err)
 }
 

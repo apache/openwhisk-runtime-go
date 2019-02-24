@@ -4,10 +4,12 @@ import (
 	"archive/zip"
 	"bytes"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 )
 
+// Unzip extracts file and directories in the given destination folder
 func Unzip(src []byte, dest string) error {
 	reader := bytes.NewReader(src)
 	r, err := zip.NewReader(reader, int64(len(src)))
@@ -56,4 +58,32 @@ func Unzip(src []byte, dest string) error {
 		}
 	}
 	return nil
+}
+
+// Zip creates a zip with one file named "exec"
+func Zip(file string) ([]byte, error) {
+	// read the file, zip it and write it to stdout
+	buf := new(bytes.Buffer)
+	zwr := zip.NewWriter(buf)
+	zf, err := zwr.Create("exec")
+	if err != nil {
+		return nil, err
+	}
+	filedata, err := ioutil.ReadFile(file)
+	if err != nil {
+		return nil, err
+	}
+	_, err = zf.Write(filedata)
+	if err != nil {
+		return nil, err
+	}
+	err = zwr.Flush()
+	if err != nil {
+		return nil, err
+	}
+	err = zwr.Close()
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
