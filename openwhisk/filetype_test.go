@@ -37,6 +37,8 @@ var windowsFile = []byte{
 	0x4d, 0x5a, 0x90, 0x00, 0x03, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00,
 }
 
+var shellFile = []byte("#!/bin/sh\necho hello\n")
+
 func Example_filetype() {
 	fmt.Printf("%t\n%t\n", IsElf(linuxFile), IsElf(zipFile))
 	fmt.Printf("%t\n%t\n", IsMach64(darwinFile), IsMach64(zipFile))
@@ -45,6 +47,7 @@ func Example_filetype() {
 	fmt.Printf("%t\n%t\n", IsExecutable(linuxFile, "linux"), IsExecutable(zipFile, "linux"))
 	fmt.Printf("%t\n%t\n", IsExecutable(windowsFile, "windows"), IsExecutable(zipFile, "windows"))
 	fmt.Printf("%t\n%t\n", IsExecutable(darwinFile, "darwin"), IsExecutable(zipFile, "darwin"))
+	fmt.Printf("%t\n%t\n%t\n", IsExecutable(shellFile, "darwin"), IsExecutable(shellFile, "linux"), IsExecutable(shellFile, "windows"))
 	// Output:
 	// true
 	// false
@@ -58,6 +61,9 @@ func Example_filetype() {
 	// false
 	// true
 	// false
+	// true
+	// false
+	// true
 	// true
 	// false
 

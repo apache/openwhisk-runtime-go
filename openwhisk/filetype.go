@@ -37,13 +37,19 @@ func IsMach64(buf []byte) bool {
 		buf[2] == 0xed && buf[3] == 0xfe
 }
 
+// IsBangPath checks for a shell executable
+func IsBangPath(buf []byte) bool {
+	return len(buf) > 2 &&
+		buf[0] == '#' && buf[1] == '!'
+}
+
 // IsExecutable check if it is an executable, according the current runtime
 func IsExecutable(buf []byte, runtime string) bool {
 	switch runtime {
 	case "darwin":
-		return IsMach64(buf)
+		return IsMach64(buf) || IsBangPath(buf)
 	case "linux":
-		return IsElf(buf)
+		return IsElf(buf) || IsBangPath(buf)
 	case "windows":
 		return IsExe(buf)
 	default:
