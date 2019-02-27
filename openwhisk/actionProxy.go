@@ -125,22 +125,18 @@ func (ap *ActionProxy) Start(port int) {
 func (ap *ActionProxy) ExtractAndCompileIO(r io.Reader, w io.Writer, main string) {
 
 	// read the std input
-	log.Println("ReadAll")
 	in, err := ioutil.ReadAll(r)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// extract and compile it
-	log.Println("ExtractAndCompile")
 	file, err := ap.ExtractAndCompile(&in, main)
-	log.Println(file)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// zip the directory containing the file and write output
-	log.Println("Zip")
 	zip, err := Zip(filepath.Dir(file))
 	if err != nil {
 		log.Fatal(err)

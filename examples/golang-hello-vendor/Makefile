@@ -1,5 +1,5 @@
 OW_USER?=openwhisk
-OW_RUNTIME?=$(OW_USER)/actionloop
+OW_RUNTIME?=$(OW_USER)/actionloop-v1.0.2
 OW_COMPILER?=$(OW_USER)/actionloop-golang-v1.11
 WSK?=wsk
 MAIN=hello
@@ -23,14 +23,14 @@ $(BINZIP): $(SRCS) $(VENDORS) $(SRCZIP)
 	docker run -i $(OW_COMPILER) -compile $(MAIN) <$(SRCZIP) >$(BINZIP)
 
 $(SRCZIP): $(SRCS) $(VENDORS)
-	cd src ; zip ../$(SRCZIP) -r *
+	cd src ; zip ../$(SRCZIP) -qr *
 
 clean:
 	-$(WSK) action delete $(PACKAGE)/$(NAME)
-	-rm $(BINZIP) $(SRCZIP) package.done test.json
+	-rm $(BINZIP) $(SRCZIP) package.done test.json 2>/dev/null
 
 clean_vendor:
-	-rm -r $(VENDORS)
+	-rm -r $(VENDORS) 
 
 test: test.json
 	$(WSK) action invoke test/$(NAME) -r
