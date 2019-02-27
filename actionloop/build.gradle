@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-ext.dockerImageName = 'actionloop-v1.0.2'
+ext.dockerImageName = 'actionloop-v2'
 apply from: '../gradle/docker.gradle'
 
 distDocker.dependsOn 'copyProxy'

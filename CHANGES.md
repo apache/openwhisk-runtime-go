@@ -22,12 +22,12 @@
 - librdkafka in golang image
 - showing version numbuer with -debug
 
-# Actionloop v1.0.2
+# Actionloop v2
 Versioning
-- renamed actionloop docker image to actionloop-v1.0.2
+- renamed actionloop docker image to actionloop-v2
 Docker Images Support
 - static build of the executable docker image, so actionloop can be used also in alpine images
 ActionLoop for Scripting Languages
 - any script starting with '#!' is recognized as executable
 - now the -compile will zip the entire directory of the `bin` directory after compilation
-- if you upload a folder `src/exec` the entire directory is moved to `bin`, including other uplooaded files
+- if you upload a folder `src/exec` the entire directory is moved to `bin`, including other uploaded files
