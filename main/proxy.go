@@ -19,7 +19,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -40,24 +39,6 @@ func fatalIf(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-// use the runtime as a compiler "on-the-fly"
-func extractAndCompile(ap *openwhisk.ActionProxy) {
-
-	// read the std input
-	in, err := ioutil.ReadAll(os.Stdin)
-	fatalIf(err)
-
-	// extract and compile it
-	file, err := ap.ExtractAndCompile(&in, *compile)
-	fatalIf(err)
-
-	// zip and write output
-	zip, err = Zip(file)
-	fatalIf(err)
-	_, err = os.Stdout.Write(zip)
-	fatalIf(err)
 }
 
 func main() {
@@ -81,7 +62,7 @@ func main() {
 
 	// compile on the fly upon request
 	if *compile != "" {
-		extractAndCompile(ap)
+		ap.ExtractAndCompileIO(os.Stdin, os.Stdout, *compile)
 		return
 	}
 

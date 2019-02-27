@@ -16,5 +16,27 @@
  */
 package openwhisk
 
-// Version number - internal
-var Version = "1.0.2"
+import (
+	"fmt"
+	"os"
+)
+
+func Example() {
+	os.RemoveAll("./action/unzip")
+	os.Mkdir("./action/unzip", 0755)
+	buf, err := Zip("_test/pysample")
+	fmt.Println(err)
+	err = Unzip(buf, "./action/unzip")
+	sys("_test/find.sh", "./action/unzip")
+	fmt.Println(err)
+	// Output:
+	// <nil>
+	// ./action/unzip
+	// ./action/unzip/exec
+	// ./action/unzip/lib
+	// ./action/unzip/lib/action
+	// ./action/unzip/lib/action/__init__.py
+	// ./action/unzip/lib/action/main.py
+	// ./action/unzip/lib/exec.py
+	// <nil>
+}

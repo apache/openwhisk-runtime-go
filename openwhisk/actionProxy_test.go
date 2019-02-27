@@ -18,8 +18,10 @@
 package openwhisk
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"testing"
 
@@ -80,4 +82,46 @@ func TestStartLatestAction_emit2(t *testing.T) {
 	assert.Equal(t, res, []byte("2\n"))
 	/**/
 	ap.theExecutor.Stop()
+}
+
+func Example_compile_bin() {
+	os.RemoveAll("./action/c1")
+	logf, _ := ioutil.TempFile("/tmp", "log")
+	ap := NewActionProxy("./action/c1", "_test/compile.py", logf, logf)
+	dat, _ := Zip("_test/pysample")
+	inp := bytes.NewBuffer(dat)
+	out := new(bytes.Buffer)
+	ap.ExtractAndCompileIO(inp, out, "main")
+	Unzip(out.Bytes(), "./action/c1/out")
+	sys("_test/find.sh", "./action/c1/out")
+	// Output:
+	// ./action/c1/out
+	// ./action/c1/out/exec
+	// ./action/c1/out/lib
+	// ./action/c1/out/lib/action
+	// ./action/c1/out/lib/action/__init__.py
+	// ./action/c1/out/lib/action/main.py
+	// ./action/c1/out/lib/exec.py
+}
+
+func Example_compile_src() {
+	os.RemoveAll("./action/c2")
+	logf, _ := ioutil.TempFile("/tmp", "log")
+	ap := NewActionProxy("./action/c2", "_test/compile.py", logf, logf)
+	log.Println(ioutil.ReadAll(logf))
+	dat, _ := Zip("_test/pysample/lib")
+	inp := bytes.NewBuffer(dat)
+	out := new(bytes.Buffer)
+	ap.ExtractAndCompileIO(inp, out, "main")
+	Unzip(out.Bytes(), "./action/c2/out")
+	sys("_test/find.sh", "./action/c2/out")
+	// Output:
+	// ./action/c2/out
+	// ./action/c2/out/action
+	// ./action/c2/out/action/action
+	// ./action/c2/out/action/action/__init__.py
+	// ./action/c2/out/action/action/main.py
+	// ./action/c2/out/action/exec.py
+	// ./action/c2/out/exec
+
 }
