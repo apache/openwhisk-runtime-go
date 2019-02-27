@@ -23,9 +23,8 @@ distDocker.dependsOn 'copyCompiler'
 distDocker.dependsOn 'copyEpilogue'
 distDocker.finalizedBy('cleanup')
 
-
 task copyProxy(type: Copy) {
-    from '../actionProxyLoop/proxy'
+    from '../common/proxy'
     into '.'
 }
 

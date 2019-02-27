@@ -46,11 +46,13 @@ golang {
   goVersion = '1.11.5'
 }
 
-
 build.dependsOn vendor
 
 build {
   targetPlatform = ['linux-amd64']
-  go """build -o actionProxyLoop/proxy -ldflags '-extldflags "-static"'  main/proxy.go"""
+  go """build -o common/proxy -ldflags '-extldflags "-static"'  main/proxy.go"""
 }
- 
+
+task cleanup(type: Delete) {
+    delete 'common/proxy'
+}

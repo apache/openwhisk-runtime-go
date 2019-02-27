@@ -39,6 +39,10 @@ This repository containst both the OpenWhisk runtime for Golang Actions, as well
 - Deployment for [Generic](docs/DEPLOY.md#generic) actions
 - The [ActionLoop](docs/ACTION.md#actionloop) protocol for generic actions
 
+# Change Log
+
+[CHANGES.md](Here.)
+
 # License
 [Apache 2.0](LICENSE.txt)
 

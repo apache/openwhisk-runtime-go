@@ -15,5 +15,19 @@
  * limitations under the License.
  */
 
-ext.dockerImageName = 'actionloop-v1.0.1'
+ext.dockerImageName = 'actionloop-v1.0.2'
 apply from: '../gradle/docker.gradle'
+
+distDocker.dependsOn 'copyProxy'
+distDocker.finalizedBy('cleanup')
+
+task copyProxy(type: Copy) {
+    from '../common/proxy'
+    into '.'
+}
+
+task cleanup(type: Delete) {
+    delete 'proxy'
+    delete 'gobuild.py'
+    delete 'gobuild.py.launcher.go'
+}
