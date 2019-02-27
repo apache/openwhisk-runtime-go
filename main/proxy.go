@@ -46,7 +46,7 @@ func main() {
 
 	// show version number
 	if *version {
-		fmt.Println("OpenWhisk ActionLoop Proxy", openwhisk.Version)
+		fmt.Printf("OpenWhisk ActionLoop Proxy v%s\n", openwhisk.Version)
 		return
 	}
 
