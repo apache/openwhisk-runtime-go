@@ -1,6 +1,6 @@
-Michele Sciabarra <michele@sciabarra.com>
+Michele Sciabarra <msciabarra@apache.org>
 
-Carlos Santana 
+Carlos Santana <csantana23@gmail.com>
 
 Rodric Rabbah <rodric@gmail.com>
 

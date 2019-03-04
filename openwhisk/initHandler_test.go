@@ -226,3 +226,20 @@ func Example_badinit_nocompiler() {
 	// 500 {"error":"no action defined yet"}
 	// hi
 }
+
+func Example_zip_init() {
+	ts, cur, log := startTestServer("")
+	buf, _ := Zip("_test/pysample")
+	doInit(ts, initBytes(buf, ""))
+	doRun(ts, ``)
+	doRun(ts, `{"name":"World"}`)
+	stopTestServer(ts, cur, log)
+	// Output:
+	// 200 {"ok":true}
+	// 200 {"python": "Hello, Mike"}
+	// 200 {"python": "Hello, World"}
+	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
+	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
+	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
+	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
+}

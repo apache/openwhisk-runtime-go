@@ -1,5 +1,5 @@
 OW_USER?=openwhisk
-OW_RUNTIME?=$(OW_USER)/actionloop
+OW_RUNTIME?=$(OW_USER)/actionloop-v2
 OW_COMPILER?=$(OW_USER)/actionloop-golang-v1.11
 WSK?=wsk
 MAIN=main
@@ -16,14 +16,14 @@ devel: package.done $(SRCZIP)
 	$(WSK) action update $(PACKAGE)/$(NAME) $(SRCZIP) --main $(MAIN) --docker $(OW_COMPILER)
 
 $(BINZIP): $(SRCS)
-	cd src ; zip - -r * | docker run -i $(OW_COMPILER) -compile $(MAIN) >../$(BINZIP)
+	cd src ; zip - -qr * | docker run -i $(OW_COMPILER) -compile $(MAIN) >../$(BINZIP)
 
 $(SRCZIP): $(SRCS)
-	cd src ; zip ../$(SRCZIP) -r *
+	cd src ; zip ../$(SRCZIP) -qr *
 
 clean:
 	-$(WSK) action delete $(PACKAGE)/$(NAME)
-	-rm  $(BINZIP) $(SRCZIP) package.done test.json
+	-rm $(BINZIP) $(SRCZIP) package.done test.json 2>/dev/null
 
 test: test.json
 	$(WSK) action invoke test/$(NAME) -r

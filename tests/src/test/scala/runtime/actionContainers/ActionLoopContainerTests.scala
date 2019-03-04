@@ -32,12 +32,12 @@ class ActionLoopContainerTests
 
   import GoResourceHelpers._
 
-  val image = "actionloop"
+  val image = "actionloop-v2"
 
   def withActionLoopContainer(code: ActionContainer => Unit) =
-    withContainer("actionloop")(code)
+    withContainer(image)(code)
 
-  behavior of "actionloop"
+  behavior of image
 
   def shCodeHello(main: String) = Seq(
     Seq(main) ->

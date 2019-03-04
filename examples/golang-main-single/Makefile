@@ -1,5 +1,5 @@
 OW_USER?=openwhisk
-OW_RUNTIME?=$(OW_USER)/actionloop
+OW_RUNTIME?=$(OW_USER)/actionloop-v2
 OW_COMPILER?=$(OW_USER)/actionloop-golang-v1.11
 WSK?=wsk
 MAIN=main
@@ -19,7 +19,7 @@ $(ZIP): $(SRC)
 
 clean:
 	-$(WSK) action delete $(PACKAGE)/$(NAME)
-	-rm $(ZIP) package.done test.json
+	-rm $(ZIP) package.done test.json 2>/dev/null
 
 test: test.json
 	$(WSK) action invoke test/$(NAME) -r

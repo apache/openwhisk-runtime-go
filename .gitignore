@@ -11,8 +11,9 @@ tests/build/
 vendor/
 
 # Go binary proxy
-actionProxyLoop/proxy
-golang1.10/proxy
+common/proxy
+actionloop/proxy
+golang1.11/proxy
 
 # Go test transient files
 openwhisk/_test/exec
@@ -26,6 +27,7 @@ openwhisk/_test/output/
 openwhisk/action/
 openwhisk/compile/
 openwhisk/debug.test
+*.pyc
 
 # Eclipse
 tests/bin/

@@ -14,45 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package openwhisk
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath "cz.alenkacz:gradle-scalafmt:${gradle.scalafmt.version}"
-    }
-}
+import (
+	"fmt"
+	"os"
+)
 
-plugins {
-    id 'com.github.blindpirate.gogradle' version '0.8.1'
-}
-
-dependencies {
-    golang {
-        build 'github.com/sirupsen/logrus@v1.1.0'
-        test 'github.com/stretchr/testify@v1.2.1'
-    }
-}
-
-
-subprojects {
-    apply plugin: 'scalafmt'
-    scalafmt.configFilePath = gradle.scalafmt.config
-}
-
-golang {
-  packagePath = 'github.com/apache/incubator-openwhisk-runtime-go'
-  goVersion = '1.11.5'
-}
-
-build.dependsOn vendor
-
-build {
-  targetPlatform = ['linux-amd64']
-  go """build -o common/proxy -ldflags '-extldflags "-static"'  main/proxy.go"""
-}
-
-task cleanup(type: Delete) {
-    delete 'common/proxy'
+func Example() {
+	os.RemoveAll("./action/unzip")
+	os.Mkdir("./action/unzip", 0755)
+	buf, err := Zip("_test/pysample")
+	fmt.Println(err)
+	err = Unzip(buf, "./action/unzip")
+	sys("_test/find.sh", "./action/unzip")
+	fmt.Println(err)
+	// Output:
+	// <nil>
+	// ./action/unzip
+	// ./action/unzip/exec
+	// ./action/unzip/lib
+	// ./action/unzip/lib/action
+	// ./action/unzip/lib/action/__init__.py
+	// ./action/unzip/lib/action/main.py
+	// ./action/unzip/lib/exec.py
+	// <nil>
 }

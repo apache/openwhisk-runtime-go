@@ -1,4 +1,4 @@
-#!/bin/bash
+<!--
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -15,42 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+-->
+# ActionLoop v1.0.1
+- embedded file type detection
+- now showing the commend
+- librdkafka in golang image
+- showing version numbuer with -debug
 
-cd "$(dirname $0)"
-
-function build {
-   test -e exec && rm exec
-   cp $1.src $1.go
-   GOPATH=$PWD go build -a -o exec $1.go
-   rm $1.go
-}
-
-function build_main {
-   test -e exec && rm exec
-   cp ../../common/gobuild.py.launcher.go $1.go
-   cat $1.src >>$1.go
-   go build -a -o exec $1.go
-   rm $1.go
-}
-
-
-build hi
-zip -q hi.zip exec
-cp exec hi
-
-build_main hello_message
-zip -q hello_message.zip exec
-cp exec hello_message
-
-build_main hello_greeting
-zip -q hello_greeting.zip exec
-cp exec hello_greeting
-
-test -e hello.zip && rm hello.zip
-cd src
-zip -q -r ../hello.zip main.go hello
-cd ..
-
-build exec
-test -e exec.zip && rm exec.zip
-zip -q -r exec.zip exec etc dir
+# Actionloop v2
+Versioning
+- renamed actionloop docker image to actionloop-v2
+Docker Images Support
+- static build of the executable docker image, so actionloop can be used also in alpine images
+ActionLoop for Scripting Languages
+- any script starting with '#!' is recognized as executable
+- now the -compile will zip the entire directory of the `bin` directory after compilation
+- if you upload a folder `src/exec` the entire directory is moved to `bin`, including other uploaded files

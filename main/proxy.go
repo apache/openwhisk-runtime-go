@@ -17,11 +17,8 @@
 package main
 
 import (
-	"archive/zip"
-	"bytes"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -44,38 +41,12 @@ func fatalIf(err error) {
 	}
 }
 
-// use the runtime as a compiler "on-the-fly"
-func extractAndCompile(ap *openwhisk.ActionProxy) {
-
-	// read the std input
-	in, err := ioutil.ReadAll(os.Stdin)
-	fatalIf(err)
-
-	// extract and compile it
-	file, err := ap.ExtractAndCompile(&in, *compile)
-	fatalIf(err)
-
-	// read the file, zip it and write it to stdout
-	buf := new(bytes.Buffer)
-	zwr := zip.NewWriter(buf)
-	zf, err := zwr.Create("exec")
-	fatalIf(err)
-	filedata, err := ioutil.ReadFile(file)
-	fatalIf(err)
-	_, err = zf.Write(filedata)
-	fatalIf(err)
-	fatalIf(zwr.Flush())
-	fatalIf(zwr.Close())
-	_, err = os.Stdout.Write(buf.Bytes())
-	fatalIf(err)
-}
-
 func main() {
 	flag.Parse()
 
 	// show version number
 	if *version {
-		fmt.Println("OpenWhisk ActionLoop Proxy", openwhisk.Version)
+		fmt.Printf("OpenWhisk ActionLoop Proxy v%s\n", openwhisk.Version)
 		return
 	}
 
@@ -91,7 +62,7 @@ func main() {
 
 	// compile on the fly upon request
 	if *compile != "" {
-		extractAndCompile(ap)
+		ap.ExtractAndCompileIO(os.Stdin, os.Stdout, *compile)
 		return
 	}
 

@@ -127,14 +127,9 @@ func (ap *ActionProxy) initHandler(w http.ResponseWriter, r *http.Request) {
 
 // ExtractAndCompile decode the buffer and if a compiler is defined, compile it also
 func (ap *ActionProxy) ExtractAndCompile(buf *[]byte, main string) (string, error) {
-	// extract in "bin" or in "src" if the runtime can compile
-	suffix := "bin"
-	if ap.compiler != "" {
-		suffix = "src"
-	}
 
-	// extract action
-	file, err := ap.ExtractAction(buf, suffix)
+	// extract action in src folder
+	file, err := ap.ExtractAction(buf, "src")
 	if err != nil {
 		return "", err
 	}
@@ -148,26 +143,21 @@ func (ap *ActionProxy) ExtractAndCompile(buf *[]byte, main string) (string, erro
 	srcDir := filepath.Join(parent, "src")
 	binDir := filepath.Join(parent, "bin")
 	binFile := filepath.Join(binDir, "exec")
-	os.Mkdir(binDir, 0755)
 
-	// if the file is already compiled just move it from src to bin
-	if isCompiled(file) {
-		os.Rename(file, binFile)
-		return binFile, nil
-	}
-
-	// no compiler, move it anyway
-	if ap.compiler == "" {
-		os.Rename(file, binFile)
+	// if the file is already compiled or there is no compiler just move it from src to bin
+	if ap.compiler == "" || isCompiled(file) {
+		os.Rename(srcDir, binDir)
 		return binFile, nil
 	}
 
 	// ok let's try to compile
 	Debug("compiling: %s main: %s", file, main)
+	os.Mkdir(binDir, 0755)
 	err = ap.CompileAction(main, srcDir, binDir)
 	if err != nil {
 		return "", err
 	}
+
 	// check only if the file exist
 	if _, err := os.Stat(binFile); os.IsNotExist(err) {
 		return "", fmt.Errorf("cannot compile")

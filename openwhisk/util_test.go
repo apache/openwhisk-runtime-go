@@ -110,8 +110,7 @@ func initCode(file string, main string) string {
 	return string(j)
 }
 
-func initBinary(file string, main string) string {
-	dat, _ := ioutil.ReadFile(file)
+func initBytes(dat []byte, main string) string {
 	enc := base64.StdEncoding.EncodeToString(dat)
 	body := initBodyRequest{Binary: true, Code: enc}
 	if main != "" {
@@ -119,6 +118,11 @@ func initBinary(file string, main string) string {
 	}
 	j, _ := json.Marshal(initRequest{Value: body})
 	return string(j)
+}
+
+func initBinary(file string, main string) string {
+	dat, _ := ioutil.ReadFile(file)
+	return initBytes(dat, main)
 }
 
 func abs(in string) string {
@@ -166,17 +170,18 @@ func removeLineNr(out string) string {
 	return re.ReplaceAllString(out, "::")
 }
 func TestMain(m *testing.M) {
-	// Debugging = true // enable debug
-	// silence those annoying logs
-	if !Debugging {
+	var Debug = false // enable debug of tests
+	if !Debug {
+		// silence those annoying tests
 		log.SetOutput(ioutil.Discard)
+		// build support files
+		sys("_test/build.sh")
+		sys("_test/zips.sh")
 	}
 
 	// increase timeouts for init
 	DefaultTimeoutStart = 1000 * time.Millisecond
 	// build some test stuff
-	sys("_test/build.sh")
-	sys("_test/zips.sh")
 	// go ahead
 	code := m.Run()
 	os.Exit(code)

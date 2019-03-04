@@ -50,7 +50,7 @@ const (
 )
 
 // compile a main
-func Example_compile() {
+func Example_cli_compiler() {
 	sys(PREP, "hello.src", "0", "exec")
 	ap := NewActionProxy(TMP, COMP, os.Stdout, os.Stderr)
 	fmt.Println(isCompiled(TMP + "0/src/exec"))
