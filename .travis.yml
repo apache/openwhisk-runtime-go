@@ -4,38 +4,38 @@
 sudo: required
 language: go
 go:
-- "1.11.5"
+  - "1.11.5"
 services:
-- docker
+  - docker
 notifications:
   email: true
 before_install:
-- "./tools/travis/setup.sh"
+  - "./tools/travis/setup.sh"
 install: true
 script:
-- "./tools/travis/scan.sh && ./tools/travis/build.sh && ./tools/travis/test.sh"
+  - "./tools/travis/scan.sh && ./tools/travis/build.sh && ./tools/travis/test.sh"
 after_failure: cat .gogradle/reports/test/index.html
 deploy:
-- provider: script
-  skip_cleanup: true
-  script: "./tools/travis/publish.sh openwhisk ${TRAVIS_TAG%@*} ${TRAVIS_TAG##*@}"
-  on:
-    tags: true
-    all_branches: true
-    repo: apache/incubator-openwhisk-runtime-go
-- provider: script
-  skip_cleanup: true
-  script: "./tools/travis/publish.sh openwhisk actionProxyLoop latest"
-  on:
-    branch: master
-    repo: apache/incubator-openwhisk-runtime-go
-- provider: script
-  skip_cleanup: true
-  script: "./tools/travis/publish.sh openwhisk golang1.11 latest"
-  on:
-    branch: master
-    repo: apache/incubator-openwhisk-runtime-go
+  - provider: script
+    skip_cleanup: true
+    script: "./tools/travis/publish.sh openwhisk ${TRAVIS_TAG%@*} ${TRAVIS_TAG##*@}"
+    on:
+      tags: true
+      all_branches: true
+      repo: apache/incubator-openwhisk-runtime-go
+  - provider: script
+    skip_cleanup: true
+    script: "./tools/travis/publish.sh openwhisk actionloop latest"
+    on:
+      branch: master
+      repo: apache/incubator-openwhisk-runtime-go
+  - provider: script
+    skip_cleanup: true
+    script: "./tools/travis/publish.sh openwhisk golang1.11 latest"
+    on:
+      branch: master
+      repo: apache/incubator-openwhisk-runtime-go
 env:
   global:
-  - secure: GNKMZjEW1BKBb8NSiFB/Bogh0V5co5TefLLaj9oYJrKCP8rheFY4mWwINR74dYwSFIVmBhuuwZCm62zZwzb2TTivjQihOwU9SeTaUvJHlcLu6j1T/gTcMX5dkDOrdzqZaKoU5NpMbvad1fnDfEG9oU/VE7fARAxziZ2yBXOGkt2p2whkGXrs43gMyRKJv7ytUwpjvzhD48hJHgn0Eq6EwVIYxO5gJfGAhiA0ucH75c3jI4yEz7sw7SaoFxAQRL7VICaTH8JI+tKWU673HCclIRiPeZWQ23rI/f3MV8SNTKJm0GtnjM8LA9uC96qV6f5aXMn1EdaMGoCQbR9jBeqZG7pq8O2QHA/1eNNDw5sCISS05plCJ2yz/G4PUndnuToKm/sx6/qbdRA3QzTrNQfwTTcuUi+j4mYEFANgT774CeGdnajfNy4cZoeVEFmBTXdi5V1DuFLujSQrzRSHddHHUQXGUMaz4qv5R8g2aQNNJzYfknGwG0AbqCKld5j3VNtrjpiUqPAHmAi2O1/4gNd5dM42h4ARNnX4S8M/SPqWmzTAbtXaLcJIKxsyh9Xb1FINiCDsLNiuYWHb2QIjnuiXXgQvy/F1FAn231hJOYq1p6gA0QT/WBaAE77yfDR6EKmvaoBfqUuFQgfjwDH9hdsBiPb9U1jS/74yJqMBFiyW0nU=
-  - secure: sdSLUbg6ZkZiSO/gytXd83IpJ3TD2KeFWMP60VwadEPBDJf88Wju1S9xlHSan+gOgX5wU8S5Az1wfi1njGKZTmxNHgXa/LgCgJvmdoKPIHsJld5A38tvK3t1qeOzrM7UpzwdqqrEt+Xl6AlxCE82293IznOgCWaaLfBc5TawCThTLGZ2XSQYbZj4Uh12twCsKIUvnHV0Kr2wHRrSDGq6r2VSniHk8w66QMNOBu6V6zxYXKNhJpoRBU6X8vMGsn9GDNr6PG1GnO0oZGDQn/dJMxUK/QAgeskVHptX8Fytnzyri6vut0JPiMbT8AtolOxzjv/7KcqhO0YdxjVy+/3sTLpCRM0zfcx8q9RbufNiBTuERDrUYb8EKqHyX4QNJEVpf+oImNsKw/8ry991OdhrG9cyzXNT+0/oS5U7C/F7gS7nqb/kjBP+qJ+6AwdnOU1re5brv7BkH9Rj6d6tVLfSG35gRXAuwoouh6iXgXDiPu5dLNWzwazyEiIw2Pr10QWdZGJ7EwqJiPdw640wevfk8WQiwkCyduyII6OYMdZUwAjEDP4sehHoP61WPz2k8ollfiUIoTjzRrF9eO0Ni0qnz0/lBUw9zSpMZbD46KG5v/29dRLrvj9NYNAUx2KU57O080gZxIBgp1eI3WOX/Imia1phsZkP4Q7wtID03UOsiPs=
+    - secure: GNKMZjEW1BKBb8NSiFB/Bogh0V5co5TefLLaj9oYJrKCP8rheFY4mWwINR74dYwSFIVmBhuuwZCm62zZwzb2TTivjQihOwU9SeTaUvJHlcLu6j1T/gTcMX5dkDOrdzqZaKoU5NpMbvad1fnDfEG9oU/VE7fARAxziZ2yBXOGkt2p2whkGXrs43gMyRKJv7ytUwpjvzhD48hJHgn0Eq6EwVIYxO5gJfGAhiA0ucH75c3jI4yEz7sw7SaoFxAQRL7VICaTH8JI+tKWU673HCclIRiPeZWQ23rI/f3MV8SNTKJm0GtnjM8LA9uC96qV6f5aXMn1EdaMGoCQbR9jBeqZG7pq8O2QHA/1eNNDw5sCISS05plCJ2yz/G4PUndnuToKm/sx6/qbdRA3QzTrNQfwTTcuUi+j4mYEFANgT774CeGdnajfNy4cZoeVEFmBTXdi5V1DuFLujSQrzRSHddHHUQXGUMaz4qv5R8g2aQNNJzYfknGwG0AbqCKld5j3VNtrjpiUqPAHmAi2O1/4gNd5dM42h4ARNnX4S8M/SPqWmzTAbtXaLcJIKxsyh9Xb1FINiCDsLNiuYWHb2QIjnuiXXgQvy/F1FAn231hJOYq1p6gA0QT/WBaAE77yfDR6EKmvaoBfqUuFQgfjwDH9hdsBiPb9U1jS/74yJqMBFiyW0nU=
+    - secure: sdSLUbg6ZkZiSO/gytXd83IpJ3TD2KeFWMP60VwadEPBDJf88Wju1S9xlHSan+gOgX5wU8S5Az1wfi1njGKZTmxNHgXa/LgCgJvmdoKPIHsJld5A38tvK3t1qeOzrM7UpzwdqqrEt+Xl6AlxCE82293IznOgCWaaLfBc5TawCThTLGZ2XSQYbZj4Uh12twCsKIUvnHV0Kr2wHRrSDGq6r2VSniHk8w66QMNOBu6V6zxYXKNhJpoRBU6X8vMGsn9GDNr6PG1GnO0oZGDQn/dJMxUK/QAgeskVHptX8Fytnzyri6vut0JPiMbT8AtolOxzjv/7KcqhO0YdxjVy+/3sTLpCRM0zfcx8q9RbufNiBTuERDrUYb8EKqHyX4QNJEVpf+oImNsKw/8ry991OdhrG9cyzXNT+0/oS5U7C/F7gS7nqb/kjBP+qJ+6AwdnOU1re5brv7BkH9Rj6d6tVLfSG35gRXAuwoouh6iXgXDiPu5dLNWzwazyEiIw2Pr10QWdZGJ7EwqJiPdw640wevfk8WQiwkCyduyII6OYMdZUwAjEDP4sehHoP61WPz2k8ollfiUIoTjzRrF9eO0Ni0qnz0/lBUw9zSpMZbD46KG5v/29dRLrvj9NYNAUx2KU57O080gZxIBgp1eI3WOX/Imia1phsZkP4Q7wtID03UOsiPs=
