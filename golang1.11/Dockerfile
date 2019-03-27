@@ -1,4 +1,4 @@
-FROM golang:1.11.4
+FROM golang:1.11.6
 RUN echo "deb http://deb.debian.org/debian stretch-backports main contrib non-free" \
      >>/etc/apt/sources.list &&\
     apt-get update && apt-get install -y \

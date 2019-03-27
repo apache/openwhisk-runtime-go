@@ -21,4 +21,4 @@
 
 ## Apache 1.13.0-incubating (next release)
 - Initial version
-- Go 1.11.5
+- Go 1.11.6
