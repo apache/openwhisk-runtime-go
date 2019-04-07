@@ -25,7 +25,7 @@ deploy:
       repo: apache/incubator-openwhisk-runtime-go
   - provider: script
     skip_cleanup: true
-    script: "./tools/travis/publish.sh openwhisk actionloop latest"
+    script: "./tools/travis/publish.sh openwhisk actionloop-v2 latest"
     on:
       branch: master
       repo: apache/incubator-openwhisk-runtime-go
