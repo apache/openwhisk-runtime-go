@@ -23,9 +23,9 @@ distDocker.finalizedBy('cleanup')
 
 task staticBuildProxy(type: Exec) {
 	environment CGO_ENABLED: "0"
-	commandLine 'go', 'build', 
-		'-o',  'proxy', '-a', 
-		'-ldflags', '-extldflags "-static"', 
+	commandLine 'go', 'build',
+		'-o',  'proxy', '-a',
+		'-ldflags', '-extldflags "-static"',
 		'../main/proxy.go'
 }
 
