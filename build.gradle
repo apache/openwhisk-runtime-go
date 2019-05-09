@@ -41,6 +41,7 @@ subprojects {
     scalafmt.configFilePath = gradle.scalafmt.config
 }
 
+// used only to build go 1.11 - go 1.12 build with go modules and native go
 golang {
   packagePath = 'github.com/apache/incubator-openwhisk-runtime-go'
   goVersion = '1.11.6'

@@ -55,7 +55,8 @@ def build(parent, source_dir, target):
     # compile...
     env = {
       "PATH": os.environ["PATH"],
-      "GOPATH": os.path.abspath(parent)
+      "GOPATH": os.path.abspath(parent),
+      "GOCACHE": "/tmp"
     }
     if os.path.isdir("%s/main" % source_dir):
         source_dir += "/main"

@@ -15,25 +15,8 @@
  * limitations under the License.
  */
 
-ext.dockerImageName = 'actionloop-v2'
-apply from: '../gradle/docker.gradle'
-
-distDocker.dependsOn 'staticBuildProxy'
-distDocker.finalizedBy('cleanup')
-
-task staticBuildProxy(type: Exec) {
-	environment CGO_ENABLED: "0"
-	environment GOOS: "linux"
-	environment GOARCH: "amd64"
-
-	commandLine 'go', 'build',
-		'-o',  'proxy', '-a',
-		'-ldflags', '-extldflags "-static"',
-		'../main/proxy.go'
-}
-
-task cleanup(type: Delete) {
-    delete 'proxy'
-    delete 'gobuild.py'
-    delete 'gobuild.py.launcher.go'
+ @RunWith(classOf[JUnitRunner])
+class ActionLoopGo12ContainerTests extends ActionLoopGoContainerTests {
+     val goCompiler = "actionloop-golang-v1.12"
+     val image = goCompiler
 }
