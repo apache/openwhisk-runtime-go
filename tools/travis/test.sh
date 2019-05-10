@@ -26,8 +26,8 @@ WHISKDIR="$ROOTDIR/../openwhisk"
 
 export OPENWHISK_HOME=$WHISKDIR
 cd ${ROOTDIR}
-go version
 pushd openwhisk
+go version
 go test -v
 popd
 TERM=dumb ./gradlew test --info
