@@ -38,3 +38,5 @@ git clone https://github.com/apache/incubator-openwhisk-utilities.git
 git clone --depth=1 https://github.com/apache/incubator-openwhisk.git openwhisk
 cd openwhisk
 ./tools/travis/setup.sh
+go get github.com/sirupsen/logrus
+go get github.com/stretchr/testify/assert

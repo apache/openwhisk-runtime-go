@@ -60,12 +60,37 @@ func TestExtractActionTest_zip(t *testing.T) {
 
 func TestExtractAction_script(t *testing.T) {
 	log, _ := ioutil.TempFile("", "log")
+	assert.Nil(t, os.RemoveAll("./action/x4"))
 	ap := NewActionProxy("./action/x4", "", log, log)
 	buf := []byte("#!/bin/sh\necho ok")
 	_, err := ap.ExtractAction(&buf, "bin")
 	//fmt.Print(err)
 	assert.Nil(t, err)
 }
+
+func TestExtractAction_save_jar(t *testing.T) {
+	os.Setenv("OW_SAVE_JAR", "exec.jar")
+	log, _ := ioutil.TempFile("", "log")
+	assert.Nil(t, os.RemoveAll("./action/x5"))
+	ap := NewActionProxy("./action/x5", "", log, log)
+	file, _ := ioutil.ReadFile("_test/sample.jar")
+	_, err := ap.ExtractAction(&file, "bin")
+	assert.Nil(t, exists("./action/x5", "bin/exec.jar"))
+	assert.Nil(t, err)
+	os.Setenv("OW_SAVE_JAR", "")
+}
+
+func TestExtractAction_extract_jar(t *testing.T) {
+	os.Setenv("OW_SAVE_JAR", "")
+	log, _ := ioutil.TempFile("", "log")
+	assert.Nil(t, os.RemoveAll("./action/x6"))
+	ap := NewActionProxy("./action/x6", "", log, log)
+	file, _ := ioutil.ReadFile("_test/sample.jar")
+	_, err := ap.ExtractAction(&file, "bin")
+	assert.Nil(t, exists("./action/x6", "bin/META-INF/MANIFEST.MF"))
+	assert.Nil(t, err)
+}
+
 
 func TestHighestDir(t *testing.T) {
 	assert.Equal(t, highestDir("./_test"), 0)

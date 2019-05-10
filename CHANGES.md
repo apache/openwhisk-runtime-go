@@ -31,3 +31,8 @@ ActionLoop for Scripting Languages
 - any script starting with '#!' is recognized as executable
 - now the -compile will zip the entire directory of the `bin` directory after compilation
 - if you upload a folder `src/exec` the entire directory is moved to `bin`, including other uploaded files
+- Support for Go 1.12.4
+- Support for jar not expanded for Java when set OW_SAVE_JAR
+- You can initalize multiple times when debugging
+- Removed gogradle plugin, now building directly with go
+

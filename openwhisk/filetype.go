@@ -45,6 +45,7 @@ func IsBangPath(buf []byte) bool {
 
 // IsExecutable check if it is an executable, according the current runtime
 func IsExecutable(buf []byte, runtime string) bool {
+	Debug("checking executable for %s", runtime)
 	switch runtime {
 	case "darwin":
 		return IsMach64(buf) || IsBangPath(buf)

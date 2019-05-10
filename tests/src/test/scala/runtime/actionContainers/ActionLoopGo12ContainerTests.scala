@@ -18,8 +18,8 @@
 package runtime.actionContainers
 
 //import java.util.concurrent.TimeoutException
-import actionContainers.{ActionContainer, ActionProxyContainerTestUtils}
 import actionContainers.ActionContainer.withContainer
+import actionContainers.{ActionContainer, ActionProxyContainerTestUtils}
 import common.WskActorSystem
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -29,13 +29,13 @@ import org.scalatest.junit.JUnitRunner
 import spray.json.{JsObject, JsString}
 
 @RunWith(classOf[JUnitRunner])
-class ActionLoopGoContainerTests
+class ActionLoopGo12ContainerTests
     extends ActionProxyContainerTestUtils
     with WskActorSystem {
 
   import GoResourceHelpers._
 
-  val goCompiler = "actionloop-golang-v1.11"
+  val goCompiler = "actionloop-golang-v1.12"
   val image = goCompiler
 
   def withActionLoopContainer(code: ActionContainer => Unit) =

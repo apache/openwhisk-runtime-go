@@ -21,12 +21,12 @@ import (
 	"os"
 )
 
-func Example() {
+func Example_zip() {
 	os.RemoveAll("./action/unzip")
 	os.Mkdir("./action/unzip", 0755)
 	buf, err := Zip("_test/pysample")
 	fmt.Println(err)
-	err = Unzip(buf, "./action/unzip")
+	err = UnzipOrSaveJar(buf, "./action/unzip", "./action/unzip/exec.jar")
 	sys("_test/find.sh", "./action/unzip")
 	fmt.Println(err)
 	// Output:
@@ -38,5 +38,19 @@ func Example() {
 	// ./action/unzip/lib/action/__init__.py
 	// ./action/unzip/lib/action/main.py
 	// ./action/unzip/lib/exec.py
+	// <nil>
+}
+func Example_jar() {
+	os.RemoveAll("./action/unzip")
+	os.Mkdir("./action/unzip", 0755)
+	buf, err := Zip("_test/jar")
+	fmt.Println(err)
+	err = UnzipOrSaveJar(buf, "./action/unzip", "./action/unzip/exec.jar")
+	sys("_test/find.sh", "./action/unzip")
+	fmt.Println(err)
+	// Output:
+	// <nil>
+	// ./action/unzip
+	// ./action/unzip/exec.jar
 	// <nil>
 }

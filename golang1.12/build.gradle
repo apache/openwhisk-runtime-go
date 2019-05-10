@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-ext.dockerImageName = 'actionloop-golang-v1.11'
+ext.dockerImageName = 'actionloop-golang-v1.12'
 apply from: '../gradle/docker.gradle'
 
 distDocker.dependsOn 'staticBuildProxy'
@@ -33,6 +33,7 @@ task staticBuildProxy(type: Exec) {
 		'-ldflags', '-extldflags "-static"',
 		'../main/proxy.go'
 }
+
 
 task copyCompiler(type: Copy) {
     from '../common/gobuild.py'

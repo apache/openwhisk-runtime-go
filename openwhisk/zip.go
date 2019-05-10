@@ -19,20 +19,44 @@ package openwhisk
 import (
 	"archive/zip"
 	"bytes"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-// Unzip extracts file and directories in the given destination folder
-func Unzip(src []byte, dest string) error {
+func openZip(src []byte) *zip.Reader {
 	reader := bytes.NewReader(src)
 	r, err := zip.NewReader(reader, int64(len(src)))
 	if err != nil {
-		return err
+		return nil
 	}
+	return r
+}
+
+// UnzipOrSaveJar checks if is is a jar file looking if there is a META-INF folder in it
+// if it is a jar file, save it as the file jarFile
+// Otherwise unzip the files in the destination dir
+func UnzipOrSaveJar(src []byte, dest string, jarFile string) error {
+	r := openZip(src)
+	if r == nil {
+		return fmt.Errorf("not a zip file")
+	}
+	for _, f := range r.File {
+		if f.Name == "META-INF/MANIFEST.MF" {
+			ioutil.WriteFile(jarFile, src, 0644)
+			return nil
+		}
+	}
+	return Unzip(src, dest)
+}
+
+// Unzip extracts file and directories in the given destination folder
+func Unzip(src []byte, dest string) error {
+	r := openZip(src)
 	os.MkdirAll(dest, 0755)
 	// Closure to address file descriptors issue with all the deferred .Close() methods
 	extractAndWriteFile := func(f *zip.File) error {

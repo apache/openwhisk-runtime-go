@@ -14,6 +14,7 @@ vendor/
 common/proxy
 actionloop/proxy
 golang1.11/proxy
+golang1.12/proxy
 
 # Go test transient files
 openwhisk/_test/exec
@@ -22,6 +23,7 @@ openwhisk/_test/hi
 openwhisk/_test/hello_greeting
 openwhisk/_test/hello_message
 openwhisk/_test/*.zip
+openwhisk/_test/*.jar
 openwhisk/_test/compile/
 openwhisk/_test/output/
 openwhisk/action/

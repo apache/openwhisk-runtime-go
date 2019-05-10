@@ -170,8 +170,8 @@ func removeLineNr(out string) string {
 	return re.ReplaceAllString(out, "::")
 }
 func TestMain(m *testing.M) {
-	var Debug = false // enable debug of tests
-	if !Debug {
+	Debugging = false // enable debug of tests
+	if !Debugging {
 		// silence those annoying tests
 		log.SetOutput(ioutil.Discard)
 		// build support files
