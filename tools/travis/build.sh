@@ -41,7 +41,7 @@ echo "vcap.services.file=" >> whisk.properties
 # Build/Compile go
 cd $ROOTDIR
 # compile without testing as we need docker images first
-TERM=dumb ./gradlew build -x test
+TERM=dumb ./gradlew goBuild -x test
 # ok now you can build docker images using the compiled proxy
 TERM=dumb ./gradlew distDocker
 

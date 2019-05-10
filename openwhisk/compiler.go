@@ -27,6 +27,7 @@ import (
 
 // check if the file exists and it is already compiled
 func isCompiled(file string) bool {
+	Debug("IsCompiled? %s", file)
 	_, err := os.Stat(file)
 	if err != nil {
 		return false

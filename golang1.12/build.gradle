@@ -18,15 +18,22 @@
 ext.dockerImageName = 'actionloop-golang-v1.12'
 apply from: '../gradle/docker.gradle'
 
-distDocker.dependsOn 'copyProxy'
+distDocker.dependsOn 'staticBuildProxy'
 distDocker.dependsOn 'copyCompiler'
 distDocker.dependsOn 'copyEpilogue'
 distDocker.finalizedBy('cleanup')
 
-task copyProxy(type: Copy) {
-    from '../common/proxy'
-    into '.'
+task staticBuildProxy(type: Exec) {
+	environment CGO_ENABLED: "0"
+	environment GOOS: "linux"
+	environment GOARCH: "amd64"
+
+	commandLine 'go', 'build',
+		'-o',  'proxy', '-a',
+		'-ldflags', '-extldflags "-static"',
+		'../main/proxy.go'
 }
+
 
 task copyCompiler(type: Copy) {
     from '../common/gobuild.py'

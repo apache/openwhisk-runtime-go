@@ -51,9 +51,10 @@ cd src
 zip -q -r ../hello.zip main.go hello
 cd ..
 
+test -e sample.jar && rm sample.jar
+cd jar ; zip -q -r ../sample.jar * ; cd ..
+
 build exec
 test -e exec.zip && rm exec.zip
 zip -q -r exec.zip exec etc dir
-test -e sample.jar && rm sample.jar
-cd jar ; zip -q -r ../sample.jar * ; cd ..
 

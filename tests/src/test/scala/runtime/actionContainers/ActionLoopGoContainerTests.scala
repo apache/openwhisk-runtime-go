@@ -62,14 +62,14 @@ class ActionLoopGoContainerTests
         |""".stripMargin
   }
 
-  private def helloSrc(main: String) = Seq(
+   def helloSrc(main: String) = Seq(
     Seq(s"${main}.go") -> helloGo(main)
   )
 
-  private def helloMsg(name: String = "Demo") =
+  def helloMsg(name: String = "Demo") =
     runPayload(JsObject("name" -> JsString(name)))
 
-  private def okMsg(key: String, value: String) =
+  def okMsg(key: String, value: String) =
     200 -> Some(JsObject(key -> JsString(value)))
 
   it should "run sample with init that does nothing" in {

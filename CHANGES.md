@@ -34,3 +34,5 @@ ActionLoop for Scripting Languages
 - Support for Go 1.12.4
 - Support for jar not expanded for Java when set OW_SAVE_JAR
 - You can initalize multiple times when debugging
+- Removed gogradle plugin, now building directly with go
+
