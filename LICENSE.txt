@@ -200,3 +200,11 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+============
+MIT licenses
+============
+
+This distribution depends on the following components, which are available under an MIT License (https://opensource.org/licenses/MIT).
+
+Testify 1.2.1 (https://github.com/stretchr/testify)
