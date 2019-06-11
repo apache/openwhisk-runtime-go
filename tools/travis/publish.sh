@@ -21,11 +21,19 @@ set -eux
 # Build script for Travis-CI.
 
 IMAGE_PREFIX=$1
-RUNTIME=$2
+RUNTIME_VERSION=$2
 IMAGE_TAG=$3
 
 if [[ ! -z ${DOCKER_USER} ]] && [[ ! -z ${DOCKER_PASSWORD} ]]; then
 docker login -u "${DOCKER_USER}" -p "${DOCKER_PASSWORD}"
+fi
+
+if [ ${RUNTIME_VERSION} == "1.11" ]; then
+  RUNTIME="golang1.11"
+elif [ ${RUNTIME_VERSION} == "1.12" ]; then
+  RUNTIME="golang1.12"
+elif [ ${RUNTIME_VERSION} == "actionloop" ]; then
+  RUNTIME="actionloop"
 fi
 
 if [[ ! -z ${RUNTIME} ]]; then
