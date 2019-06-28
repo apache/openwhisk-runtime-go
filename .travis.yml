@@ -39,13 +39,13 @@ deploy:
       repo: apache/incubator-openwhisk-runtime-go
   - provider: script
     skip_cleanup: true
-    script: "./tools/travis/publish.sh openwhisk actionloop latest"
+    script: "./tools/travis/publish.sh openwhisk actionloop nightly"
     on:
       branch: master
       repo: apache/incubator-openwhisk-runtime-go
   - provider: script
     skip_cleanup: true
-    script: "./tools/travis/publish.sh openwhisk 1.11 latest && ./tools/travis/publish.sh openwhisk 1.12 latest"
+    script: "./tools/travis/publish.sh openwhisk 1.11 nightly && ./tools/travis/publish.sh openwhisk 1.12 nightly"
     on:
       branch: master
       repo: apache/incubator-openwhisk-runtime-go
