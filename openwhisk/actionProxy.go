@@ -18,6 +18,7 @@
 package openwhisk
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -64,13 +65,23 @@ func NewActionProxy(baseDir string, compiler string, outFile *os.File, errFile *
 		nil,
 		outFile,
 		errFile,
-		nil,
+		map[string]string{},
 	}
 }
 
 //SetEnv sets the environment
-func (ap *ActionProxy) SetEnv(env map[string]string) {
-	ap.env = env
+func (ap *ActionProxy) SetEnv(env map[string]interface{}) {
+	for k, v := range env {
+		s, ok := v.(string)
+		if ok {
+			ap.env[k] = s
+			continue
+		}
+		buf, err := json.Marshal(v)
+		if err == nil {
+			ap.env[k] = string(buf)
+		}
+	}
 }
 
 // StartLatestAction tries to start
