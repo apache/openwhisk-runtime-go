@@ -91,6 +91,10 @@ func (ap *ActionProxy) initHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// passing the env to the action proxy
+	ap.SetEnv(ap.env)
+
+	// setting main
 	main := request.Value.Main
 	if main == "" {
 		main = "main"
