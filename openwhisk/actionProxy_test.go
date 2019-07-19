@@ -123,5 +123,4 @@ func Example_compile_src() {
 	// ./action/c2/out/action/action/main.py
 	// ./action/c2/out/action/exec.py
 	// ./action/c2/out/exec
-
 }

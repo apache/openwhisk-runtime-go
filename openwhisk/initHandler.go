@@ -29,9 +29,10 @@ import (
 )
 
 type initBodyRequest struct {
-	Code   string `json:"code,omitempty"`
-	Binary bool   `json:"binary,omitempty"`
-	Main   string `json:"main,omitempty"`
+	Code   string                 `json:"code,omitempty"`
+	Binary bool                   `json:"binary,omitempty"`
+	Main   string                 `json:"main,omitempty"`
+	Env    map[string]interface{} `json:"env,omitempty"`
 }
 
 type initRequest struct {
