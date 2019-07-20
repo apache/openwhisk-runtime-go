@@ -138,9 +138,9 @@ func Example_SetEnv() {
 		}`), &m)
 	log.Println(m)
 	ap.SetEnv(m)
-	fmt.Println(ap.env)
+	fmt.Println(ap.env["a"], ap.env["o"], ap.env["s"], ap.env["n"])
 	// Output:
 	// map[]
-	// map[a:[1,2,3] n:123 o:{"a":1,"b":2} s:string]
+	// [1,2,3] {"a":1,"b":2} string 123
 
 }
