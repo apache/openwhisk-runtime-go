@@ -18,7 +18,7 @@
 -->
 # Apache OpenWhisk Runtimes for Go
 
-[![Build Status](https://travis-ci.org/apache/incubator-openwhisk-runtime-go.svg?branch=master)](https://travis-ci.org/apache/incubator-openwhisk-runtime-go)
+[![Build Status](https://travis-ci.org/apache/openwhisk-runtime-go.svg?branch=master)](https://travis-ci.org/apache/openwhisk-runtime-go)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Join Slack](https://img.shields.io/badge/join-slack-9B69A0.svg)](http://slack.openwhisk.org/)
 
@@ -46,6 +46,3 @@ This repository containst both the OpenWhisk runtime for Golang Actions, as well
 # License
 [Apache 2.0](LICENSE.txt)
 
-# Disclaimer
-
-Apache OpenWhisk Runtime Go is an effort undergoing incubation at The Apache Software Foundation (ASF), sponsored by the Apache Incubator. Incubation is required of all newly accepted projects until a further review indicates that the infrastructure, communications, and decision making process have stabilized in a manner consistent with other successful ASF projects. While incubation status is not necessarily a reflection of the completeness or stability of the code, it does indicate that the project has yet to be fully endorsed by the ASF.

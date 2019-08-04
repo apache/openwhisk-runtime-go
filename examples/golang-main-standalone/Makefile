@@ -1,5 +1,5 @@
 OW_USER?=openwhisk
-OW_RUNTIME?=$(OW_USER)/actionloop-v2
+OW_RUNTIME?=$(OW_USER)/actionloop-base
 OW_COMPILER?=$(OW_USER)/actionloop-golang-v1.11
 WSK?=wsk
 MAIN=main
