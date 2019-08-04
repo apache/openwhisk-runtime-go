@@ -1,6 +1,6 @@
 WSK?=wsk
 OW_USER?=openwhisk
-OW_RUNTIME?=$(OW_USER)/actionloop-v2
+OW_RUNTIME?=$(OW_USER)/actionloop-base
 NAME=bash-hello
 PACKAGE=test
 SRC=hello.sh

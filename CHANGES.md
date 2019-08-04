@@ -36,3 +36,6 @@ ActionLoop for Scripting Languages
 - You can initalize multiple times when debugging
 - Removed gogradle plugin, now building directly with go
 
+# Deincubation
+- Removed the -incubation
+- Now all runtimes use source release so no more actionloop-v2, renamed to actionloop-base

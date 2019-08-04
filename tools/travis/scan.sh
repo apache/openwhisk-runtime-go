@@ -22,7 +22,7 @@ set -ex
 
 SCRIPTDIR=$(cd $(dirname "$0") && pwd)
 ROOTDIR="$SCRIPTDIR/../.."
-UTILDIR="$ROOTDIR/../incubator-openwhisk-utilities"
+UTILDIR="$ROOTDIR/../openwhisk-utilities"
 
 # run scancode using the ASF Release configuration
 pushd $UTILDIR
