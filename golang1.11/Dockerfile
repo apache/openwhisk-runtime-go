@@ -14,14 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM golang:1.11.6
+FROM golang:1.11.13
 RUN echo "deb http://deb.debian.org/debian stretch-backports main contrib non-free" \
      >>/etc/apt/sources.list &&\
     apt-get update && apt-get install -y \
      curl \
      jq \
      git \
-     realpath &&\
+     coreutils &&\
     apt-get -y install \
      librdkafka1=0.11.6-1~bpo9+1 \
      librdkafka++1=0.11.6-1~bpo9+1 && \

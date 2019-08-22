@@ -18,10 +18,10 @@
 
 set -e
 
-# add realpath
+# add realpath by installing coreutils
 if ! which realpath
 then sudo apt-get -y update
-     sudo apt-get -y install realpath
+     sudo apt-get -y install coreutils
 fi
 
 # Build script for Travis-CI.

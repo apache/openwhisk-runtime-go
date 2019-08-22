@@ -67,7 +67,7 @@ Then you need a set of utilities used in tests:
 - zip
 - realpath
 
-Linux: `apt-get install bc zip realpath`
+Linux: `apt-get install bc zip coreutils`
 OSX: `brew install zip coreutils`
 
 **NOTE**: Because tests build and cache some binary files, perform a `git clean -fx` and **do not share folders between linux and osx** because binaries are in different format...
