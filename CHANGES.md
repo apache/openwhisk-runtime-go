@@ -39,3 +39,4 @@ ActionLoop for Scripting Languages
 # Deincubation
 - Removed the -incubation
 - Now all runtimes use source release so no more actionloop-v2, renamed to actionloop-base
+- upgraded to go 1.12.9 and 1.11.13

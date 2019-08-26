@@ -27,6 +27,7 @@ task staticBuildProxy(type: Exec) {
 	environment CGO_ENABLED: "0"
 	environment GOOS: "linux"
 	environment GOARCH: "amd64"
+    environment GO111MODULE: "on"
 
 	commandLine 'go', 'build',
 		'-o',  'proxy', '-a',
