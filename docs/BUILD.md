@@ -65,7 +65,6 @@ Then you need a set of utilities used in tests:
 
 - bc
 - zip
-- realpath
 
 Linux: `apt-get install bc zip coreutils`
 OSX: `brew install zip coreutils`
