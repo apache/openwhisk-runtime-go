@@ -20,8 +20,7 @@ RUN echo "deb http://deb.debian.org/debian stretch-backports main contrib non-fr
     apt-get update && apt-get install -y \
      curl \
      jq \
-     git \
-     realpath &&\
+     git &&\
     apt-get -y install \
      librdkafka1=0.11.6-1~bpo9+1 \
      librdkafka++1=0.11.6-1~bpo9+1 && \
