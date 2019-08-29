@@ -19,6 +19,7 @@ package openwhisk
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -123,5 +124,23 @@ func Example_compile_src() {
 	// ./action/c2/out/action/action/main.py
 	// ./action/c2/out/action/exec.py
 	// ./action/c2/out/exec
+}
+
+func Example_SetEnv() {
+	ap := NewActionProxy("", "", nil, nil)
+	fmt.Println(ap.env)
+	var m map[string]interface{}
+	json.Unmarshal([]byte(`{
+		  "s": "string",
+		  "n": 123,
+		  "a": [1,2,3],
+		  "o": {"a":1,"b":2}
+		}`), &m)
+	log.Println(m)
+	ap.SetEnv(m)
+	fmt.Println(ap.env["a"], ap.env["o"], ap.env["s"], ap.env["n"])
+	// Output:
+	// map[]
+	// [1,2,3] {"a":1,"b":2} string 123
 
 }

@@ -44,12 +44,13 @@ type Executor struct {
 // NewExecutor creates a child subprocess using the provided command line,
 // writing the logs in the given file.
 // You can then start it getting a communication channel
-func NewExecutor(logout *os.File, logerr *os.File, command string, args ...string) (proc *Executor) {
+func NewExecutor(logout *os.File, logerr *os.File, command string, env map[string]string, args ...string) (proc *Executor) {
 	cmd := exec.Command(command, args...)
 	cmd.Stdout = logout
 	cmd.Stderr = logerr
-	cmd.Env = []string{
-		"__OW_API_HOST=" + os.Getenv("__OW_API_HOST"),
+	cmd.Env = []string{}
+	for k, v := range env {
+		cmd.Env = append(cmd.Env, k+"="+v)
 	}
 	Debug("env: %v", cmd.Env)
 	if Debugging {

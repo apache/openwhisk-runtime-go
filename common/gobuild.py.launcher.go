@@ -80,7 +80,6 @@ func main() {
 			log.Printf("%v\n", input)
 		}
 		// set environment variables
-		err = json.Unmarshal(inbuf, &input)
 		for k, v := range input {
 			if k == "value" {
 				continue

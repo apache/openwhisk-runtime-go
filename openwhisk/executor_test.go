@@ -21,21 +21,23 @@ import (
 	"io/ioutil"
 )
 
+var m = map[string]string{}
+
 func ExampleNewExecutor_failed() {
 	log, _ := ioutil.TempFile("", "log")
-	proc := NewExecutor(log, log, "true")
+	proc := NewExecutor(log, log, "true", m)
 	err := proc.Start()
 	fmt.Println(err)
 	proc.Stop()
-	proc = NewExecutor(log, log, "/bin/pwd")
+	proc = NewExecutor(log, log, "/bin/pwd", m)
 	err = proc.Start()
 	fmt.Println(err)
 	proc.Stop()
-	proc = NewExecutor(log, log, "donotexist")
+	proc = NewExecutor(log, log, "donotexist", m)
 	err = proc.Start()
 	fmt.Println(err)
 	proc.Stop()
-	proc = NewExecutor(log, log, "/etc/passwd")
+	proc = NewExecutor(log, log, "/etc/passwd", m)
 	err = proc.Start()
 	fmt.Println(err)
 	proc.Stop()
@@ -48,7 +50,7 @@ func ExampleNewExecutor_failed() {
 
 func ExampleNewExecutor_bc() {
 	log, _ := ioutil.TempFile("", "log")
-	proc := NewExecutor(log, log, "_test/bc.sh")
+	proc := NewExecutor(log, log, "_test/bc.sh", m)
 	err := proc.Start()
 	fmt.Println(err)
 	res, _ := proc.Interact([]byte("2+2"))
@@ -64,7 +66,7 @@ func ExampleNewExecutor_bc() {
 
 func ExampleNewExecutor_hello() {
 	log, _ := ioutil.TempFile("", "log")
-	proc := NewExecutor(log, log, "_test/hello.sh")
+	proc := NewExecutor(log, log, "_test/hello.sh", m)
 	err := proc.Start()
 	fmt.Println(err)
 	res, _ := proc.Interact([]byte(`{"value":{"name":"Mike"}}`))
@@ -75,6 +77,22 @@ func ExampleNewExecutor_hello() {
 	// <nil>
 	// {"hello": "Mike"}
 	// msg=hello Mike
+	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
+	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
+}
+
+func ExampleNewExecutor_env() {
+	log, _ := ioutil.TempFile("", "log")
+	proc := NewExecutor(log, log, "_test/env.sh", map[string]string{"TEST_HELLO": "WORLD", "TEST_HI": "ALL"})
+	err := proc.Start()
+	fmt.Println(err)
+	res, _ := proc.Interact([]byte(`{"value":{"name":"Mike"}}`))
+	fmt.Printf("%s", res)
+	proc.Stop()
+	dump(log)
+	// Output:
+	// <nil>
+	// { "env": "TEST_HELLO=WORLD TEST_HI=ALL"}
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
 }

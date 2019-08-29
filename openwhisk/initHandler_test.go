@@ -18,6 +18,7 @@
 package openwhisk
 
 import (
+	"encoding/json"
 	"fmt"
 	"path/filepath"
 )
@@ -242,4 +243,25 @@ func Example_zip_init() {
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
+}
+
+func Example_parse_env() {
+	var request initBodyRequest
+	body := []byte(`{"code":"code"}`)
+	json.Unmarshal(body, &request)
+	fmt.Println(request.Env)
+
+	var request1 initBodyRequest
+	body = []byte(`{"code":"code", "env":{"hello":"world"}}`)
+	json.Unmarshal(body, &request1)
+	fmt.Println(request1.Env["hello"])
+
+	var request2 initBodyRequest
+	body = []byte(`{"code":"code", "env": { "hello": "world", "hi": "all"}}`)
+	json.Unmarshal(body, &request2)
+	fmt.Println(request2.Env["hello"], request2.Env["hi"])
+	// Output:
+	// map[]
+	// world
+	// world all
 }

@@ -18,6 +18,7 @@
 package openwhisk
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -48,6 +49,9 @@ type ActionProxy struct {
 	// out and err files
 	outFile *os.File
 	errFile *os.File
+
+	// environment
+	env map[string]string
 }
 
 // NewActionProxy creates a new action proxy that can handle http requests
@@ -61,6 +65,22 @@ func NewActionProxy(baseDir string, compiler string, outFile *os.File, errFile *
 		nil,
 		outFile,
 		errFile,
+		map[string]string{},
+	}
+}
+
+//SetEnv sets the environment
+func (ap *ActionProxy) SetEnv(env map[string]interface{}) {
+	for k, v := range env {
+		s, ok := v.(string)
+		if ok {
+			ap.env[k] = s
+			continue
+		}
+		buf, err := json.Marshal(v)
+		if err == nil {
+			ap.env[k] = string(buf)
+		}
 	}
 }
 
@@ -84,7 +104,7 @@ func (ap *ActionProxy) StartLatestAction() error {
 	// try to launch the action
 	executable := fmt.Sprintf("%s/%d/bin/exec", ap.baseDir, highestDir)
 	os.Chmod(executable, 0755)
-	newExecutor := NewExecutor(ap.outFile, ap.errFile, executable)
+	newExecutor := NewExecutor(ap.outFile, ap.errFile, executable, ap.env)
 	Debug("starting %s", executable)
 	err := newExecutor.Start()
 	if err == nil {
