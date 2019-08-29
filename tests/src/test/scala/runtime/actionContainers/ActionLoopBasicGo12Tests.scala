@@ -100,6 +100,18 @@ class ActionLoopBasicGo12Tests
       |}
     """.stripMargin)
 
+  override val testEnvParameters = TestConfig(
+    """
+      |package main
+      |import "os"
+      |func Main(args map[string]interface{}) map[string]interface{} {
+      | res := make(map[string]interface{})
+      | res["SOME_VAR"] = os.Getenv("SOME_VAR")
+      | res["ANOTHER_VAR"] = os.Getenv("ANOTHER_VAR")
+      | return res
+      |}
+    """.stripMargin)
+
   override val testInitCannotBeCalledMoreThanOnce = TestConfig(
     """|package main
        |func Main(args map[string]interface{}) map[string]interface{} {
