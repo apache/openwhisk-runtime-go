@@ -53,7 +53,7 @@ func sendOK(w http.ResponseWriter) {
 func (ap *ActionProxy) initHandler(w http.ResponseWriter, r *http.Request) {
 
 	// you can do muliple initializations when debugging
-	if ap.initialized && !Debugging {
+	if ap.Initialized && !Debugging {
 		msg := "Cannot initialize the action more than once."
 		sendError(w, http.StatusForbidden, msg)
 		log.Println(msg)
@@ -127,7 +127,7 @@ func (ap *ActionProxy) initHandler(w http.ResponseWriter, r *http.Request) {
 		sendError(w, http.StatusBadRequest, "cannot start action: "+err.Error())
 		return
 	}
-	ap.initialized = true
+	ap.Initialized = true
 	sendOK(w)
 }
 

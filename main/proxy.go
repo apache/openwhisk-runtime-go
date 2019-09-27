@@ -17,8 +17,11 @@
 package main
 
 import (
+	"archive/zip"
+	"bytes"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 
@@ -41,12 +44,76 @@ func fatalIf(err error) {
 	}
 }
 
+// use the runtime as a compiler "on-the-fly"
+func extractAndCompile(ap *openwhisk.ActionProxy) {
+
+	// read the std input
+	in, err := ioutil.ReadAll(os.Stdin)
+	fatalIf(err)
+
+	// extract and compile it
+	file, err := ap.ExtractAndCompile(&in, *compile)
+	fatalIf(err)
+
+	// read the file, zip it and write it to stdout
+	buf := new(bytes.Buffer)
+	zwr := zip.NewWriter(buf)
+	zf, err := zwr.Create("exec")
+	fatalIf(err)
+	filedata, err := ioutil.ReadFile(file)
+	fatalIf(err)
+	_, err = zf.Write(filedata)
+	fatalIf(err)
+	fatalIf(zwr.Flush())
+	fatalIf(zwr.Close())
+	_, err = os.Stdout.Write(buf.Bytes())
+	fatalIf(err)
+}
+
+// auto init
+func autoInit(ap *openwhisk.ActionProxy, initFile string, main string) {
+	if initFile == "" {
+		return
+	}
+	_, err := os.Stat(initFile)
+	if os.IsNotExist(err) {
+		openwhisk.Debug("not found %s: %s", initFile, err)
+		return
+	}
+	buf, err := ioutil.ReadFile(initFile)
+	if err != nil {
+		openwhisk.Debug("cannot read: %s", err)
+		return
+	}
+
+	// default main to "main"
+	if main == "" {
+		main = "main"
+	}
+
+	// if a compiler is defined try to compile
+	_, err = ap.ExtractAndCompile(&buf, main)
+	if err != nil {
+		openwhisk.Debug("compile error: %s", err)
+		return
+	}
+
+	// start an action
+	err = ap.StartLatestAction()
+	if err != nil {
+		openwhisk.Debug("%s", err)
+		return
+	}
+	openwhisk.Debug("action autoinitialized")
+	ap.Initialized = true
+}
+
 func main() {
 	flag.Parse()
 
 	// show version number
 	if *version {
-		fmt.Printf("OpenWhisk ActionLoop Proxy v%s\n", openwhisk.Version)
+		fmt.Println("OpenWhisk ActionLoop Proxy", openwhisk.Version)
 		return
 	}
 
@@ -62,9 +129,12 @@ func main() {
 
 	// compile on the fly upon request
 	if *compile != "" {
-		ap.ExtractAndCompileIO(os.Stdin, os.Stdout, *compile)
+		extractAndCompile(ap)
 		return
 	}
+
+	// auto initialization if available
+	autoInit(ap, os.Getenv("OW_AUTOINIT"), os.Getenv("OW_AUTOINIT_MAIN"))
 
 	// start the balls rolling
 	openwhisk.Debug("OpenWhisk ActionLoop Proxy %s: starting", openwhisk.Version)
