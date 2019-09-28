@@ -28,4 +28,4 @@ spec:
         - name: url
           value: $TGT
 EOF
-kubectl -n sample get po -w
+echo "check status with: kubectl -n sample get po -w"

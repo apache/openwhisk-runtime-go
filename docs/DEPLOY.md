@@ -163,6 +163,19 @@ You can also use the full `actionloop-golang-v1.11` as runtime, it is only bigge
 
 Note that the output is always a zip file in  Linux AMD64 format so the executable can be run only inside a Docker Linux container.
 
+<a name="knative"/>
+# Knative support
+
+Action precompilation can be performed in a Knative build, producing a precompiled action. You can then bundle the action in a single image.
+
+If you set the ennvironmente variables `OW_AUTOINIT` to the image executable, the action is automatically initialized. 
+
+If the action is a binary executable a `main` is not required, however you can also bundle a zip file containing sources. In this case you may need to specify also the main function, using the environment variable `OW_AUTOINIT_MAIN`.
+
+In the folder `examples/knative` there is an example building an images with Tekton Pipelines.
+
+
+
 
 
 
