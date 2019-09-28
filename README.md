@@ -28,7 +28,7 @@ This repository containst both the OpenWhisk runtime for Golang Actions, as well
 - Writing Actions for the runtime in [Golang](docs/ACTION.md#golang)
 - How to deploy your [Golang](docs/DEPLOY.md#golang) sources
 - Precompiling [Golang](docs/DEPLOY.md#precompile) actions
-- Support for [Knative](docs/DEPLOY.md#knative) builds 
+- Support for [Knative](docs/DEPLOY.md#knative) builds
 - How to use VSCode to write [Golang](docs/DEPLOY.md#vscode) actions
 - How to [Build](docs/BUILD.md#building) the runtime, with development notes
 

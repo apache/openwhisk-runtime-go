@@ -164,7 +164,8 @@ You can also use the full `actionloop-golang-v1.11` as runtime, it is only bigge
 Note that the output is always a zip file in  Linux AMD64 format so the executable can be run only inside a Docker Linux container.
 
 <a name="knative"/>
-# Knative support
+
+## Knative support
 
 Action precompilation can be performed in a Knative build, producing a precompiled action. You can then bundle the action in a single image.
 
