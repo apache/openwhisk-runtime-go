@@ -16,11 +16,10 @@
 # limitations under the License.
 #
 -->
-# ActionLoop v1.0.1
-- embedded file type detection
-- now showing the commend
-- librdkafka in golang image
-- showing version numbuer with -debug
+# 1.14.0
+- Removed the -incubation
+- Now all runtimes use source release so no more actionloop-v2, renamed to actionloop-base
+- upgraded to go 1.12.9 and 1.11.13
 
 # Actionloop v2
 Versioning
@@ -36,7 +35,8 @@ ActionLoop for Scripting Languages
 - You can initalize multiple times when debugging
 - Removed gogradle plugin, now building directly with go
 
-# Deincubation
-- Removed the -incubation
-- Now all runtimes use source release so no more actionloop-v2, renamed to actionloop-base
-- upgraded to go 1.12.9 and 1.11.13
+# ActionLoop v1.0.1
+- embedded file type detection
+- now showing the commend
+- librdkafka in golang image
+- showing version numbuer with -debug
