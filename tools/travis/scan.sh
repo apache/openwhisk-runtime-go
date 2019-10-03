@@ -26,5 +26,5 @@ UTILDIR="$ROOTDIR/../openwhisk-utilities"
 
 # run scancode using the ASF Release configuration
 pushd $UTILDIR
-scancode/scanCode.py --config $ROOTDIR/tools/scancode/ASF-Release.cfg $ROOTDIR
+scancode/scanCode.py --config scancode/ASF-Release.cfg $ROOTDIR
 popd
