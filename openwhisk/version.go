@@ -17,4 +17,4 @@
 package openwhisk
 
 // Version number - internal
-var Version = "2.1"
+var Version = "1.14.0"
