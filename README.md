@@ -22,7 +22,7 @@
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Join Slack](https://img.shields.io/badge/join-slack-9B69A0.svg)](http://slack.openwhisk.org/)
 
-This repository containst both the OpenWhisk runtime for Golang Actions, as well as a runtime for Generic executables.
+This repository contains both the OpenWhisk runtime for Golang Actions, as well as a runtime for Generic executables.
 
 - If you are in a hurry, check the [examples](examples/EXAMPLES.md)
 - Writing Actions for the runtime in [Golang](docs/ACTION.md#golang)
@@ -41,7 +41,7 @@ This repository containst both the OpenWhisk runtime for Golang Actions, as well
 
 # Change Log
 
-[CHANGES.md](Here.)
+[CHANGES.md](CHANGES.md)
 
 # License
 [Apache 2.0](LICENSE.txt)
