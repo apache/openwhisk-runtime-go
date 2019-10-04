@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-IMG?=whisk/actionloop-golang-v1.11
+IMG?=whisk/action-golang-v1.11
 IMG2?=whisk/actionloop
 
 all: golang bash

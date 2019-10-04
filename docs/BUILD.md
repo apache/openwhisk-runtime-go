@@ -43,7 +43,7 @@ To build the docker images, after compiling go proxy:
 
 This will build the images:
 
-* `actionloop-golang-v1.11`: an image supporting  Go sources
+* `action-golang-v1.11`: an image supporting  Go sources
 * `actionloop`: the base image, supporting generic executables ans shell script
 
 The `actionloop` image can be used for supporting other compiled programming languages as long as they implement a `compile` script and the *action loop* protocol described below.
