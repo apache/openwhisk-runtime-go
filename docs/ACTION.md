@@ -22,7 +22,7 @@
 
 ## How to write Go Actions
 
-The `actionloop-golang-v1.11` runtime can execute actions written in the Go programming language in OpenWhisk, either precompiled binary or compiling sources on the fly.
+The `action-golang-v1.11` runtime can execute actions written in the Go programming language in OpenWhisk, either precompiled binary or compiling sources on the fly.
 
 ### Entry Point
 
@@ -122,7 +122,7 @@ done
 
 Note here we are just interested in the payload, but in general you may also want to retrieve other fields.
 
-Note the `actionloop` image will accept any source and will try to run it (if it is possible), while the `actionloop-golang-v1.11`  will instead try to compile the sources assuming it is Golang instead.
+Note the `actionloop` image will accept any source and will try to run it (if it is possible), while the `action-golang-v1.11`  will instead try to compile the sources assuming it is Golang instead.
 
 <a name="actionloopgo">
 

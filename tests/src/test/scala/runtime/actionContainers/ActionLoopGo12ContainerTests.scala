@@ -35,7 +35,7 @@ class ActionLoopGo12ContainerTests
 
   import GoResourceHelpers._
 
-  val goCompiler = "actionloop-golang-v1.12"
+  val goCompiler = "action-golang-v1.12"
   val image = goCompiler
 
   def withActionLoopContainer(code: ActionContainer => Unit) =
