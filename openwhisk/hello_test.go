@@ -1,10 +1,8 @@
 package openwhisk
 
-import (
-	"testing"
-)
-
-func TestDoget(t *testing.T) {
+func ExampledoGet() {
 	doGet()
+	// Output: hello errore
+	// Hello errore
 
 }

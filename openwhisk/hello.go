@@ -5,5 +5,5 @@ import (
 )
 
 func doGet() {
-	fmt.Println("hello world")
+	fmt.Println("Hello world")
 }
