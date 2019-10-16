@@ -1,8 +1,6 @@
 package openwhisk
 
-func ExampledoGet() {
+func ExampleDoGet() {
 	doGet()
-	// Output: hello errore
-	// Hello errore
-
+	// Output: Hello errore
 }
