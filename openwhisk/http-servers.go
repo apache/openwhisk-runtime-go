@@ -1,25 +1,12 @@
 package openwhisk
 
 import (
-	"io/ioutil"
-	"log"
+	"fmt"
 	"net/http"
 )
 
-func hello(w http.ResponseWriter, req *http.Request) {
+func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 
-	resp, err := http.Get("/hello")
-
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	body, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Println(string(body))
+	fmt.Println("hello")
 
 }
