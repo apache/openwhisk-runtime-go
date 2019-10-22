@@ -14,9 +14,11 @@ func ExampleHello(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		println(err)
 	}
-	defer res.Body.Close()
 
 	responseData, err := ioutil.ReadAll(res.Body)
+
+	defer res.Body.Close()
+
 	if err != nil {
 		println(err)
 	}
