@@ -132,6 +132,8 @@ func (ap *ActionProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ap.initHandler(w, r)
 	case "/run":
 		ap.runHandler(w, r)
+	case "/hello":
+		ap.helloHandler(w, r)
 	}
 }
 

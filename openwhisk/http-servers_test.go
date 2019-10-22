@@ -2,23 +2,29 @@ package openwhisk
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
-	"net/http/httptest"
 )
 
-func ExampleHealthCheckHandler() {
+func ExampleHello(w http.ResponseWriter, r *http.Request) {
 
 	ts, cur, log := startTestServer("")
 
-	req, err := http.NewRequest("GET", "hello", nil)
+	res, err := http.Get("/hello")
 	if err != nil {
-		fmt.Println(err)
+		println(err)
+	}
+	defer res.Body.Close()
+
+	responseData, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		println(err)
 	}
 
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(startTestServer)
+	responseString := string(responseData)
+	fmt.Fprint(w, responseString)
 
-	handler.ServeHTTP(rr, req)
+	println(res)
 
 	// Output: hello
 

@@ -50,10 +50,6 @@ func startTestServer(compiler string) (*httptest.Server, string, *os.File) {
 	ts := httptest.NewServer(ap)
 	log.Printf(ts.URL)
 	doPost(ts.URL+"/init", `{value: {code: ""}}`)
-	// handler for test http get
-	fmt.Println("BEFORE-HANDLE")
-
-	fmt.Println("AFTER-HANDLE")
 
 	return ts, cur, buf
 }
