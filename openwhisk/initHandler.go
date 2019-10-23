@@ -171,8 +171,4 @@ func (ap *ActionProxy) ExtractAndCompile(buf *[]byte, main string) (string, erro
 	return binFile, nil
 }
 
-func (ap *ActionProxy) helloHandler(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Println("hello")
-
-}

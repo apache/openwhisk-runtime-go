@@ -1,12 +1,7 @@
 package openwhisk
 
-import (
-	"fmt"
-	"net/http"
-)
+import "net/http"
 
-func hello(w http.ResponseWriter, r *http.Request) {
-
-	fmt.Println("hello")
-
+func (ap *ActionProxy) helloHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("hello\n"))
 }

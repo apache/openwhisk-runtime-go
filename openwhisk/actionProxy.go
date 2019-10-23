@@ -127,6 +127,7 @@ func (ap *ActionProxy) StartLatestAction() error {
 }
 
 func (ap *ActionProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	Debug(r.URL.Path)
 	switch r.URL.Path {
 	case "/init":
 		ap.initHandler(w, r)

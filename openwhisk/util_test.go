@@ -63,6 +63,19 @@ func stopTestServer(ts *httptest.Server, cur string, buf *os.File) {
 	dump(buf)
 }
 
+func doGet(url string) (string, int, error) {
+	res, err := http.Get(url)
+	if err != nil {
+		return "", -1, err
+	}
+	defer res.Body.Close()
+	resp, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return "", -1, err
+	}
+	return string(resp), res.StatusCode, nil	
+}
+
 func doPost(url string, message string) (string, int, error) {
 	buf := bytes.NewBufferString(message)
 	res, err := http.Post(url, "application/json", buf)
