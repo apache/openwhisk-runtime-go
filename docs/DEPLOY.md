@@ -92,7 +92,7 @@ If you want for example use the library `github.com/sirupsen/logrus` to manage y
 
 For example consider you have in the file `src/hello/hello.go` the import:
 
-```
+```go
 import "github.com/sirupsen/logrus"
 ```
 
