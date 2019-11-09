@@ -92,7 +92,7 @@ If you want for example use the library `github.com/sirupsen/logrus` to manage y
 
 For example consider you have in the file `src/hello/hello.go` the import:
 
-```
+```go
 import "github.com/sirupsen/logrus"
 ```
 
@@ -129,7 +129,7 @@ If you need to use vendor folder in the main package, you need to create a direc
 
 ### Using VsCode
 
-If you are using [VsCode[(https://code.visualstudio.com/) as your Go development environment with the [VsCode Go](https://marketplace.visualstudio.com/items?itemName=ms-vscode.Go) support, and you want to get rid of errors and have it working properly, you need to configure it to support the suggested:
+If you are using [VsCode](https://code.visualstudio.com/) as your Go development environment with the [VsCode Go](https://marketplace.visualstudio.com/items?itemName=ms-vscode.Go) support, and you want to get rid of errors and have it working properly, you need to configure it to support the suggested:
 
 - you need to have a `src` folder in your source
 - you need either to open the `src` folder as the top level source or add it as a folder in the workspace (not just have it as a subfolder)
