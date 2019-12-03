@@ -69,18 +69,20 @@ class ActionLoopBasicTests extends BasicActionRunnerTests with WskActorSystem {
     """#!/bin/bash
       |while read line
       |do
-      |  __OW_API_HOST="$(echo "$line"      | jq -r .api_host)"
-      |  __OW_API_KEY="$(echo "$line"       | jq -r .api_key)"
-      |  __OW_NAMESPACE="$(echo "$line"     | jq -r .namespace)"
-      |  __OW_ACTIVATION_ID="$(echo "$line" | jq -r .activation_id)"
-      |  __OW_ACTION_NAME="$(echo "$line"   | jq -r .action_name)"
-      |  __OW_DEADLINE="$(echo "$line"      | jq -r .deadline)"
+      |  __OW_API_HOST="$(echo "$line"       | jq -r .api_host)"
+      |  __OW_API_KEY="$(echo "$line"        | jq -r .api_key)"
+      |  __OW_NAMESPACE="$(echo "$line"      | jq -r .namespace)"
+      |  __OW_ACTIVATION_ID="$(echo "$line"  | jq -r .activation_id)"
+      |  __OW_ACTION_NAME="$(echo "$line"    | jq -r .action_name)"
+      |  __OW_ACTION_VERSION="$(echo "$line" | jq -r .action_version)"
+      |  __OW_DEADLINE="$(echo "$line"       | jq -r .deadline)"
       |  echo >&3 "{ \
       |   \"api_host\": \"$__OW_API_HOST\", \
       |   \"api_key\": \"$__OW_API_KEY\", \
       |   \"namespace\": \"$__OW_NAMESPACE\", \
       |   \"activation_id\": \"$__OW_ACTIVATION_ID\", \
       |   \"action_name\": \"$__OW_ACTION_NAME\", \
+      |   \"action_version\": \"$__OW_ACTION_VERSION\", \
       |   \"deadline\": \"$__OW_DEADLINE\" }"
       | done
     """.stripMargin)

@@ -94,6 +94,7 @@ class ActionLoopBasicGo12Tests
       |	res["api_key"] = os.Getenv("__OW_API_KEY")
       |	res["namespace"] = os.Getenv("__OW_NAMESPACE")
       |	res["action_name"] = os.Getenv("__OW_ACTION_NAME")
+      |	res["action_version"] = os.Getenv("__OW_ACTION_VERSION")
       |	res["activation_id"] = os.Getenv("__OW_ACTIVATION_ID")
       |	res["deadline"] = os.Getenv("__OW_DEADLINE")
       |	return res
