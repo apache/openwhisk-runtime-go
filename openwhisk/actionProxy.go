@@ -71,6 +71,7 @@ func NewActionProxy(baseDir string, compiler string, outFile *os.File, errFile *
 
 //SetEnv sets the environment
 func (ap *ActionProxy) SetEnv(env map[string]interface{}) {
+	ap.env["__OW_API_HOST"] = os.Getenv("__OW_API_HOST")
 	for k, v := range env {
 		s, ok := v.(string)
 		if ok {
