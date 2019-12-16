@@ -65,11 +65,12 @@ class ActionLoopBasicTests extends BasicActionRunnerTests with WskActorSystem {
        |done
     """.stripMargin)
 
+  // the __OW_API_HOST should already be in the environment
+  // so it is not expected in/read from the input line
   override val testEnv = TestConfig(
     """#!/bin/bash
       |while read line
       |do
-      |  __OW_API_HOST="$(echo "$line"       | jq -r .api_host)"
       |  __OW_API_KEY="$(echo "$line"        | jq -r .api_key)"
       |  __OW_NAMESPACE="$(echo "$line"      | jq -r .namespace)"
       |  __OW_ACTIVATION_ID="$(echo "$line"  | jq -r .activation_id)"
