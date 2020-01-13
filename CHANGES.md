@@ -16,6 +16,10 @@
 # limitations under the License.
 #
 -->
+# 1.15.0
+- added OW_ACTION_VERSION to action environment (PR#113)
+- propagate API_HOST from parent to child process (PR#115)
+
 # 1.14.0
 - Removed the -incubation
 - Now all runtimes use source release so no more actionloop-v2, renamed to actionloop-base
