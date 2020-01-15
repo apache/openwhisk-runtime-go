@@ -26,6 +26,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // ActionProxy is the container of the data specific to a server
@@ -71,7 +72,14 @@ func NewActionProxy(baseDir string, compiler string, outFile *os.File, errFile *
 
 //SetEnv sets the environment
 func (ap *ActionProxy) SetEnv(env map[string]interface{}) {
-	ap.env["__OW_API_HOST"] = os.Getenv("__OW_API_HOST")
+	// propagate all the variables starting with "__OW_"
+	for _, v := range os.Environ() {
+		if strings.HasPrefix(v, "__OW_") {
+			res := strings.Split(v, "=")
+			ap.env[res[0]] = res[1]
+		}
+	}
+	// get other variables from the init payload
 	for k, v := range env {
 		s, ok := v.(string)
 		if ok {
