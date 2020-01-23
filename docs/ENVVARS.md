@@ -31,7 +31,7 @@ The following variables are usually set in the Dockerfile
 
 `OW_EXECUTION_ENV` enables detection and verification of the compilation environent. The compiler is expected to create a file named `exec.env` in the same folder as the `exec` file to be run. If this variable is set, before starting an action, the init will check that the content of the `exec.env` starts with the value of the variable. The actual content of the `exec.env` can be actually a longer string.
 
-## Environment variables propagated to actions.
+## Environment variables propagated to actions and to the compilation script
 
 The proxy itself sets the following environment variables:
 
@@ -41,12 +41,10 @@ The proxy itself sets the following environment variables:
 
 `__OW_PROXY_VERSION` is the version of the proxy
 
-Any other environmet set in the Dockerfile that starts with `__OW_` are propagated to the proxy and can override also the values set by the proxy.
+Any other environment variable set in the Dockerfile that starts with `__OW_` are propagated to the proxy and can override also the values set by the proxy.
 
-Furthermore, actions can receive their own environment variables and can override the variables set
+Furthermore, actions receive their own environment variables and the values set overrides the variables set from the proxy and in the environment.
 
-
-  Furthermore also the version of the proxy is propagated to the action as
 
 
 

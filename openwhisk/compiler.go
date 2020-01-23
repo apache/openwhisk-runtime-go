@@ -54,6 +54,9 @@ func (ap *ActionProxy) CompileAction(main string, srcDir string, binDir string) 
 	var cmd *exec.Cmd
 	cmd = exec.Command(ap.compiler, main, srcDir, binDir)
 	cmd.Env = []string{"PATH=" + os.Getenv("PATH")}
+	for k, v := range ap.env {
+		cmd.Env = append(cmd.Env, k+"="+v)
+	}
 
 	// gather stdout and stderr
 	out, err := cmd.CombinedOutput()
