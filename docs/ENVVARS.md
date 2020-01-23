@@ -19,7 +19,9 @@
 
 # Environment Variables
 
-The proxy uses a few enviroment variables that affects its behavior.
+## Enviroment variables that control behaviour of the proxy
+
+The following variables are usually set in the Dockerfile
 
 `OW_COMPILER` points to the compiler script to use to compile actions.
 
@@ -27,10 +29,24 @@ The proxy uses a few enviroment variables that affects its behavior.
 
 `OW_WAIT_FOR_ACK` enables waiting for an acknowledgement in the actionloop protocol. It should be enabled in all the newer runtimes. Do not enable in existing runtimes as it would break existing actions built for that runtime.
 
-`OW_EXECUTION_ENV` enables detection and verification of the compilation environent. The compiler is expected to create a file named `exec.env` in the same folder as the `exec` file to be run. If this variable is set, before starting an action, the init will check that the content of the `exec.env` starts with the value of the variable. The actual content of the `exec.env` can be actually a longer string. 
+`OW_EXECUTION_ENV` enables detection and verification of the compilation environent. The compiler is expected to create a file named `exec.env` in the same folder as the `exec` file to be run. If this variable is set, before starting an action, the init will check that the content of the `exec.env` starts with the value of the variable. The actual content of the `exec.env` can be actually a longer string.
 
-This variable is also propagated to the action as `__OW_EXECUTION_ENV`. Furthermore also the version of the proxy is propagated to the action as  `__OW_EXECUTION_VERSION`.
+## Environment variables propagated to actions.
 
+The proxy itself sets the following environment variables:
+
+`__OW_EXECUTION_ENV` is the same value that the proxy receive as `OW_EXECUTION_ENV`
+
+`__OW_WAIT_FOR_ACK` is set if the proxy has the variable `OW_WAIT_FOR_ACK` set.
+
+`__OW_PROXY_VERSION` is the version of the proxy
+
+Any other environmet set in the Dockerfile that starts with `__OW_` are propagated to the proxy and can override also the values set by the proxy.
+
+Furthermore, actions can receive their own environment variables and can override the variables set
+
+
+  Furthermore also the version of the proxy is propagated to the action as
 
 
 
