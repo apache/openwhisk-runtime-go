@@ -16,6 +16,11 @@
 # limitations under the License.
 #
 -->
+# 1.16.0
+- added OW_WAIT_FOR_ACK to wait for an acknowledgement in the action
+- added OW_EXECUTION_ENV check to validate the execution environment before starting an action
+- send compilation logs in standard output
+
 # 1.15.0
 - added OW_ACTION_VERSION to action environment (PR#113)
 - propagate API_HOST from parent to child process (PR#115)

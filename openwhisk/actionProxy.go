@@ -115,7 +115,9 @@ func (ap *ActionProxy) StartLatestAction() error {
 	os.Chmod(executable, 0755)
 	newExecutor := NewExecutor(ap.outFile, ap.errFile, executable, ap.env)
 	Debug("starting %s", executable)
-	err := newExecutor.Start()
+
+	// start executor
+	err := newExecutor.Start(os.Getenv("OW_WAIT_FOR_ACK") != "")
 	if err == nil {
 		ap.theExecutor = newExecutor
 		if curExecutor != nil {

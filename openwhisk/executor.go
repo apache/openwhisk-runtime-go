@@ -19,6 +19,7 @@ package openwhisk
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -95,10 +96,16 @@ func (proc *Executor) Exited() bool {
 	}
 }
 
+// ActionAck is the expected data structure for the action acknowledgement
+type ActionAck struct {
+	Ok bool `json:"ok"`
+}
+
 // Start execution of the command
-// wait a bit to check if the command exited
+// if the flag ack is true, wait forever for an acknowledgement
+// if the flag ack is false wait a bit to check if the command exited
 // returns an error if the program fails
-func (proc *Executor) Start() error {
+func (proc *Executor) Start(waitForAck bool) error {
 	// start the underlying executable
 	Debug("Start:")
 	err := proc.cmd.Start()
@@ -108,15 +115,53 @@ func (proc *Executor) Start() error {
 		return fmt.Errorf("command exited")
 	}
 	Debug("pid: %d", proc.cmd.Process.Pid)
+
 	go func() {
 		proc.cmd.Wait()
 		proc.exited <- true
 	}()
+
+	// not waiting for an ack, so use a timeout
+	if !waitForAck {
+		select {
+		case <-proc.exited:
+			return fmt.Errorf("command exited")
+		case <-time.After(DefaultTimeoutStart):
+			return nil
+		}
+		return nil
+	}
+
+	// wait for acknowledgement
+	Debug("waiting for an ack")
+	ack := make(chan error)
+	go func() {
+		out, err := proc.output.ReadBytes('\n')
+		if err != nil {
+			ack <- err
+			return
+		}
+		// parse ack
+		var ackData ActionAck
+		err = json.Unmarshal(out, &ackData)
+		if err != nil {
+			ack <- err
+			return
+		}
+		// check ack
+		if !ackData.Ok {
+			ack <- fmt.Errorf("the action did not return a proper acknowledgement")
+		}
+		ack <- nil
+	}()
+	// wait for ack or unexpected termination
 	select {
+	// ack received
+	case err = <-ack:
+		return err
+	// process exited
 	case <-proc.exited:
 		return fmt.Errorf("command exited")
-	case <-time.After(DefaultTimeoutStart):
-		return nil
 	}
 }
 
