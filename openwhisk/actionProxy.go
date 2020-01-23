@@ -72,6 +72,18 @@ func NewActionProxy(baseDir string, compiler string, outFile *os.File, errFile *
 
 //SetEnv sets the environment
 func (ap *ActionProxy) SetEnv(env map[string]interface{}) {
+	// Propagate proxy version
+	ap.env["__OW_PROXY_VERSION"] = Version
+	// propagate OW_EXECUTION_ENV as  __OW_EXECUTION_ENV
+	ee := os.Getenv("OW_EXECUTION_ENV")
+	if ee != "" {
+		ap.env["__OW_EXECUTION_ENV"] = ee
+	}
+	// require an ack
+	wa := os.Getenv("OW_WAIT_FOR_ACK")
+	if wa != "" {
+		ap.env["__OW_WAIT_FOR_ACK"] = wa
+	}
 	// propagate all the variables starting with "__OW_"
 	for _, v := range os.Environ() {
 		if strings.HasPrefix(v, "__OW_") {
@@ -105,6 +117,20 @@ func (ap *ActionProxy) StartLatestAction() error {
 		Debug("no action found")
 		ap.theExecutor = nil
 		return fmt.Errorf("no valid actions available")
+	}
+
+	// check version
+	execEnv := os.Getenv("OW_EXECUTION_ENV")
+	if execEnv != "" {
+		execEnvFile := fmt.Sprintf("%s/%d/bin/exec.env", ap.baseDir, highestDir)
+		execEnvData, err := ioutil.ReadFile(execEnvFile)
+		if err != nil {
+			return err
+		}
+		if !strings.HasPrefix(string(execEnvData), execEnv) {
+			fmt.Printf("Expected exec.env should start with %s\nActual value: %s", execEnv, execEnvData)
+			return fmt.Errorf("execution environment version mismatch, check logs")
+		}
 	}
 
 	// save the current executor
