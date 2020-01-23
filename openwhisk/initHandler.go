@@ -117,7 +117,8 @@ func (ap *ActionProxy) initHandler(w http.ResponseWriter, r *http.Request) {
 	// if a compiler is defined try to compile
 	_, err = ap.ExtractAndCompile(&buf, main)
 	if err != nil {
-		sendError(w, http.StatusBadGateway, err.Error())
+		fmt.Printf(err.Error())
+		sendError(w, http.StatusBadGateway, "compilation error, check logs")
 		return
 	}
 
