@@ -121,7 +121,6 @@ func (ap *ActionProxy) initHandler(w http.ResponseWriter, r *http.Request) {
 			sendError(w, http.StatusBadGateway, err.Error())
 		} else {		
 			ap.outFile.Write([]byte(err.Error()+"\n"))
-			ap.outFile.Flush()
 			sendError(w, http.StatusBadGateway, "compilation error, check logs")
 			return
 		}
