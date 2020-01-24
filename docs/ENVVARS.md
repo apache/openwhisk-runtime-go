@@ -29,7 +29,9 @@ The following variables are usually set in the Dockerfile
 
 `OW_WAIT_FOR_ACK` enables waiting for an acknowledgement in the actionloop protocol. It should be enabled in all the newer runtimes. Do not enable in existing runtimes as it would break existing actions built for that runtime.
 
-`OW_EXECUTION_ENV` enables detection and verification of the compilation environent. The compiler is expected to create a file named `exec.env` in the same folder as the `exec` file to be run. If this variable is set, before starting an action, the init will check that the content of the `exec.env` starts with the value of the variable. The actual content of the `exec.env` can be actually a longer string.
+`OW_EXECUTION_ENV` enables detection and verification of the compilation environent. The compiler is expected to create a file named `exec.env` in the same folder as the `exec` file to be run. If this variable is set, before starting an action, the init will check that the content of the `exec.env`, trimmed of spaces and new lines, is the same, to ensure an action is executed in the right execution environment.
+
+`OW_LOG_INIT_ERROR` enables logging of compilation error; the default behaviour is to return errors in the answer of the init.
 
 ## Environment variables propagated to actions and to the compilation script
 
