@@ -137,6 +137,7 @@ func (proc *Executor) Start(waitForAck bool) error {
 	ack := make(chan error)
 	go func() {
 		out, err := proc.output.ReadBytes('\n')
+		Debug("received ack %s", out)
 		if err != nil {
 			ack <- err
 			return
@@ -151,6 +152,7 @@ func (proc *Executor) Start(waitForAck bool) error {
 		// check ack
 		if !ackData.Ok {
 			ack <- fmt.Errorf("The action did not initialize properly.")
+			return
 		}
 		ack <- nil
 	}()
