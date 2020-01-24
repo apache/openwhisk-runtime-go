@@ -120,7 +120,7 @@ func (ap *ActionProxy) initHandler(w http.ResponseWriter, r *http.Request) {
 		if os.Getenv("OW_LOG_INIT_ERROR") == "" {
 			sendError(w, http.StatusBadGateway, err.Error())
 		} else {
-			ap.outFile.Write([]byte(err.Error() + "\n"))
+			ap.errFile.Write([]byte(err.Error() + "\n"))
 			ap.outFile.Write([]byte(OutputGuard))
 			ap.errFile.Write([]byte(OutputGuard))
 			sendError(w, http.StatusBadGateway, "The action failed to generate or locate a binary. See logs for details.")
