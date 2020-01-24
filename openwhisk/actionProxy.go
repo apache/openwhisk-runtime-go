@@ -127,7 +127,7 @@ func (ap *ActionProxy) StartLatestAction() error {
 		if err != nil {
 			return err
 		}
-		if !strings.HasPrefix(string(execEnvData), execEnv) {
+		if strings.TrimSpace(string(execEnvData)) != execEnv {
 			fmt.Printf("Expected exec.env should start with %s\nActual value: %s", execEnv, execEnvData)
 			return fmt.Errorf("execution environment version mismatch, check logs")
 		}
