@@ -131,7 +131,7 @@ func (ap *ActionProxy) initHandler(w http.ResponseWriter, r *http.Request) {
 	// start an action
 	err = ap.StartLatestAction()
 	if err != nil {
-		sendError(w, http.StatusBadRequest, "cannot start action: "+err.Error())
+		sendError(w, http.StatusBadGateway, "cannot start action: "+err.Error())
 		return
 	}
 	ap.initialized = true
