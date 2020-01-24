@@ -156,7 +156,7 @@ func Example_main_zipinit_nocompiler() {
 	// 200 {"message":"Hello, Mike!"}
 	// name=Mike
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
-	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
+	// XXX_THE_END_OF_A_WSK_ACTIVATION_XXX
 }
 
 func Example_compile_simple() {

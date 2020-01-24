@@ -163,7 +163,7 @@ func (proc *Executor) Start(waitForAck bool) error {
 		return err
 	// process exited
 	case <-proc.exited:
-		return fmt.Errorf("command exited")
+		return fmt.Errorf("command exited before ack")
 	}
 }
 

@@ -93,6 +93,40 @@ func ExampleNewExecutor_env() {
 	// Output:
 	// <nil>
 	// { "env": "TEST_HELLO=WORLD TEST_HI=ALL"}
+	// XXX_THE_END_OF_A_W//SK_ACTIVATION_XXX
 	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
-	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
+}
+
+func ExampleNewExecutor_ack() {
+	log, _ := ioutil.TempFile("", "log")
+	proc := NewExecutor(log, log, "_test/hi", m)
+	err := proc.Start(true)
+	fmt.Println(err)
+	proc.Stop()
+	dump(log)
+	// Output:
+	// command exited before ack
+    // hi
+}
+
+func ExampleNewExecutor_badack() {
+	log, _ := ioutil.TempFile("", "log")
+	proc := NewExecutor(log, log, "_test/badack.sh", m)
+	err := proc.Start(true)
+	fmt.Println(err)
+	proc.Stop()
+	dump(log)
+	// Output:
+	// invalid character 'b' looking for beginning of value
+}
+
+func ExampleNewExecutor_badack2() {
+	log, _ := ioutil.TempFile("", "log")
+	proc := NewExecutor(log, log, "_test/badack2.sh", m)
+	err := proc.Start(true)
+	fmt.Println(err)
+	proc.Stop()
+	dump(log)
+	// Output:
+	// The action did not initialize properly.
 }
