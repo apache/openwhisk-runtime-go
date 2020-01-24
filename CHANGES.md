@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 -->
-# 1.16.0
+# 1.16.0 (not yet an Apache release)
 - added OW_WAIT_FOR_ACK to wait for an acknowledgement in the action
 - added OW_EXECUTION_ENV check to validate the execution environment before starting an action
 - send compilation logs in standard output

@@ -150,7 +150,7 @@ func (proc *Executor) Start(waitForAck bool) error {
 		}
 		// check ack
 		if !ackData.Ok {
-			ack <- fmt.Errorf("the action did not return a proper acknowledgement")
+			ack <- fmt.Errorf("The action did not initialize properly.")
 		}
 		ack <- nil
 	}()

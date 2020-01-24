@@ -112,7 +112,7 @@ In the current actionloop image there is `bash` and the `jq` command, so you can
 #!/bin/bash
 # send an ack if required
 if test -n "$__OW_WAIT_FOR_ACK"
-then echo '{"ok":true}' >&3
+  then echo '{"ok":true}' >&3
 fi
 # read input forever line by line
 while read line
