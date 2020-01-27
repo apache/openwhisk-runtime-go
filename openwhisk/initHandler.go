@@ -131,8 +131,15 @@ func (ap *ActionProxy) initHandler(w http.ResponseWriter, r *http.Request) {
 	// start an action
 	err = ap.StartLatestAction()
 	if err != nil {
-		sendError(w, http.StatusBadGateway, "cannot start action: "+err.Error())
-		return
+		if os.Getenv("OW_LOG_INIT_ERROR") == "" {
+			sendError(w, http.StatusBadGateway, "cannot start action: "+err.Error())
+		} else {
+			ap.errFile.Write([]byte(err.Error() + "\n"))
+			ap.outFile.Write([]byte(OutputGuard))
+			ap.errFile.Write([]byte(OutputGuard))
+			sendError(w, http.StatusBadGateway, "Cannot start action. Check logs for details.")
+			return
+		}
 	}
 	ap.initialized = true
 	sendOK(w)
