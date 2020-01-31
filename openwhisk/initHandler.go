@@ -124,8 +124,8 @@ func (ap *ActionProxy) initHandler(w http.ResponseWriter, r *http.Request) {
 			ap.outFile.Write([]byte(OutputGuard))
 			ap.errFile.Write([]byte(OutputGuard))
 			sendError(w, http.StatusBadGateway, "The action failed to generate or locate a binary. See logs for details.")
-			return
 		}
+		return
 	}
 
 	// start an action
@@ -138,8 +138,8 @@ func (ap *ActionProxy) initHandler(w http.ResponseWriter, r *http.Request) {
 			ap.outFile.Write([]byte(OutputGuard))
 			ap.errFile.Write([]byte(OutputGuard))
 			sendError(w, http.StatusBadGateway, "Cannot start action. Check logs for details.")
-			return
 		}
+		return
 	}
 	ap.initialized = true
 	sendOK(w)
