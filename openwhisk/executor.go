@@ -80,7 +80,13 @@ func (proc *Executor) Interact(in []byte) ([]byte, error) {
 	// input to the subprocess
 	proc.input.Write(in)
 	proc.input.Write([]byte("\n"))
-	out, err := proc.output.ReadBytes('\n')
+	var out []byte
+	var err error
+	if proc.Exited() {
+		err = fmt.Errorf("command exited")
+	} else {
+		out, err = proc.output.ReadBytes('\n')
+	}
 	proc.cmd.Stdout.Write([]byte(OutputGuard))
 	proc.cmd.Stderr.Write([]byte(OutputGuard))
 	return out, err
