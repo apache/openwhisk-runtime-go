@@ -20,6 +20,7 @@ package openwhisk
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -80,12 +81,25 @@ func (proc *Executor) Interact(in []byte) ([]byte, error) {
 	// input to the subprocess
 	proc.input.Write(in)
 	proc.input.Write([]byte("\n"))
-	var out []byte
+
+	chout := make(chan []byte)
+	go func() {
+		out, err := proc.output.ReadBytes('\n')
+		if err == nil {
+			chout <- out
+		} else {
+			chout <- []byte{}
+		}
+	}()
 	var err error
-	if proc.Exited() {
-		err = fmt.Errorf("command exited")
-	} else {
-		out, err = proc.output.ReadBytes('\n')
+	var out []byte
+	select {
+	case out = <-chout:
+		if len(out) == 0 {
+			err = errors.New("no answer from the action")
+		}
+	case <-proc.exited:
+		err = errors.New("command exited")
 	}
 	proc.cmd.Stdout.Write([]byte(OutputGuard))
 	proc.cmd.Stderr.Write([]byte(OutputGuard))
