@@ -47,7 +47,7 @@ clean:
 	-rm $(BINZIP) $(SRCZIP) package.done test.json 2>/dev/null
 
 clean_vendor:
-	-rm -r $(VENDORS) 
+	-rm -r $(VENDORS)
 
 test: test.json
 	$(WSK) action invoke test/$(NAME) -r
