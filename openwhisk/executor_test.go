@@ -106,7 +106,7 @@ func ExampleNewExecutor_ack() {
 	dump(log)
 	// Output:
 	// command exited before ack
-    // hi
+	// hi
 }
 
 func ExampleNewExecutor_badack() {
@@ -129,4 +129,21 @@ func ExampleNewExecutor_badack2() {
 	dump(log)
 	// Output:
 	// The action did not initialize properly.
+}
+
+func ExampleNewExecutor_helloack() {
+	log, _ := ioutil.TempFile("", "log")
+	proc := NewExecutor(log, log, "_test/helloack/exec", m)
+	err := proc.Start(true)
+	fmt.Println(err)
+	res, _ := proc.Interact([]byte(`{"value":{"name":"Mike"}}`))
+	fmt.Printf("%s", res)
+	proc.Stop()
+	dump(log)
+	// Output:
+	// <nil>
+	// {"hello": "Mike"}
+	// msg=hello Mike
+	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
+	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
 }

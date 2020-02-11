@@ -149,7 +149,6 @@ func (proc *Executor) Start(waitForAck bool) error {
 		case <-time.After(DefaultTimeoutStart):
 			return nil
 		}
-		return nil
 	}
 
 	// wait for acknowledgement
