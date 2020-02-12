@@ -41,8 +41,6 @@ The proxy itself sets the following environment variables:
 
 `__OW_WAIT_FOR_ACK` is set if the proxy has the variable `OW_WAIT_FOR_ACK` set.
 
-`__OW_PROXY_VERSION` is the version of the proxy
-
 Any other environment variable set in the Dockerfile that starts with `__OW_` are propagated to the proxy and can override also the values set by the proxy.
 
 Furthermore, actions receive their own environment variables and the values set overrides the variables set from the proxy and in the environment.
