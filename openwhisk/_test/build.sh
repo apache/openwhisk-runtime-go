@@ -57,5 +57,7 @@ cd jar ; zip -q -r ../sample.jar * ; cd ..
 build exec
 test -e exec.zip && rm exec.zip
 zip -q -r exec.zip exec etc dir
+echo exec/env >helloack/exec.env
 zip -j helloack.zip helloack/*
+
 

@@ -73,7 +73,7 @@ The `actionloop` runtime can execute  generic Linux executable in an efficient w
 
 <a name="actionloop">
 
-### The Action Loop Protocol 
+### The Action Loop Protocol
 
 The protocol can be specified informally as follow.
 
