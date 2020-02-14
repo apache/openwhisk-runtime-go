@@ -77,7 +77,7 @@ The `actionloop` runtime can execute  generic Linux executable in an efficient w
 
 The protocol can be specified informally as follows.
 
-- Send an acknowledgement if required. If the environment variable `__OW_WAIT_FOR_ACK` is not empty, write on file descriptor 3 the string `{ "ok": true }`.
+- Send an acknowledgement after initialization when required. If the environment variable `__OW_WAIT_FOR_ACK` is not empty, write on file descriptor 3 the string `{ "ok": true }`.
 
 - Read one line from standard input (file descriptor 0).
 - Parse the line as a JSON object. Currently the object will be in currently in the format:
