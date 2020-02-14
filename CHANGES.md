@@ -17,7 +17,7 @@
 #
 -->
 # 1.16.0 (next release)
-- added OW_WAIT_FOR_ACK to wait for an acknowledgement in the action
+- added OW_WAIT_FOR_ACK such at if true, the proxy waits for an acknowledgement from the action on startup
 - added OW_EXECUTION_ENV check to validate the execution environment before starting an action
 - send compilation logs in standard output
 
