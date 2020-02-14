@@ -75,7 +75,7 @@ The `actionloop` runtime can execute  generic Linux executable in an efficient w
 
 ### The Action Loop Protocol
 
-The protocol can be specified informally as follow.
+The protocol can be specified informally as follows.
 
 - Send an acknowledgement if required. If the environment variable `__OW_WAIT_FOR_ACK` is not empty, write on file descriptor 3 the string `{ "ok": true }`.
 
