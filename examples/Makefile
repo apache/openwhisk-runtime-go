@@ -16,11 +16,11 @@
 #
 
 # prefix
-IMAGES?=openwhisk     	
+IMAGES?=openwhisk
 
 all: .PHONY
 
-.PHONY: bash-hello golang-hello-single golang-main-single golang-main-standalone golang-main-package golang-main-vendor golang-hello-vendor 
+.PHONY: bash-hello golang-hello-single golang-main-single golang-main-standalone golang-main-package golang-main-vendor golang-hello-vendor
 
 bash-hello:
 	cd $@ && OW_USER=$(IMAGES) make clean deploy test
