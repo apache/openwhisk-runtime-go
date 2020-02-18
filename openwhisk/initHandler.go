@@ -117,14 +117,28 @@ func (ap *ActionProxy) initHandler(w http.ResponseWriter, r *http.Request) {
 	// if a compiler is defined try to compile
 	_, err = ap.ExtractAndCompile(&buf, main)
 	if err != nil {
-		sendError(w, http.StatusBadGateway, err.Error())
+		if os.Getenv("OW_LOG_INIT_ERROR") == "" {
+			sendError(w, http.StatusBadGateway, err.Error())
+		} else {
+			ap.errFile.Write([]byte(err.Error() + "\n"))
+			ap.outFile.Write([]byte(OutputGuard))
+			ap.errFile.Write([]byte(OutputGuard))
+			sendError(w, http.StatusBadGateway, "The action failed to generate or locate a binary. See logs for details.")
+		}
 		return
 	}
 
 	// start an action
 	err = ap.StartLatestAction()
 	if err != nil {
-		sendError(w, http.StatusBadRequest, "cannot start action: "+err.Error())
+		if os.Getenv("OW_LOG_INIT_ERROR") == "" {
+			sendError(w, http.StatusBadGateway, "cannot start action: "+err.Error())
+		} else {
+			ap.errFile.Write([]byte(err.Error() + "\n"))
+			ap.outFile.Write([]byte(OutputGuard))
+			ap.errFile.Write([]byte(OutputGuard))
+			sendError(w, http.StatusBadGateway, "Cannot start action. Check logs for details.")
+		}
 		return
 	}
 	ap.initialized = true

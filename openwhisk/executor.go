@@ -19,6 +19,8 @@ package openwhisk
 
 import (
 	"bufio"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -79,7 +81,26 @@ func (proc *Executor) Interact(in []byte) ([]byte, error) {
 	// input to the subprocess
 	proc.input.Write(in)
 	proc.input.Write([]byte("\n"))
-	out, err := proc.output.ReadBytes('\n')
+
+	chout := make(chan []byte)
+	go func() {
+		out, err := proc.output.ReadBytes('\n')
+		if err == nil {
+			chout <- out
+		} else {
+			chout <- []byte{}
+		}
+	}()
+	var err error
+	var out []byte
+	select {
+	case out = <-chout:
+		if len(out) == 0 {
+			err = errors.New("no answer from the action")
+		}
+	case <-proc.exited:
+		err = errors.New("command exited")
+	}
 	proc.cmd.Stdout.Write([]byte(OutputGuard))
 	proc.cmd.Stderr.Write([]byte(OutputGuard))
 	return out, err
@@ -95,10 +116,16 @@ func (proc *Executor) Exited() bool {
 	}
 }
 
+// ActionAck is the expected data structure for the action acknowledgement
+type ActionAck struct {
+	Ok bool `json:"ok"`
+}
+
 // Start execution of the command
-// wait a bit to check if the command exited
+// if the flag ack is true, wait forever for an acknowledgement
+// if the flag ack is false wait a bit to check if the command exited
 // returns an error if the program fails
-func (proc *Executor) Start() error {
+func (proc *Executor) Start(waitForAck bool) error {
 	// start the underlying executable
 	Debug("Start:")
 	err := proc.cmd.Start()
@@ -108,15 +135,54 @@ func (proc *Executor) Start() error {
 		return fmt.Errorf("command exited")
 	}
 	Debug("pid: %d", proc.cmd.Process.Pid)
+
 	go func() {
 		proc.cmd.Wait()
 		proc.exited <- true
 	}()
+
+	// not waiting for an ack, so use a timeout
+	if !waitForAck {
+		select {
+		case <-proc.exited:
+			return fmt.Errorf("command exited")
+		case <-time.After(DefaultTimeoutStart):
+			return nil
+		}
+	}
+
+	// wait for acknowledgement
+	Debug("waiting for an ack")
+	ack := make(chan error)
+	go func() {
+		out, err := proc.output.ReadBytes('\n')
+		Debug("received ack %s", out)
+		if err != nil {
+			ack <- err
+			return
+		}
+		// parse ack
+		var ackData ActionAck
+		err = json.Unmarshal(out, &ackData)
+		if err != nil {
+			ack <- err
+			return
+		}
+		// check ack
+		if !ackData.Ok {
+			ack <- fmt.Errorf("The action did not initialize properly.")
+			return
+		}
+		ack <- nil
+	}()
+	// wait for ack or unexpected termination
 	select {
+	// ack received
+	case err = <-ack:
+		return err
+	// process exited
 	case <-proc.exited:
-		return fmt.Errorf("command exited")
-	case <-time.After(DefaultTimeoutStart):
-		return nil
+		return fmt.Errorf("command exited before ack")
 	}
 }
 

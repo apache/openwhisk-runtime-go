@@ -221,9 +221,9 @@ func Example_badinit_nocompiler() {
 	// Output:
 	// 500 {"error":"no action defined yet"}
 	// 403 {"error":"Missing main/no code to execute."}
-	// 400 {"error":"cannot start action: command exited"}
-	// 400 {"error":"cannot start action: command exited"}
-	// 400 {"error":"cannot start action: command exited"}
+	// 502 {"error":"cannot start action: command exited"}
+	// 502 {"error":"cannot start action: command exited"}
+	// 502 {"error":"cannot start action: command exited"}
 	// 500 {"error":"no action defined yet"}
 	// hi
 }

@@ -126,6 +126,24 @@ func Example_compile_src() {
 	// ./action/c2/out/exec
 }
 
+func Example_badcompile() {
+
+	os.Setenv("OW_LOG_INIT_ERROR", "1")
+	ts, cur, log := startTestServer("_test/badcompile.sh")
+	res, _, _ := doPost(ts.URL+"/init", initBytes([]byte("hello"), "main"))
+	fmt.Print(res)
+	stopTestServer(ts, cur, log)
+	os.Setenv("OW_LOG_INIT_ERROR", "")
+	// Unordered output:
+	// {"error":"The action failed to generate or locate a binary. See logs for details."}
+	// error in stdout
+	// error in stderr
+	//
+	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
+	// XXX_THE_END_OF_A_WHISK_ACTIVATION_XXX
+
+}
+
 func Example_SetEnv() {
 	ap := NewActionProxy("", "", nil, nil)
 	fmt.Println(ap.env)
@@ -143,4 +161,32 @@ func Example_SetEnv() {
 	// map[]
 	// [1,2,3] {"a":1,"b":2} string 123
 
+}
+
+func Example_executionEnv_nocheck() {
+	os.Setenv("OW_EXECUTION_ENV", "")
+	ts, cur, log := startTestServer("")
+	res, _, _ := doPost(ts.URL+"/init", initBinary("_test/helloack.zip", "main"))
+	fmt.Print(res)
+	stopTestServer(ts, cur, log)
+	// Output:
+	// {"ok":true}
+}
+
+func Example_executionEnv_check() {
+	os.Setenv("OW_EXECUTION_ENV", "bad/env")
+	ts, cur, log := startTestServer("")
+	res, _, _ := doPost(ts.URL+"/init", initBinary("_test/helloack.zip", "main"))
+	fmt.Print(res)
+	os.Setenv("OW_EXECUTION_ENV", "exec/env")
+	res, _, _ = doPost(ts.URL+"/init", initBinary("_test/helloack.zip", "main"))
+	fmt.Print(res)
+	stopTestServer(ts, cur, log)
+	// reset value
+	os.Setenv("OW_EXECUTION_ENV", "")
+	// Output:
+	// Expected exec.env should start with bad/env
+	// Actual value: exec/env
+	// {"error":"cannot start action: Execution environment version mismatch. See logs for details."}
+	// {"ok":true}
 }

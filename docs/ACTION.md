@@ -75,7 +75,9 @@ The `actionloop` runtime can execute  generic Linux executable in an efficient w
 
 ### The Action Loop Protocol
 
-The protocol can be specified informally as follow.
+The protocol can be specified informally as follows.
+
+- Send an acknowledgement after initialization when required. If the environment variable `__OW_WAIT_FOR_ACK` is not empty, write on file descriptor 3 the string `{ "ok": true }`.
 
 - Read one line from standard input (file descriptor 0).
 - Parse the line as a JSON object. Currently the object will be in currently in the format:
@@ -108,6 +110,10 @@ In the current actionloop image there is `bash` and the `jq` command, so you can
 
 ```bash
 #!/bin/bash
+# send an ack if required
+if test -n "$__OW_WAIT_FOR_ACK"
+  then echo '{"ok":true}' >&3
+fi
 # read input forever line by line
 while read line
 do

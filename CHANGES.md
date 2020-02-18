@@ -16,6 +16,11 @@
 # limitations under the License.
 #
 -->
+# 1.16.0 (next release)
+- added OW_WAIT_FOR_ACK such at if true, the proxy waits for an acknowledgement from the action on startup
+- added OW_EXECUTION_ENV to validate the execution environment before starting an action
+- write compilation logs to standard out
+
 # 1.15.0
 - added OW_ACTION_VERSION to action environment (PR#113)
 - propagate API_HOST from parent to child process (PR#115)
