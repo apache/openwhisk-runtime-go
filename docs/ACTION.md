@@ -63,7 +63,7 @@ func Main(obj map[string]interface{}) map[string]interface{} {
 }
 ```
 
-You can also have multiple source files in an action, packages and vendor folders.  Check the [deployment](DEPLOYMENT.md) document for more details how to package and deploy actions.
+You can also have multiple source files in an action, packages and vendor folders.  Check the [deployment](DEPLOY.md) document for more details how to package and deploy actions.
 
 <a name="generic"/>
 
