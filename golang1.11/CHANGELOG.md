@@ -19,6 +19,6 @@
 
 # Go 1.11 OpenWhisk Runtime Container
 
-## Apache 1.13.0-incubating (next release)
-- Initial version
-- Go 1.11.6
+## Apache 1.16 (next release)
+Changes:
+- Adding Go 1.11.13
