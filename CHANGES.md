@@ -17,6 +17,8 @@
 #
 -->
 # 1.16.0 (next release)
+- upgraded to go 1.12.17
+- add 'apt-get upgrade' to the image build to get latest security fixes during each build, for the case the base images are not updated frequently
 - added OW_WAIT_FOR_ACK such at if true, the proxy waits for an acknowledgement from the action on startup
 - added OW_EXECUTION_ENV to validate the execution environment before starting an action
 - write compilation logs to standard out
