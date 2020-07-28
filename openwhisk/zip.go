@@ -67,7 +67,7 @@ func Unzip(src []byte, dest string) error {
 		}
 		path := filepath.Join(dest, f.Name)
 		if f.FileInfo().IsDir() {
-			return os.MkdirAll(path, f.Mode())
+			return os.MkdirAll(path, 0755)
 		}
 		err = os.MkdirAll(filepath.Dir(path), 0755)
 		if err != nil {
