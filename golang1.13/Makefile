@@ -45,19 +45,7 @@ debugger:
 	-e OW_COMPILER=/mnt/bin/compile \
 	-v $(PWD):/mnt whisk/$(IMG)
 
-
-
-	--add-host openwhisk:$(shell docker inspect openwhisk | jq -r '.[0].NetworkSettings.IPAddress') \
-
-
-server:
-	docker exec -ti go-action chisel server -p 8079
-
-client:
-	chisel client http://localhost:8079 8081:127.0.0.1:8081
-
 enter:
 	docker exec -ti go-action bash
-
 
 .PHONY: build clean  debug

@@ -42,5 +42,4 @@ package.done:
 test.json:
 	echo '{ "name": "Mike" }' >test.json
 
-
 .PHONY: test devel deploy clean

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM golang:1.13.8
+FROM golang:1.13.14
 RUN echo "deb http://deb.debian.org/debian stretch-backports main contrib non-free" \
      >>/etc/apt/sources.list &&\
     apt-get update && apt-get install -y \
@@ -28,8 +28,7 @@ RUN echo "deb http://deb.debian.org/debian stretch-backports main contrib non-fr
     apt-get -y install \
      librdkafka-dev=0.11.6-1~bpo9+1 && \
     rm -rf /var/lib/apt/lists/* && \
-    go get -u github.com/go-delve/delve/cmd/dlv && \
-    go get -v github.com/jpillora/chisel
+    go get -u github.com/go-delve/delve/cmd/dlv
 RUN mkdir /action
 WORKDIR /action
 ADD proxy /bin/proxy

@@ -27,8 +27,8 @@ class ActionLoopBasicGoTests
     extends BasicActionRunnerTests
     with WskActorSystem {
 
-  val goCompiler = "action-golang-v1.11"
-  val image = goCompiler
+  lazy val goCompiler = "action-golang-v1.11"
+  lazy val image = goCompiler
 
   override def withActionContainer(env: Map[String, String] = Map.empty)(
       code: ActionContainer => Unit) = {

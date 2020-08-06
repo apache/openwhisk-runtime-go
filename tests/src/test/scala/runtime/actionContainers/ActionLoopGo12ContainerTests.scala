@@ -17,127 +17,16 @@
 
 package runtime.actionContainers
 
-//import java.util.concurrent.TimeoutException
-import actionContainers.ActionContainer.withContainer
-import actionContainers.{ActionContainer, ActionProxyContainerTestUtils}
 import common.WskActorSystem
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
-//import spray.json.JsNumber
-//import spray.json.JsBoolean
-import spray.json.{JsObject, JsString}
-
 @RunWith(classOf[JUnitRunner])
 class ActionLoopGo12ContainerTests
-    extends ActionProxyContainerTestUtils
-    with WskActorSystem {
+    extends ActionLoopGoContainerTests
+      with WskActorSystem {
 
-  import GoResourceHelpers._
+  override lazy val goCompiler = "action-golang-v1.12"
+  override lazy val image = goCompiler
 
-  val goCompiler = "action-golang-v1.12"
-  val image = goCompiler
-
-  def withActionLoopContainer(code: ActionContainer => Unit) =
-    withContainer(image)(code)
-
-  behavior of image
-
-  def helloGo(main: String, pkg: String = "main") = {
-    val func = main.capitalize
-    s"""|package ${pkg}
-        |
-        |import "fmt"
-        |
-        |func ${func}(obj map[string]interface{}) map[string]interface{} {
-        |	 name, ok := obj["name"].(string)
-        |	 if !ok {
-        |	  	name = "Stranger"
-        |	 }
-        |	 fmt.Printf("name=%s\\n", name)
-        |  msg := make(map[string]interface{})
-        |	 msg["${pkg}-${main}"] = "Hello, " + name + "!"
-        |	 return msg
-        |}
-        |""".stripMargin
-  }
-
-   def helloSrc(main: String) = Seq(
-    Seq(s"${main}.go") -> helloGo(main)
-  )
-
-  def helloMsg(name: String = "Demo") =
-    runPayload(JsObject("name" -> JsString(name)))
-
-  def okMsg(key: String, value: String) =
-    200 -> Some(JsObject(key -> JsString(value)))
-
-  it should "run sample with init that does nothing" in {
-    val (out, err) = withActionLoopContainer { c =>
-      c.init(JsObject())._1 should be(403)
-      c.run(JsObject())._1 should be(500)
-    }
-  }
-
-  it should "accept a binary main" in {
-    val exe = ExeBuilder.mkBase64Zip(goCompiler, helloSrc("main"), "main")
-
-    withActionLoopContainer { c =>
-      c.init(initPayload(exe))._1 shouldBe (200)
-      c.run(helloMsg()) should be(okMsg("main-main", "Hello, Demo!"))
-    }
-  }
-
-
-  it should "accept a src main action " in {
-    var src = ExeBuilder.mkBase64Src(helloSrc("main"))
-    withActionLoopContainer { c =>
-      c.init(initPayload(src))._1 shouldBe (200)
-      c.run(helloMsg()) should be(okMsg("main-main", "Hello, Demo!"))
-    }
-  }
-
-  it should "accept a src not-main action " in {
-    var src = ExeBuilder.mkBase64Src(helloSrc("hello"))
-    withActionLoopContainer { c =>
-      c.init(initPayload(src, "hello"))._1 shouldBe (200)
-      c.run(helloMsg()) should be(okMsg("main-hello", "Hello, Demo!"))
-    }
-  }
-
-  it should "accept a zipped src main action" in {
-    var src = ExeBuilder.mkBase64SrcZip(helloSrc("main"))
-    withActionLoopContainer { c =>
-      c.init(initPayload(src))._1 shouldBe (200)
-      c.run(helloMsg()) should be(okMsg("main-main", "Hello, Demo!"))
-    }
-  }
-
-  it should "accept a zipped src not-main action" in {
-    var src = ExeBuilder.mkBase64SrcZip(helloSrc("hello"))
-    withActionLoopContainer { c =>
-      c.init(initPayload(src, "hello"))._1 shouldBe (200)
-      c.run(helloMsg()) should be(okMsg("main-hello", "Hello, Demo!"))
-    }
-  }
-
-  it should "deploy a zip main src with subdir" in {
-    var src = ExeBuilder.mkBase64SrcZip(
-      Seq(
-        Seq("hello", "hello.go") -> helloGo("Hello", "hello"),
-        Seq("main.go") ->
-          """
-          |package main
-          |import "hello"
-          |func Main(args map[string]interface{})map[string]interface{} {
-          | return hello.Hello(args)
-          |}
-        """.stripMargin
-      )
-    )
-    withActionLoopContainer { c =>
-      c.init(initPayload(src))._1 shouldBe (200)
-      c.run(helloMsg()) should be(okMsg("hello-Hello", "Hello, Demo!"))
-    }
-  }
 }
