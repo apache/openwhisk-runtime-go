@@ -73,6 +73,8 @@ func Example_hello() {
 	N := "1"
 	sys(PREP, "hello1.src", N, "exec")
 	ap := NewActionProxy(TMP, COMP, os.Stdout, os.Stderr)
+	env := map[string]interface{}{"GOROOT": TMP + N}
+	ap.SetEnv(env)
 	ap.CompileAction("hello", TMP+N+"/src", TMP+N+"/bin")
 	sys(CHECK, TMP+N+"/bin/exec")
 	// Output:
@@ -86,6 +88,8 @@ func Example_package() {
 	N := "2"
 	sys(PREP, "hello2.src", N, "exec", "hello")
 	ap := NewActionProxy(TMP, COMP, os.Stdout, os.Stderr)
+	env := map[string]interface{}{"GOROOT": TMP + N}
+	ap.SetEnv(env)
 	ap.CompileAction("main", TMP+N+"/src", TMP+N+"/bin")
 	sys(CHECK, TMP+N+"/bin/exec")
 	// Output:

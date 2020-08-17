@@ -34,6 +34,9 @@ var debug = flag.Bool("debug", false, "enable debug output")
 // flag to require on-the-fly compilation
 var compile = flag.String("compile", "", "compile, reading in standard input the specified function, and producing the result in stdout")
 
+// flag to pass an environment as a json string
+var env = flag.String("env", "", "pass an environment as a json string")
+
 // fatal if error
 func fatalIf(err error) {
 	if err != nil {
@@ -62,7 +65,7 @@ func main() {
 
 	// compile on the fly upon request
 	if *compile != "" {
-		ap.ExtractAndCompileIO(os.Stdin, os.Stdout, *compile)
+		ap.ExtractAndCompileIO(os.Stdin, os.Stdout, *compile, *env)
 		return
 	}
 

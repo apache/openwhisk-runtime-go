@@ -27,5 +27,5 @@ class ActionLoopBasicGo14Tests
 
   override lazy val goCompiler = "action-golang-v1.14"
   override lazy val image = goCompiler
-
+  override lazy val requireAck = true
 }

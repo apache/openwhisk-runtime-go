@@ -103,6 +103,7 @@ func (ap *ActionProxy) SetEnv(env map[string]interface{}) {
 			ap.env[k] = string(buf)
 		}
 	}
+	Debug("init env: %s", ap.env)
 }
 
 // StartLatestAction tries to start
@@ -179,13 +180,19 @@ func (ap *ActionProxy) Start(port int) {
 }
 
 // ExtractAndCompileIO read in input and write in output to use the runtime as a compiler "on-the-fly"
-func (ap *ActionProxy) ExtractAndCompileIO(r io.Reader, w io.Writer, main string) {
+func (ap *ActionProxy) ExtractAndCompileIO(r io.Reader, w io.Writer, main string, env string) {
 
 	// read the std input
 	in, err := ioutil.ReadAll(r)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	envMap := make(map[string]interface{})
+	if env != "" {
+	    json.Unmarshal([]byte(env), &envMap)
+	}
+    ap.SetEnv(envMap)
 
 	// extract and compile it
 	file, err := ap.ExtractAndCompile(&in, main)

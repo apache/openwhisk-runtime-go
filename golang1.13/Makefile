@@ -35,16 +35,6 @@ debug:
 	-e OW_COMPILER=/mnt/bin/compile \
 	-v $(PWD):/mnt whisk/$(IMG)
 
-.PHONY: debugger
-debugger:
-	docker run -p 8080:8080 -p 8079:8079 \
-	--name go-action --rm -ti --entrypoint=/bin/bash \
-	-e __OW_DEBUG_AUTH=123456 \
-	-e __OW_DEBUG_PROXY=http://$(shell docker inspect openwhisk | jq -r '.[0].NetworkSettings.IPAddress'):3281 \
-	-e __OW_DEBUG_PORT=8081 \
-	-e OW_COMPILER=/mnt/bin/compile \
-	-v $(PWD):/mnt whisk/$(IMG)
-
 enter:
 	docker exec -ti go-action bash
 

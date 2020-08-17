@@ -17,7 +17,7 @@
 
 WSK?=wsk
 OW_USER?=openwhisk
-OW_RUNTIME?=$(OW_USER)/actionloop-base
+OW_RUNTIME?=$(OW_USER)/actionloop-base:nightly
 NAME=bash-hello
 PACKAGE=test
 SRC=hello.sh

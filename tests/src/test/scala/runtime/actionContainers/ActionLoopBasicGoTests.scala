@@ -29,6 +29,7 @@ class ActionLoopBasicGoTests
 
   lazy val goCompiler = "action-golang-v1.11"
   lazy val image = goCompiler
+  lazy val requireAck = false
 
   override def withActionContainer(env: Map[String, String] = Map.empty)(
       code: ActionContainer => Unit) = {
@@ -43,21 +44,22 @@ class ActionLoopBasicGoTests
   override val testNoSourceOrExec = TestConfig("")
 
   override val testNotReturningJson = TestConfig(
-    """
-      |package main
-      |import (
-      |	"bufio"
-      |	"fmt"
-      |	"os"
-      |)
-      |func main() {
-      |	reader := bufio.NewReader(os.Stdin)
-      |	out := os.NewFile(3, "pipe")
-      |	defer out.Close()
-      |	reader.ReadBytes('\n')
-      |	fmt.Fprintln(out, "\"a string but not a map\"")
-      |	reader.ReadBytes('\n')
-      |}
+    s"""
+       |package main
+       |import (
+       |	"bufio"
+       |	"fmt"
+       |	"os"
+       |)
+       |func main() {
+       |	reader := bufio.NewReader(os.Stdin)
+       |	out := os.NewFile(3, "pipe")
+       |	defer out.Close()
+       |  ${if(requireAck) "fmt.Fprintf(out, `{ \"ok\": true}%s`, \"\\n\")" else ""}
+       |	reader.ReadBytes('\\n')
+       |	fmt.Fprintln(out, \"a string but not a map\")
+       |	reader.ReadBytes('\\n')
+       |}
     """.stripMargin)
 
   override val testEcho = TestConfig(
