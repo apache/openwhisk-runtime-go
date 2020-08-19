@@ -22,7 +22,7 @@
 
 ## How to write Go Actions
 
-The `action-golang-v1.11` runtime can execute actions written in the Go programming language in OpenWhisk, either precompiled binary or compiling sources on the fly.
+The `action-golang-v1.14` runtime can execute actions written in the Go programming language in OpenWhisk, either precompiled binary or compiling sources on the fly.
 
 ### Entry Point
 
@@ -78,7 +78,6 @@ The `actionloop` runtime can execute  generic Linux executable in an efficient w
 The protocol can be specified informally as follows.
 
 - Send an acknowledgement after initialization when required. If the environment variable `__OW_WAIT_FOR_ACK` is not empty, write on file descriptor 3 the string `{ "ok": true }`.
-
 - Read one line from standard input (file descriptor 0).
 - Parse the line as a JSON object. Currently the object will be in currently in the format:
 
@@ -146,4 +145,4 @@ If you send a zip file, you have to provide your implementation in a file called
 
 If you provide your own `main.main()`, the default `main` will not be generated.
 
-An example named `golang-main-standalone` is provided.
+An example named `standalone` is provided.

@@ -16,13 +16,13 @@
 #
 
 OW_USER?=openwhisk
-OW_RUNTIME?=$(OW_USER)/actionloop-base
-OW_COMPILER?=$(OW_USER)/action-golang-v1.11
+OW_RUNTIME?=$(OW_USER)/action-golang-v1.14:nightly
+OW_COMPILER?=$(OW_USER)/action-golang-v1.14:nightly
 WSK?=wsk
-MAIN=hello
+MAIN=main
 PACKAGE=test
-SRC=$(MAIN).go
-NAME=golang-$(MAIN)-single
+SRC=exec.go
+NAME=standalone
 ZIP=$(MAIN).zip
 
 deploy: package.done $(ZIP)
@@ -36,7 +36,8 @@ $(ZIP): $(SRC)
 
 clean:
 	-$(WSK) action delete $(PACKAGE)/$(NAME)
-	-rm $(ZIP) package.done test.json 2>/dev/null
+	-rm $(ZIP) package.done test.json
+	-rm test.out
 
 test: test.json
 	$(WSK) action invoke test/$(NAME) -r
@@ -49,4 +50,4 @@ package.done:
 	$(WSK) package update $(PACKAGE)
 	touch package.done
 
-.PHONY: deploy devel test clean
+.PHONY: deploy test clean

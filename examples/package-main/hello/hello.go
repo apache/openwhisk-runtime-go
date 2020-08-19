@@ -14,28 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package hello
 
 import (
-	"encoding/json"
-	"testing"
+	"fmt"
 )
 
-func TestHello(t *testing.T) {
-	var input = make(map[string]interface{})
-	input["name"] = "Mike"
-	output := Hello(input)
-	json, _ := json.Marshal(output)
-	if string(json) != `{"golang-hello-vendor":"Hello, Mike"}` {
-		t.Fail()
+// Hello receive an event in format
+// { "name": "Mike"}
+// and returns a greeting in format
+// { "greetings": "Hello, Mike"}
+func Hello(args map[string]interface{}) map[string]interface{} {
+	res := make(map[string]interface{})
+	greetings := "world"
+	name, ok := args["name"].(string)
+	if ok {
+		greetings = name
 	}
-}
-
-func TestHello_noName(t *testing.T) {
-	var input = make(map[string]interface{})
-	output := Hello(input)
-	json, _ := json.Marshal(output)
-	if string(json) != `{"golang-hello-vendor":"Hello, world"}` {
-		t.Fail()
-	}
+	res["package-main"] = "Hello, " + greetings
+	fmt.Printf("Hello, %s\n", greetings)
+	return res
 }

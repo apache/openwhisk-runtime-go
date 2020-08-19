@@ -22,29 +22,24 @@
 This is a collection of examples.
 Tested on:
 
-- dep version 0.5.0 (check the version `dep version`)
-- Go version 1.11.1
+- Go version 1.14.6
 - GNU Make 3.81
-- Linux Ubuntu 14.04
-- Mac OSX 10.13
-- Windows, with Git Bash, Docker for Windows, make from ezwinports, zip.exe
+- Linux Ubuntu 18.04
+- Mac OSX 10.15.6
+- Windows 10 with WSL 2
 
 Each examples has a  Makefile with 4 targets:
 
 - `make deploy` (or just make) deploys the action, precompiling it
 - `make devel`  deploys the action in source format, leaving the compilation to the runtime
--  `make test` runs a simple test on the action; it should be already deployed
+- `make test` runs a simple test on the action; it should be already deployed
 - `clean` removes intermediate files
 
 Available examples:
 
-- [Simple Golang action](golang-main-single) main is `main.Main`
-- [Simple Golang action](golang-hello-single) main is `main.Hello`
-- [Golang action with a subpackage](golang-main-package) main is `main.Main` invoking a `hello.Hello`
-- [Golang action with a vendor folder](golang-main-vendor) main is `main.Main` using a dependency `github.com/rs/zerolog`
-- [Golang action with a subpackage and vendor folder](golang-hello-vendor) main is `main.Hello` invoking a `hello.Hello` using a dependency `github.com/sirupsen/logrus`
-- [Standalone Golang Action](golang-main-standalone) main is `main.main`, implements the ActionLoop directly
-- [Simple Bash action](bash-hello) a simple bash script action implementing the ActionLoop directly
-
-
-
+- [Simple Golang action](single-main) main is `main.Main`
+- [Simple Golang action](single-hello) main is `main.Hello`
+- [Golang action with a package](package-main) main is `main.Main` invoking a `hello.Hello` and a test
+- [Golang action with a module](module-main) main is `main.Main` using a dependency `github.com/rs/zerolog`
+- [Standalone Golang Action](standalone) implements the ActionLoop directly in go
+- [Simple Bash action](bash) action implementing the ActionLoop directly 

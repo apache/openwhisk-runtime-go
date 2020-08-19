@@ -15,10 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+# NOTE by default actionloop classic does not use an ack
+# if enabled with OW_REQUIRES_ACK you need
+# echo '{"ok": true}'
 while read line
 do
    name="$(echo $line | jq -r .value.name)"
    test "$name" == "null" && name="world"
    echo msg="hello $name"
-   echo '{"bash": "'$name'"}' >&3
+   echo '{"bash": "Hello, '$name'"}' >&3
 done

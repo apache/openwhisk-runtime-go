@@ -14,16 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package main
+package hello
 
 import (
+	"encoding/json"
 	"fmt"
-	"hello"
 )
 
-// Main forwading to Hello
-func Hello(args map[string]interface{}) map[string]interface{} {
-	fmt.Println("Entering Hello")
-	return hello.Hello(args)
+func ExampleHello() {
+	var input = make(map[string]interface{})
+	input["name"] = "Mike"
+	output := Hello(input)
+	json, _ := json.Marshal(output)
+	fmt.Printf("%s", json)
+	// Output:
+	// Hello, Mike
+	// {"package-main":"Hello, Mike"}
+}
+
+func ExampleHello_noName() {
+	var input = make(map[string]interface{})
+	output := Hello(input)
+	json, _ := json.Marshal(output)
+	fmt.Printf("%s", json)
+	// Output:
+	// Hello, world
+	// {"golang-main-package":"Hello, world"}
 }

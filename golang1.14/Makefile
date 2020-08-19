@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-IMG=action-golang-v1.14:latest
+IMG=action-golang-v1.14
 
 build:
 	GOOS=linux GOARCH=amd64 go build -o proxy -a  -ldflags '-extldflags "-static"' ../main/proxy.go
@@ -23,41 +23,19 @@ build:
 
 push: build
 	docker tag $(IMG) actionloop/$(IMG)
-	docker push actionloop/$(IMG)
+	docker push actionloop/$(IMG):nightly
 
 clean:
 	docker rmi -f whisk/$(IMG) actionloop/$(IMG)
 
-.PHONY: debug
 debug:
-	docker run -p 8080:8080 -p 8079:8079 \
+	docker run -p 8080:8080 \
 	--name go-action --rm -ti --entrypoint=/bin/bash \
 	-e OW_COMPILER=/mnt/bin/compile \
-	-v $(PWD):/mnt whisk/$(IMG)
-
-.PHONY: debugger
-debugger:
-	docker run -p 8080:8080 -p 8079:8079 \
-	--name go-action --rm -ti --entrypoint=/bin/bash \
-	-e __OW_DEBUG_AUTH=123456 \
-	-e __OW_DEBUG_PROXY=http://$(shell docker inspect openwhisk | jq -r '.[0].NetworkSettings.IPAddress'):3281 \
-	-e __OW_DEBUG_PORT=8081 \
-	-e OW_COMPILER=/mnt/bin/compile \
-	-v $(PWD):/mnt whisk/$(IMG)
-
-
-
-	--add-host openwhisk:$(shell docker inspect openwhisk | jq -r '.[0].NetworkSettings.IPAddress') \
-
-
-server:
-	docker exec -ti go-action chisel server -p 8079
-
-client:
-	chisel client http://localhost:8079 8081:127.0.0.1:8081
+	-v $(PWD):/mnt $(IMG)
 
 enter:
 	docker exec -ti go-action bash
 
 
-.PHONY: build clean  debug
+.PHONY: build push clean debug enter

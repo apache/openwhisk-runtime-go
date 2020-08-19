@@ -56,6 +56,10 @@ func main() {
 	if debug {
 		log.Println("started")
 	}
+	// send ack
+	// note that it depends on the runtime,
+	// go 1.13+ requires an ack, past versions does not
+	fmt.Fprintf(out, `{ "ok": true}%s`, "\n")
 	for {
 		// read one line
 		inbuf, err := reader.ReadBytes('\n')
@@ -119,6 +123,6 @@ func Main(obj map[string]interface{}) map[string]interface{} {
 	}
 	fmt.Printf("name=%s\n", name)
 	msg := make(map[string]interface{})
-	msg["main-standalone"] = "Hello, " + name + "!"
+	msg["standalone"] = "Hello, " + name + "!"
 	return msg
 }

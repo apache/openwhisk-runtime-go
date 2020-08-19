@@ -16,37 +16,45 @@
 #
 
 # prefix
-IMAGES?=openwhisk
+OW_USER?=openwhisk
 
 all: .PHONY
 
-.PHONY: bash-hello golang-hello-single golang-main-single golang-main-standalone golang-main-package golang-main-vendor golang-hello-vendor
+.PHONY: bash
+bash:
+	cd $@ && OW_USER=$(OW_USER) make clean deploy test
 
-bash-hello:
-	cd $@ && OW_USER=$(IMAGES) make clean deploy test
+.PHONY: standalone
+standalone:
+	cd $@ && OW_USER=$(OW_USER) make clean devel test
+	cd $@ && OW_USER=$(OW_USER) make clean deploy test
 
-golang-main-single:
-	cd $@ && OW_USER=$(IMAGES) make clean devel test
-	cd $@ && OW_USER=$(IMAGES) make clean deploy test
+.PHONY: single-main
+single-main:
+	cd $@ && OW_USER=$(OW_USER) make clean devel test
+	cd $@ && OW_USER=$(OW_USER) make clean deploy test
 
-golang-hello-single:
-	cd $@ && OW_USER=$(IMAGES) make clean devel test
-	cd $@ && OW_USER=$(IMAGES) make clean deploy test
+.PHONY: single-hello
+single-hello:
+	cd $@ && OW_USER=$(OW_USER) make clean devel test
+	cd $@ && OW_USER=$(OW_USER) make clean deploy test
 
-golang-main-standalone:
-	cd $@ && OW_USER=$(IMAGES) make clean devel test
-	cd $@ && OW_USER=$(IMAGES) make clean deploy test
+.PHONY: package-main
+package-main:
+	cd $@ && OW_USER=$(OW_USER) make clean devel test
+	cd $@ && OW_USER=$(OW_USER) make clean deploy test
 
-golang-main-package:
-	cd $@ && OW_USER=$(IMAGES) make clean devel test
-	cd $@ && OW_USER=$(IMAGES) make clean deploy test
+.PHONY: module-main
+module-main:
+	cd $@ && OW_USER=$(OW_USER) make clean devel test
+	cd $@ && OW_USER=$(OW_USER) make clean deploy test
 
-golang-main-vendor:
-	cd $@ && OW_USER=$(IMAGES) make clean devel test
-	cd $@ && OW_USER=$(IMAGES) make clean deploy test
-
-golang-hello-vendor:
-	cd $@ && OW_USER=$(IMAGES) make clean devel test
-	cd $@ && OW_USER=$(IMAGES) make clean deploy test
+.PHONY: module-hello
+module-hello:
+	cd $@ && OW_USER=$(OW_USER) make clean devel test
+	cd $@ && OW_USER=$(OW_USER) make clean deploy test
 
 
+test: .PHONY
+	cat */test.out | grep 'Hello' | sort >test.out
+	diff test.out test.expected

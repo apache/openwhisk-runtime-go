@@ -16,14 +16,13 @@
 #
 
 OW_USER?=openwhisk
-OW_RUNTIME?=$(OW_USER)/actionloop-base
-OW_COMPILER?=$(OW_USER)/action-golang-v1.11
+OW_RUNTIME?=$(OW_USER)/action-golang-v1.14:nightly
+OW_COMPILER?=$(OW_USER)/action-golang-v1.14:nightly
 WSK?=wsk
 MAIN=main
 PACKAGE=test
-SRCS=src/$(MAIN)/$(MAIN).go
-VENDORS=src/$(MAIN)/vendor
-NAME=golang-$(MAIN)-vendor
+SRCS=$(MAIN).go go.mod hello/hello.go hello/go.mod
+NAME=package-main
 BINZIP=$(MAIN)-bin.zip
 SRCZIP=$(MAIN)-src.zip
 
@@ -33,25 +32,20 @@ deploy: package.done $(BINZIP)
 devel: package.done $(SRCZIP)
 	$(WSK) action update $(PACKAGE)/$(NAME) $(SRCZIP) --main $(MAIN) --docker $(OW_COMPILER)
 
-src/%/vendor:
-	cd $(@D) ; DEPPROJECTROOT=$(realpath $(@D)/../..) dep ensure
+$(BINZIP): $(SRCS)
+	zip - -qr $(SRCS) | docker run -i $(OW_COMPILER) -compile $(MAIN) >$(BINZIP)
 
-$(BINZIP): $(SRCS) $(VENDORS) $(SRCZIP)
-	docker run -i $(OW_COMPILER) -compile $(MAIN) <$(SRCZIP) >$(BINZIP)
-
-$(SRCZIP): $(SRCS) $(VENDORS)
-	cd src ; zip ../$(SRCZIP) -qr *
+$(SRCZIP): $(SRCS)
+	zip $@ -r $^
 
 clean:
 	-$(WSK) action delete $(PACKAGE)/$(NAME)
-	-rm $(BINZIP) $(SRCZIP) package.done test.json
-
-clean_vendor:
-	-rm -r $(VENDORS)
+	-rm $(BINZIP) $(SRCZIP) package.done test.json 2>/dev/null
+	-rm test.out
 
 test: test.json
-	$(WSK) action invoke test/$(NAME) -r
-	$(WSK) action invoke test/$(NAME) -P test.json -r
+	$(WSK) action invoke test/$(NAME) -r | tee -a test.out
+	$(WSK) action invoke test/$(NAME) -P test.json -r | tee -a test.out
 
 test.json:
 	echo '{ "name": "Mike" }' >test.json

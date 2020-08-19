@@ -16,7 +16,14 @@
  */
 package main
 
-import "fmt"
+import (
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+)
+
+func init() {
+	zerolog.TimeFieldFormat = ""
+}
 
 // Main function for the action
 func Main(obj map[string]interface{}) map[string]interface{} {
@@ -24,8 +31,8 @@ func Main(obj map[string]interface{}) map[string]interface{} {
 	if !ok {
 		name = "world"
 	}
-	fmt.Printf("name=%s\n", name)
+	log.Debug().Str("name", name).Msg("Hello")
 	msg := make(map[string]interface{})
-	msg["golang-main-single"] = "Hello, " + name + "!"
+	msg["module-main"] = "Hello, " + name + "!"
 	return msg
 }

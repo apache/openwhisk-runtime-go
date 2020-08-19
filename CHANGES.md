@@ -16,7 +16,10 @@
 # limitations under the License.
 #
 -->
-# 1.16.0 (next release)
+# 1.16.0
+- removed build for go1.11 and go1.12
+- updated examples
+- added go 1.13 and 1.14 with Go modules
 - upgraded to go 1.12.17
 - add 'apt-get upgrade' to the image build to get latest security fixes during each build, for the case the base images are not updated frequently
 - added OW_WAIT_FOR_ACK such at if true, the proxy waits for an acknowledgement from the action on startup

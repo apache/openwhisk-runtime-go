@@ -14,11 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
 WSK?=wsk
 OW_USER?=openwhisk
 OW_RUNTIME?=$(OW_USER)/actionloop-base:nightly
-NAME=bash-hello
+NAME=bash
 PACKAGE=test
 SRC=hello.sh
 
@@ -28,12 +27,13 @@ deploy: package.done
 devel: deploy
 
 test: test.json
-	$(WSK) action invoke $(PACKAGE)/$(NAME) -r
-	$(WSK) action invoke $(PACKAGE)/$(NAME) -P test.json -r
+	$(WSK) action invoke $(PACKAGE)/$(NAME) -r | tee -a test.out
+	$(WSK) action invoke $(PACKAGE)/$(NAME) -P test.json -r | tee -a test.out
 
 clean:
 	-$(WSK) action delete $(PACKAGE)/$(NAME)
 	-rm package.done test.json
+	-rm test.out
 
 package.done:
 	$(WSK) package update $(PACKAGE)
