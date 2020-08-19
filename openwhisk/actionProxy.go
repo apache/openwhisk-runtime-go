@@ -33,7 +33,7 @@ import (
 type ActionProxy struct {
 
 	// is it initialized?
-	initialized bool
+	Initialized bool
 
 	// current directory
 	baseDir string
