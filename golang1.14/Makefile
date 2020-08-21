@@ -17,9 +17,10 @@
 IMG=action-golang-v1.14
 
 build:
-	GOOS=linux GOARCH=amd64 go build -o proxy -a  -ldflags '-extldflags "-static"' ../main/proxy.go
-	docker build -t $(IMG) .
-	docker tag $(IMG) whisk/$(IMG)
+	#GOOS=linux GOARCH=amd64 go build -o proxy -a  -ldflags '-extldflags "-static"' ../main/proxy.go
+	#docker build -t $(IMG) .
+	#docker tag $(IMG) whisk/$(IMG)
+	../gradlew distDocker
 
 push: build
 	docker tag $(IMG) actionloop/$(IMG)
@@ -28,11 +29,11 @@ push: build
 clean:
 	docker rmi -f whisk/$(IMG) actionloop/$(IMG)
 
-debug:
+debug: build
 	docker run -p 8080:8080 \
 	--name go-action --rm -ti --entrypoint=/bin/bash \
 	-e OW_COMPILER=/mnt/bin/compile \
-	-v $(PWD):/mnt $(IMG)
+	-v $(PWD):/mnt whisk/$(IMG)
 
 enter:
 	docker exec -ti go-action bash

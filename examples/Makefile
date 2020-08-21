@@ -18,6 +18,10 @@
 # prefix
 OW_USER?=openwhisk
 
+test: .PHONY
+	cat */test.out | grep 'Hello' | sort >test.out
+	diff test.out test.expected
+
 all: .PHONY
 
 .PHONY: bash
@@ -46,15 +50,7 @@ package-main:
 
 .PHONY: module-main
 module-main:
-	cd $@ && OW_USER=$(OW_USER) make clean devel test
+	# this exceeds 3 seconds for initializiation
+	#cd $@ && OW_USER=$(OW_USER) make clean devel test
 	cd $@ && OW_USER=$(OW_USER) make clean deploy test
 
-.PHONY: module-hello
-module-hello:
-	cd $@ && OW_USER=$(OW_USER) make clean devel test
-	cd $@ && OW_USER=$(OW_USER) make clean deploy test
-
-
-test: .PHONY
-	cat */test.out | grep 'Hello' | sort >test.out
-	diff test.out test.expected

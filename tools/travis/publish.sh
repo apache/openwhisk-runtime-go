@@ -28,10 +28,8 @@ if [[ ! -z ${DOCKER_USER} ]] && [[ ! -z ${DOCKER_PASSWORD} ]]; then
 docker login -u "${DOCKER_USER}" -p "${DOCKER_PASSWORD}"
 fi
 
-if [ ${RUNTIME_VERSION} == "1.11" ]; then
-  RUNTIME="golang1.11"
-elif [ ${RUNTIME_VERSION} == "1.12" ]; then
-  RUNTIME="golang1.12"
+if [[ ${RUNTIME_VERSION} =~ 1\.[0-9]+ ]]; then
+  RUNTIME="golang$RUNTIME_VERSION"
 elif [ ${RUNTIME_VERSION} == "actionloop" ]; then
   RUNTIME="actionloop"
 fi

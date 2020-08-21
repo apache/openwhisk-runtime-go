@@ -18,8 +18,8 @@
 include 'tests'
 
 include 'actionloop'
-include 'golang1.11'
-include 'golang1.12'
+//include 'golang1.11'
+//include 'golang1.12'
 include 'golang1.13'
 include 'golang1.14'
 

@@ -26,6 +26,6 @@ func Hello(obj map[string]interface{}) map[string]interface{} {
 	}
 	fmt.Printf("name=%s\n", name)
 	msg := make(map[string]interface{})
-	msg["golang-hello-single"] = "Hello, " + name + "!"
+	msg["single-hello"] = "Hello, " + name + "!"
 	return msg
 }

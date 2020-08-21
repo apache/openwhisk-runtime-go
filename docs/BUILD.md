@@ -43,10 +43,11 @@ To build the docker images, after compiling go proxy:
 
 This will build the images:
 
-* `action-golang-v1.11`: an image supporting  Go sources
-* `actionloop`: the base image, supporting generic executables ans shell script
+* `action-golang-v1.13`: an image supporting Go 1.13 sources (does expect an ack)
+* `action-golang-v1.14`: an image supporting Go 1.14 sources (does expect an ack)
+* `actionloop-base`: the base image, supporting generic executables ans shell script (does not expect an ack)
 
-The `actionloop` image can be used for supporting other compiled programming languages as long as they implement a `compile` script and the *action loop* protocol described below.
+The `actionloop-base` image can be used for supporting other compiled programming languages as long as they implement a `compile` script and the *action loop* protocol described below. Please check [this documens](ENVVARS.md) for configuration options
 
 To run tests:
 
@@ -59,7 +60,7 @@ To run tests:
 
 If you want to develop the proxy and run tests natively, you can do it on Linux or OSX. Development has been tested on Ubuntu Linux (14.04) and OSX 10.13. Probably other distributions work, maybe even Windows with WSL, but since it is not tested YMMMV.
 
-You need to install, of course [go 1.11.0](https://golang.org/doc/install)
+You need to install, of course [go 1.14.x](https://golang.org/doc/install)
 
 Then you need a set of utilities used in tests:
 
