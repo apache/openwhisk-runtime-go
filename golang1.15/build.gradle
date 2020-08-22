@@ -15,27 +15,24 @@
  * limitations under the License.
  */
 
-include 'tests'
+ext.dockerImageName = 'action-golang-v1.15'
+apply from: '../gradle/docker.gradle'
 
-include 'actionloop'
-//include 'golang1.11'
-//include 'golang1.12'
-include 'golang1.13'
-include 'golang1.14'
-include 'golang1.15'
+distDocker.dependsOn 'staticBuildProxy'
+distDocker.finalizedBy('cleanup')
 
-rootProject.name = 'runtime-golang'
+task staticBuildProxy(type: Exec) {
+	environment CGO_ENABLED: "0"
+	environment GOOS: "linux"
+	environment GOARCH: "amd64"
+    environment GO111MODULE: "on"
 
-gradle.ext.openwhisk = [
-        version: '1.0.0-SNAPSHOT'
-]
+	commandLine 'go', 'build',
+		'-o',  'proxy', '-a',
+		'-ldflags', '-extldflags "-static"',
+		'../main/proxy.go'
+}
 
-gradle.ext.scala = [
-    version: '2.12.7',
-    compileFlags: ['-feature', '-unchecked', '-deprecation', '-Xfatal-warnings', '-Ywarn-unused-import']
-]
-
-gradle.ext.scalafmt = [
-    version: '1.5.0',
-    config: new File(rootProject.projectDir, '.scalafmt.conf')
-]
+task cleanup(type: Delete) {
+    delete 'proxy'
+}

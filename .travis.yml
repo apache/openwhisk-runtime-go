@@ -45,7 +45,7 @@ deploy:
       repo: apache/openwhisk-runtime-go
   - provider: script
     skip_cleanup: true
-    script: "./tools/travis/publish.sh openwhisk 1.13 nightly && ./tools/travis/publish.sh openwhisk 1.14 nightly"
+    script: "./tools/travis/publish.sh openwhisk 1.13 nightly && ./tools/travis/publish.sh openwhisk 1.14 nightly && ./tools/travis/publish.sh openwhisk 1.15 nightly"
     on:
       branch: master
       repo: apache/openwhisk-runtime-go
