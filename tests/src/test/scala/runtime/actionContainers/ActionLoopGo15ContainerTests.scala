@@ -15,27 +15,19 @@
  * limitations under the License.
  */
 
-include 'tests'
+package runtime.actionContainers
 
-include 'actionloop'
-include 'golang1.11'
-include 'golang1.12'
-include 'golang1.13'
-include 'golang1.14'
-include 'golang1.15'
+import common.WskActorSystem
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
-rootProject.name = 'runtime-golang'
 
-gradle.ext.openwhisk = [
-        version: '1.0.0-SNAPSHOT'
-]
+@RunWith(classOf[JUnitRunner])
+class ActionLoopGo15ContainerTests
+    extends ActionLoopGoContainerTests
+      with WskActorSystem {
 
-gradle.ext.scala = [
-    version: '2.12.7',
-    compileFlags: ['-feature', '-unchecked', '-deprecation', '-Xfatal-warnings', '-Ywarn-unused-import']
-]
+  override lazy val goCompiler = "action-golang-v1.15"
+  override lazy val image = goCompiler
 
-gradle.ext.scalafmt = [
-    version: '1.5.0',
-    config: new File(rootProject.projectDir, '.scalafmt.conf')
-]
+}
