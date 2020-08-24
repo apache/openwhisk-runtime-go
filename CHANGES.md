@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 -->
-# 1.16.0
+# 1.16.0 (next release)
 - removed build for go1.11 and go1.12
 - updated examples
 - added go 1.13 and 1.14 with Go modules
