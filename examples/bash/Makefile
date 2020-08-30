@@ -14,22 +14,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM golang:1.11.13
-RUN echo "deb http://deb.debian.org/debian buster-backports main contrib non-free" >>/etc/apt/sources.list \
-    && apt-get update \
-    && apt-get -y --no-install-recommends upgrade \
-    && apt-get -y --no-install-recommends install \
-                        curl jq git \
-                        librdkafka1=0.11.6-1.1 \
-                        librdkafka++1=0.11.6-1.1 \
-                        librdkafka-dev=0.11.6-1.1 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && mkdir /action
+WSK?=wsk
+OW_USER?=openwhisk
+OW_RUNTIME?=$(OW_USER)/actionloop-base:nightly
+NAME=bash
+PACKAGE=test
+SRC=hello.sh
 
-WORKDIR /action
-ADD proxy /bin/proxy
-ADD gobuild.py /bin/compile
-ADD gobuild.py.launcher.go /bin/compile.launcher.go
-ENV OW_COMPILER=/bin/compile
-ENTRYPOINT [ "/bin/proxy" ]
+deploy: package.done
+	$(WSK) action update $(PACKAGE)/$(NAME) $(SRC) --docker $(OW_RUNTIME)
+
+devel: deploy
+
+test: test.json
+	$(WSK) action invoke $(PACKAGE)/$(NAME) -r | tee -a test.out
+	$(WSK) action invoke $(PACKAGE)/$(NAME) -P test.json -r | tee -a test.out
+
+clean:
+	-$(WSK) action delete $(PACKAGE)/$(NAME)
+	-rm package.done test.json
+	-rm test.out
+
+package.done:
+	$(WSK) package update $(PACKAGE)
+	touch package.done
+
+test.json:
+	echo '{ "name": "Mike" }' >test.json
+
+.PHONY: test devel deploy clean

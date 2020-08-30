@@ -14,22 +14,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM golang:1.11.13
-RUN echo "deb http://deb.debian.org/debian buster-backports main contrib non-free" >>/etc/apt/sources.list \
-    && apt-get update \
-    && apt-get -y --no-install-recommends upgrade \
-    && apt-get -y --no-install-recommends install \
-                        curl jq git \
-                        librdkafka1=0.11.6-1.1 \
-                        librdkafka++1=0.11.6-1.1 \
-                        librdkafka-dev=0.11.6-1.1 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && mkdir /action
+IMG=action-golang-v1.15
 
-WORKDIR /action
-ADD proxy /bin/proxy
-ADD gobuild.py /bin/compile
-ADD gobuild.py.launcher.go /bin/compile.launcher.go
-ENV OW_COMPILER=/bin/compile
-ENTRYPOINT [ "/bin/proxy" ]
+build:
+	../gradlew distDocker
+
+localbuild:
+	GOOS=linux GOARCH=amd64 go build -o proxy -a  -ldflags '-extldflags "-static"' ../main/proxy.go
+	docker build -t $(IMG) .
+	docker tag $(IMG) whisk/$(IMG)
+
+push: build
+	docker tag $(IMG) actionloop/$(IMG)
+	docker push actionloop/$(IMG):nightly
+
+clean:
+	docker rmi -f whisk/$(IMG) actionloop/$(IMG)
+
+debug: build
+	docker run -p 8080:8080 \
+	--name go-action --rm -ti --entrypoint=/bin/bash \
+	-e OW_COMPILER=/mnt/bin/compile \
+	-v $(PWD):/mnt whisk/$(IMG)
+
+enter:
+	docker exec -ti go-action bash
+
+
+.PHONY: build push clean debug enter

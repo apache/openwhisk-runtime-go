@@ -15,18 +15,24 @@
  * limitations under the License.
  */
 
-package runtime.actionContainers
+package hello
 
-import common.WskActorSystem
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+import (
+	"fmt"
+)
 
-@RunWith(classOf[JUnitRunner])
-class ActionLoopGo12ContainerTests
-    extends ActionLoopGoContainerTests
-      with WskActorSystem {
-
-  override lazy val goCompiler = "action-golang-v1.12"
-  override lazy val image = goCompiler
-
+// Hello receive an event in format
+// { "name": "Mike"}
+// and returns a greeting in format
+// { "greetings": "Hello, Mike"}
+func Hello(args map[string]interface{}) map[string]interface{} {
+	res := make(map[string]interface{})
+	greetings := "world"
+	name, ok := args["name"].(string)
+	if ok {
+		greetings = name
+	}
+	res["package-main"] = "Hello, " + greetings
+	fmt.Printf("Hello, %s\n", greetings)
+	return res
 }

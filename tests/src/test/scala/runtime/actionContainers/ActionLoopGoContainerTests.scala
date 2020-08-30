@@ -17,15 +17,12 @@
 
 package runtime.actionContainers
 
-//import java.util.concurrent.TimeoutException
 import actionContainers.{ActionContainer, ActionProxyContainerTestUtils}
 import actionContainers.ActionContainer.withContainer
 import common.WskActorSystem
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
-//import spray.json.JsNumber
-//import spray.json.JsBoolean
 import spray.json.{JsObject, JsString}
 
 @RunWith(classOf[JUnitRunner])
@@ -35,8 +32,8 @@ class ActionLoopGoContainerTests
 
   import GoResourceHelpers._
 
-  val goCompiler = "action-golang-v1.11"
-  val image = goCompiler
+  lazy val goCompiler = "action-golang-v1.11"
+  lazy val image = goCompiler
 
   def withActionLoopContainer(code: ActionContainer => Unit) =
     withContainer(image)(code)
@@ -125,6 +122,7 @@ class ActionLoopGoContainerTests
     var src = ExeBuilder.mkBase64SrcZip(
       Seq(
         Seq("hello", "hello.go") -> helloGo("Hello", "hello"),
+        Seq("hello", "go.mod") -> "module hello\n",
         Seq("main.go") ->
           """
           |package main
@@ -132,7 +130,8 @@ class ActionLoopGoContainerTests
           |func Main(args map[string]interface{})map[string]interface{} {
           | return hello.Hello(args)
           |}
-        """.stripMargin
+        """.stripMargin,
+        Seq("go.mod") -> "module action\nreplace hello => ./hello\nrequire hello v0.0.0-00010101000000-000000000000\n"
       )
     )
     withActionLoopContainer { c =>

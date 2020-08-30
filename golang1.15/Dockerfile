@@ -14,22 +14,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM golang:1.11.13
-RUN echo "deb http://deb.debian.org/debian buster-backports main contrib non-free" >>/etc/apt/sources.list \
-    && apt-get update \
-    && apt-get -y --no-install-recommends upgrade \
-    && apt-get -y --no-install-recommends install \
-                        curl jq git \
-                        librdkafka1=0.11.6-1.1 \
-                        librdkafka++1=0.11.6-1.1 \
-                        librdkafka-dev=0.11.6-1.1 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && mkdir /action
-
+FROM golang:1.15.0
+RUN echo "deb http://deb.debian.org/debian buster-backports main contrib non-free" \
+     >>/etc/apt/sources.list &&\
+    echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections &&\
+    apt-get update && apt-get install -y apt-utils
+RUN apt-get install -y \
+     curl \
+     jq \
+     git \
+     vim &&\
+    apt-get -y install \
+     librdkafka1=0.11.6-1.1 \
+     librdkafka++1=0.11.6-1.1 && \
+    apt-get -y install \
+     librdkafka-dev=0.11.6-1.1 && \
+    rm -rf /var/lib/apt/lists/* && \
+    go get -u github.com/go-delve/delve/cmd/dlv
+RUN mkdir /action
 WORKDIR /action
 ADD proxy /bin/proxy
-ADD gobuild.py /bin/compile
-ADD gobuild.py.launcher.go /bin/compile.launcher.go
+ADD bin/compile /bin/compile
+ADD lib/launcher.go /lib/launcher.go
 ENV OW_COMPILER=/bin/compile
+ENV OW_LOG_INIT_ERROR=1
+ENV OW_WAIT_FOR_ACK=1
+ENV OW_EXECUTION_ENV=openwhisk/action-golang-v1.15
 ENTRYPOINT [ "/bin/proxy" ]

@@ -14,19 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package main
 
-package runtime.actionContainers
+import "fmt"
 
-import common.WskActorSystem
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
-
-@RunWith(classOf[JUnitRunner])
-class ActionLoopGo12ContainerTests
-    extends ActionLoopGoContainerTests
-      with WskActorSystem {
-
-  override lazy val goCompiler = "action-golang-v1.12"
-  override lazy val image = goCompiler
-
+// Main function for the action
+func Main(obj map[string]interface{}) map[string]interface{} {
+	name, ok := obj["name"].(string)
+	if !ok {
+		name = "world"
+	}
+	fmt.Printf("name=%s\n", name)
+	msg := make(map[string]interface{})
+	msg["single-main"] = "Hello, " + name + "!"
+	return msg
 }

@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -14,22 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM golang:1.11.13
-RUN echo "deb http://deb.debian.org/debian buster-backports main contrib non-free" >>/etc/apt/sources.list \
-    && apt-get update \
-    && apt-get -y --no-install-recommends upgrade \
-    && apt-get -y --no-install-recommends install \
-                        curl jq git \
-                        librdkafka1=0.11.6-1.1 \
-                        librdkafka++1=0.11.6-1.1 \
-                        librdkafka-dev=0.11.6-1.1 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && mkdir /action
-
-WORKDIR /action
-ADD proxy /bin/proxy
-ADD gobuild.py /bin/compile
-ADD gobuild.py.launcher.go /bin/compile.launcher.go
-ENV OW_COMPILER=/bin/compile
-ENTRYPOINT [ "/bin/proxy" ]
+# NOTE by default actionloop classic does not use an ack
+# if enabled with OW_REQUIRES_ACK you need
+# echo '{"ok": true}'
+while read line
+do
+   name="$(echo $line | jq -r .value.name)"
+   test "$name" == "null" && name="world"
+   echo msg="hello $name"
+   echo '{"bash": "Hello, '$name'"}' >&3
+done

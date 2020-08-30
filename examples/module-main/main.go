@@ -14,19 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package main
 
-package runtime.actionContainers
+import (
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+)
 
-import common.WskActorSystem
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+func init() {
+	zerolog.TimeFieldFormat = ""
+}
 
-@RunWith(classOf[JUnitRunner])
-class ActionLoopGo12ContainerTests
-    extends ActionLoopGoContainerTests
-      with WskActorSystem {
-
-  override lazy val goCompiler = "action-golang-v1.12"
-  override lazy val image = goCompiler
-
+// Main function for the action
+func Main(obj map[string]interface{}) map[string]interface{} {
+	name, ok := obj["name"].(string)
+	if !ok {
+		name = "world"
+	}
+	log.Debug().Str("name", name).Msg("Hello")
+	msg := make(map[string]interface{})
+	msg["module-main"] = "Hello, " + name + "!"
+	return msg
 }

@@ -92,7 +92,7 @@ func Example_compile_bin() {
 	dat, _ := Zip("_test/pysample")
 	inp := bytes.NewBuffer(dat)
 	out := new(bytes.Buffer)
-	ap.ExtractAndCompileIO(inp, out, "main")
+	ap.ExtractAndCompileIO(inp, out, "main", "")
 	Unzip(out.Bytes(), "./action/c1/out")
 	sys("_test/find.sh", "./action/c1/out")
 	// Output:
@@ -113,7 +113,7 @@ func Example_compile_src() {
 	dat, _ := Zip("_test/pysample/lib")
 	inp := bytes.NewBuffer(dat)
 	out := new(bytes.Buffer)
-	ap.ExtractAndCompileIO(inp, out, "main")
+	ap.ExtractAndCompileIO(inp, out, "main", "")
 	Unzip(out.Bytes(), "./action/c2/out")
 	sys("_test/find.sh", "./action/c2/out")
 	// Output:

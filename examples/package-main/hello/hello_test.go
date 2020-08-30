@@ -14,19 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package hello
 
-package runtime.actionContainers
+import (
+	"encoding/json"
+	"fmt"
+)
 
-import common.WskActorSystem
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+func ExampleHello() {
+	var input = make(map[string]interface{})
+	input["name"] = "Mike"
+	output := Hello(input)
+	json, _ := json.Marshal(output)
+	fmt.Printf("%s", json)
+	// Output:
+	// Hello, Mike
+	// {"package-main":"Hello, Mike"}
+}
 
-@RunWith(classOf[JUnitRunner])
-class ActionLoopGo12ContainerTests
-    extends ActionLoopGoContainerTests
-      with WskActorSystem {
-
-  override lazy val goCompiler = "action-golang-v1.12"
-  override lazy val image = goCompiler
-
+func ExampleHello_noName() {
+	var input = make(map[string]interface{})
+	output := Hello(input)
+	json, _ := json.Marshal(output)
+	fmt.Printf("%s", json)
+	// Output:
+	// Hello, world
+	// {"golang-main-package":"Hello, world"}
 }

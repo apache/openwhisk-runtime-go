@@ -6,6 +6,7 @@
 .gogradle/
 *.log
 tests/build/
+test.out
 
 # Dependencies
 vendor/
@@ -55,4 +56,3 @@ exec
 *_launcher_.go
 test.json
 pkg/
-bin/

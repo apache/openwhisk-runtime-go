@@ -21,12 +21,13 @@ import common.WskActorSystem
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
+
 @RunWith(classOf[JUnitRunner])
-class ActionLoopGo12ContainerTests
+class ActionLoopGo15ContainerTests
     extends ActionLoopGoContainerTests
       with WskActorSystem {
 
-  override lazy val goCompiler = "action-golang-v1.12"
+  override lazy val goCompiler = "action-golang-v1.15"
   override lazy val image = goCompiler
 
 }

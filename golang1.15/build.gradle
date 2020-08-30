@@ -15,18 +15,24 @@
  * limitations under the License.
  */
 
-package runtime.actionContainers
+ext.dockerImageName = 'action-golang-v1.15'
+apply from: '../gradle/docker.gradle'
 
-import common.WskActorSystem
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+distDocker.dependsOn 'staticBuildProxy'
+distDocker.finalizedBy('cleanup')
 
-@RunWith(classOf[JUnitRunner])
-class ActionLoopGo12ContainerTests
-    extends ActionLoopGoContainerTests
-      with WskActorSystem {
+task staticBuildProxy(type: Exec) {
+	environment CGO_ENABLED: "0"
+	environment GOOS: "linux"
+	environment GOARCH: "amd64"
+    environment GO111MODULE: "on"
 
-  override lazy val goCompiler = "action-golang-v1.12"
-  override lazy val image = goCompiler
+	commandLine 'go', 'build',
+		'-o',  'proxy', '-a',
+		'-ldflags', '-extldflags "-static"',
+		'../main/proxy.go'
+}
 
+task cleanup(type: Delete) {
+    delete 'proxy'
 }
