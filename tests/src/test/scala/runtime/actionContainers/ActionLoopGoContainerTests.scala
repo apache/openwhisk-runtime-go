@@ -122,6 +122,7 @@ class ActionLoopGoContainerTests
     var src = ExeBuilder.mkBase64SrcZip(
       Seq(
         Seq("hello", "hello.go") -> helloGo("Hello", "hello"),
+        Seq("hello", "go.mod") -> "module hello\n",
         Seq("main.go") ->
           """
           |package main
@@ -129,7 +130,8 @@ class ActionLoopGoContainerTests
           |func Main(args map[string]interface{})map[string]interface{} {
           | return hello.Hello(args)
           |}
-        """.stripMargin
+        """.stripMargin,
+        Seq("go.mod") -> "module action\nreplace hello => ./hello\nrequire hello v0.0.0-00010101000000-000000000000\n"
       )
     )
     withActionLoopContainer { c =>

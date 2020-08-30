@@ -15,18 +15,20 @@
 # limitations under the License.
 #
 FROM golang:1.13.14
-RUN echo "deb http://deb.debian.org/debian stretch-backports main contrib non-free" \
+RUN echo "deb http://deb.debian.org/debian buster-backports main contrib non-free" \
      >>/etc/apt/sources.list &&\
-    apt-get update && apt-get install -y \
+    echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections &&\
+    apt-get update && apt-get install -y apt-utils
+RUN apt-get install -y \
      curl \
      jq \
      git \
      vim &&\
     apt-get -y install \
-     librdkafka1=0.11.6-1~bpo9+1 \
-     librdkafka++1=0.11.6-1~bpo9+1 && \
+     librdkafka1=0.11.6-1.1 \
+     librdkafka++1=0.11.6-1.1 && \
     apt-get -y install \
-     librdkafka-dev=0.11.6-1~bpo9+1 && \
+     librdkafka-dev=0.11.6-1.1 && \
     rm -rf /var/lib/apt/lists/* && \
     go get -u github.com/go-delve/delve/cmd/dlv
 RUN mkdir /action

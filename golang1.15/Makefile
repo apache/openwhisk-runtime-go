@@ -17,10 +17,12 @@
 IMG=action-golang-v1.15
 
 build:
-	#GOOS=linux GOARCH=amd64 go build -o proxy -a  -ldflags '-extldflags "-static"' ../main/proxy.go
-	#docker build -t $(IMG) .
-	#docker tag $(IMG) whisk/$(IMG)
 	../gradlew distDocker
+
+localbuild:
+	GOOS=linux GOARCH=amd64 go build -o proxy -a  -ldflags '-extldflags "-static"' ../main/proxy.go
+	docker build -t $(IMG) .
+	docker tag $(IMG) whisk/$(IMG)
 
 push: build
 	docker tag $(IMG) actionloop/$(IMG)

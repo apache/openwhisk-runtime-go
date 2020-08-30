@@ -19,13 +19,13 @@
 
 # Deployment options
 
-There are two images provided: the `actionloop` and the `action-golang-v1.11` available. Each image accept different input in the deployment.
+There are a few images provided: the `actionloop-base` and the `action-golang-v1.13`, `action-golang-v1.14`, `action-golang-v1.15` available. Each image accept different input in the deployment.
 
 <a name="actionloop">
 
 ## Actionloop runtime
 
-The runtime `actionlooop` accepts:
+The runtime `actionlooop-base` accepts:
 
 - single file executable
 - a zip file containing an executables
@@ -40,9 +40,9 @@ If the file is a zipped file, it must contain in the top level (*not* in a subdi
 
 ## Golang runtime
 
-The runtime `action-golang-v1.14` accepts:
+The runtime `action-golang-v1.15` (and past everions) accepts:
 
-- executable binaries implementing the ActionLoop protocol as Linux ELF executable compiled for the AMD64 architecture (as the `actionloop` runtme)
+- executable binaries implementing the ActionLoop protocol as Linux ELF executable compiled for the AMD64 architecture (as the `actionloop-base` runtme)
 - zip files containing a binary executable named `exec` in the top level, and it must be again a Linux ELF executable compiled for the AMD64 architecture
 - a single file action that is not an executable binary will be interpreted as source code and it will be compiled in a binary as described in the document about [actions](ACTION.md)
 - a zip file not containing in the top level a binary file `exec` will  be interpreted as a collection of zip files, and it will be compiled in a binary as described in the document about [actions](ACTION.md)
@@ -70,7 +70,7 @@ Check the example: `package-main` and `module-main` and look for the format of t
 <a name="precompile"/>
 ## Precompiling Go Sources Offline
 
-Compiling sources on the image can take some time when the images is initialized. You can speed up precompiling the sources using the image `action-golang-v1.14` as an offline compiler. You need `docker` for doing that.
+Compiling sources on the image can take some time when the images is initialized. You can speed up precompiling the sources using the image `action-golang-v1.15` as an offline compiler. You need `docker` for doing that.
 
 The images accepts a `-compile <main>` flag, and expects you provide sources in standard input. It will then compile them, emit the binary in standard output and errors in stderr. The output is always a zip file containing an executable.
 
@@ -78,11 +78,11 @@ If you have docker, you can do it this way:
 
 If you have a single source maybe in file `main.go`, with a function named `Main` just do this:
 
-`docker run openwhisk/action-golang-v1.14 -compile main <main.go >main.zip`
+`docker run openwhisk/action-golang-v1.15 -compile main <main.go >main.zip`
 
 If you have multiple sources in current directory, even with a subfolder with sources, you can compile it all with:
 
-`zip -r - * | docker run openwhisk/action-golang-v1.14 -compile main >main.zip`
+`zip -r - * | docker run openwhisk/action-golang-v1.15 -compile main >main.zip`
 
 You can then execute the code. Note you have to use the same runtime you used to build the image.
 
