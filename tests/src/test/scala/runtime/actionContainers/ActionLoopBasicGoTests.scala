@@ -27,7 +27,7 @@ class ActionLoopBasicGoTests
     extends BasicActionRunnerTests
     with WskActorSystem {
 
-  lazy val goCompiler = "action-golang-v1.11"
+  lazy val goCompiler = "action-golang-v1.15"
   lazy val image = goCompiler
   lazy val requireAck = false
 

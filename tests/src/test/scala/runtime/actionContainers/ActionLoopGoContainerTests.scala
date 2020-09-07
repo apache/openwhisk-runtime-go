@@ -32,7 +32,7 @@ class ActionLoopGoContainerTests
 
   import GoResourceHelpers._
 
-  lazy val goCompiler = "action-golang-v1.11"
+  lazy val goCompiler = "action-golang-v1.15"
   lazy val image = goCompiler
 
   def withActionLoopContainer(code: ActionContainer => Unit) =
