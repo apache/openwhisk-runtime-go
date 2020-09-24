@@ -14,8 +14,8 @@ vendor/
 # Go binary proxy
 common/proxy
 actionloop/proxy
-golang1.11/proxy
-golang1.12/proxy
+golang1.13/proxy
+golang1.15/proxy
 
 # Go test transient files
 openwhisk/_test/exec
