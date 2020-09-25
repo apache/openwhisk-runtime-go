@@ -19,17 +19,14 @@ package runtime.actionContainers
 import actionContainers.ActionContainer.withContainer
 import actionContainers.{ActionContainer, BasicActionRunnerTests}
 import common.WskActorSystem
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 
-@RunWith(classOf[JUnitRunner])
-class ActionLoopBasicGoTests
+abstract class ActionLoopBasicGoTests
     extends BasicActionRunnerTests
     with WskActorSystem {
 
-  lazy val goCompiler = "action-golang-v1.11"
-  lazy val image = goCompiler
-  lazy val requireAck = false
+  val goCompiler : String
+  val image : String
+  val requireAck : Boolean
 
   override def withActionContainer(env: Map[String, String] = Map.empty)(
       code: ActionContainer => Unit) = {

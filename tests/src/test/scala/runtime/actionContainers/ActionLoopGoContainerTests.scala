@@ -20,20 +20,17 @@ package runtime.actionContainers
 import actionContainers.{ActionContainer, ActionProxyContainerTestUtils}
 import actionContainers.ActionContainer.withContainer
 import common.WskActorSystem
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 
 import spray.json.{JsObject, JsString}
 
-@RunWith(classOf[JUnitRunner])
-class ActionLoopGoContainerTests
+abstract class ActionLoopGoContainerTests
     extends ActionProxyContainerTestUtils
     with WskActorSystem {
 
   import GoResourceHelpers._
 
-  lazy val goCompiler = "action-golang-v1.11"
-  lazy val image = goCompiler
+  val goCompiler : String
+  val image : String
 
   def withActionLoopContainer(code: ActionContainer => Unit) =
     withContainer(image)(code)
