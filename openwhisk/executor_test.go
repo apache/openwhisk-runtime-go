@@ -105,7 +105,7 @@ func ExampleNewExecutor_ack() {
 	proc.Stop()
 	dump(log)
 	// Output:
-	// command exited before ack
+	// Command exited abruptly during initialization.
 	// hi
 }
 
