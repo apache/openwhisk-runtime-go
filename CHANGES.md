@@ -16,6 +16,11 @@
 # limitations under the License.
 #
 -->
+# (next release)
+- go 1.15 runtime upgraded to 1.15.5
+- go 1.13 runtime upgraded to 1.13.15
+- add 'apt-get upgrade' to the image build of go 1.15 and go 1.13 to get latest security fixes during each build, for the case the base images are not updated frequently
+
 # 1.16.0
 - added go 1.13 and 1.15 with Go modules
 - removed support for go1.11 and go1.12

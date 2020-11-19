@@ -14,24 +14,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM golang:1.15.1
+FROM golang:1.15.5
 RUN echo "deb http://deb.debian.org/debian buster-backports main contrib non-free" \
      >>/etc/apt/sources.list &&\
     echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections &&\
-    apt-get update && apt-get install -y apt-utils
-RUN apt-get install -y \
+    apt-get update &&\
+    # Upgrade installed packages to get latest security fixes if the base image does not contain them already.
+    apt-get upgrade -y --no-install-recommends &&\
+    apt-get install -y apt-utils &&\
+    apt-get install -y \
      curl \
      jq \
      git \
      vim &&\
     apt-get -y install \
      librdkafka1=0.11.6-1.1 \
-     librdkafka++1=0.11.6-1.1 && \
+     librdkafka++1=0.11.6-1.1 &&\
     apt-get -y install \
-     librdkafka-dev=0.11.6-1.1 && \
-    rm -rf /var/lib/apt/lists/* && \
-    go get -u github.com/go-delve/delve/cmd/dlv
-RUN mkdir /action
+     librdkafka-dev=0.11.6-1.1 &&\
+    # Cleanup apt data, we do not need them later on.
+    apt-get clean && rm -rf /var/lib/apt/lists/* &&\
+    go get -u github.com/go-delve/delve/cmd/dlv &&\
+    mkdir /action
+
 WORKDIR /action
 ADD proxy /bin/proxy
 ADD bin/compile /bin/compile
