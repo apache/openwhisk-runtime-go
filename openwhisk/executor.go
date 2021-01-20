@@ -50,7 +50,7 @@ func NewExecutor(logout *os.File, logerr *os.File, command string, env map[strin
 	cmd := exec.Command(command, args...)
 	cmd.Stdout = logout
 	cmd.Stderr = logerr
-	cmd.Env = []string{}
+	cmd.Env = os.Environ()
 	for k, v := range env {
 		cmd.Env = append(cmd.Env, k+"="+v)
 	}
