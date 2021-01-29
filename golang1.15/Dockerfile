@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM golang:1.15.5
+FROM golang:1.15.7
 RUN echo "deb http://deb.debian.org/debian buster-backports main contrib non-free" \
      >>/etc/apt/sources.list &&\
     echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections &&\
