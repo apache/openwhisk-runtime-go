@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 -->
-# (next release)
+# 1.17.0
 - go 1.15 runtime upgraded to 1.15.7
 - go 1.13 runtime upgraded to 1.13.15
 - add 'apt-get upgrade' to the image build of go 1.15 and go 1.13 to get latest security fixes during each build, for the case the base images are not updated frequently
