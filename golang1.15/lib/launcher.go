@@ -32,7 +32,7 @@ import (
 var OwExecutionEnv = ""
 
 func main() {
-	// check if the execution enviroment is correct
+	// check if the execution environment is correct
 	if OwExecutionEnv != "" && OwExecutionEnv != os.Getenv("__OW_EXECUTION_ENV") {
 		fmt.Println("Execution Environment Mismatch")
 		fmt.Println("Expected: ", OwExecutionEnv)

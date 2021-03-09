@@ -49,11 +49,11 @@ ActionLoop for Scripting Languages
 - if you upload a folder `src/exec` the entire directory is moved to `bin`, including other uploaded files
 - Support for Go 1.12.4
 - Support for jar not expanded for Java when set OW_SAVE_JAR
-- You can initalize multiple times when debugging
+- You can initialize multiple times when debugging
 - Removed gogradle plugin, now building directly with go
 
 # ActionLoop v1.0.1
 - embedded file type detection
 - now showing the commend
 - librdkafka in golang image
-- showing version numbuer with -debug
+- showing version number with -debug

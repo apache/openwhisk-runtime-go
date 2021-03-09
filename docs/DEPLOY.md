@@ -40,9 +40,9 @@ If the file is a zipped file, it must contain in the top level (*not* in a subdi
 
 ## Golang runtime
 
-The runtime `action-golang-v1.15` (and past everions) accepts:
+The runtime `action-golang-v1.15` (and past versions) accepts:
 
-- executable binaries implementing the ActionLoop protocol as Linux ELF executable compiled for the AMD64 architecture (as the `actionloop-base` runtme)
+- executable binaries implementing the ActionLoop protocol as Linux ELF executable compiled for the AMD64 architecture (as the `actionloop-base` runtime)
 - zip files containing a binary executable named `exec` in the top level, and it must be again a Linux ELF executable compiled for the AMD64 architecture
 - a single file action that is not an executable binary will be interpreted as source code and it will be compiled in a binary as described in the document about [actions](ACTION.md)
 - a zip file not containing in the top level a binary file `exec` will  be interpreted as a collection of zip files, and it will be compiled in a binary as described in the document about [actions](ACTION.md)

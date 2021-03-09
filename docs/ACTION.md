@@ -137,7 +137,7 @@ By default the runtime expects you provide a main function that will serve one r
 
 You can however overwrite the default protocol and provide your how implementation of the ActionLoop. If you do so, you will have to take care of opening file descriptors, reading input, parse JSON and set environment variables.
 
-To overwrite the default ActionLoop you can do this either sending a single file source actino or a zip action.
+To overwrite the default ActionLoop you can do this either sending a single file source action, or a zip action.
 
 If you send a single file, you have to provide your own implementation adding a function `func main()` in the `main` package.
 

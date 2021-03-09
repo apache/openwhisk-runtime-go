@@ -215,7 +215,7 @@ func Example_badinit_nocompiler() {
 	//sys("ls", "_test/exec")
 	doInit(ts, initBinary("_test/exec", ""))      // empty
 	doInit(ts, initBinary("_test/hi", ""))        // say hi
-	doInit(ts, initBinary("_test/hello.src", "")) // source not excutable
+	doInit(ts, initBinary("_test/hello.src", "")) // source not executable
 	doRun(ts, "")
 	stopTestServer(ts, cur, log)
 	// Output:

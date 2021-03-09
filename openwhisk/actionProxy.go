@@ -107,7 +107,7 @@ func (ap *ActionProxy) SetEnv(env map[string]interface{}) {
 }
 
 // StartLatestAction tries to start
-// the more recently uplodaded
+// the more recently uploaded
 // action if valid, otherwise remove it
 // and fallback to the previous, if any
 func (ap *ActionProxy) StartLatestAction() error {
