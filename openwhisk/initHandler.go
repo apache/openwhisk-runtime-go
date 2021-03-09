@@ -52,7 +52,7 @@ func sendOK(w http.ResponseWriter) {
 
 func (ap *ActionProxy) initHandler(w http.ResponseWriter, r *http.Request) {
 
-	// you can do muliple initializations when debugging
+	// you can do multiple initializations when debugging
 	if ap.initialized && !Debugging {
 		msg := "Cannot initialize the action more than once."
 		sendError(w, http.StatusForbidden, msg)

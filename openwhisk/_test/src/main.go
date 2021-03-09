@@ -22,7 +22,7 @@ import (
 	"hello"
 )
 
-// Main forwading to Hello
+// Main forwarding to Hello
 func Main(args map[string]interface{}) map[string]interface{} {
 	fmt.Println("Main")
 	return hello.Hello(args)

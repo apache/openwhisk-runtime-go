@@ -50,7 +50,7 @@ package-main:
 
 .PHONY: module-main
 module-main:
-	# this exceeds 3 seconds for initializiation
+	# this exceeds 3 seconds for initialization
 	#cd $@ && OW_USER=$(OW_USER) make clean devel test
 	cd $@ && OW_USER=$(OW_USER) make clean deploy test
 

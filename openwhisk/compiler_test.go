@@ -25,7 +25,7 @@ import (
 /**
 Notes to understand tests:
 - tests are run from the "openwhisk" folder, as the current directory
-- precompile.sh prepare a compilation enviroment:
+- precompile.sh prepare a compilation environment:
 	_test/precompile.sh hello.src aaa main
   produces
 	 - _test/compile/src/aaa/src/main

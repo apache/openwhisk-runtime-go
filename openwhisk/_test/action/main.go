@@ -22,7 +22,7 @@ import (
 	"fmt"
 )
 
-// Main forwading to Hello
+// Main forwarding to Hello
 func Main(event json.RawMessage) (json.RawMessage, error) {
 	fmt.Println("Main:")
 	return Hello(event)
