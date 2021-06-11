@@ -16,6 +16,10 @@
 # limitations under the License.
 #
 -->
+
+# next release
+- go 1.15 runtime upgraded to 1.15.13
+
 # 1.17.0
 - go 1.15 runtime upgraded to 1.15.7
 - go 1.13 runtime upgraded to 1.13.15
