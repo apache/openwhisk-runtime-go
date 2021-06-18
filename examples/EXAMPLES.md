@@ -42,5 +42,5 @@ Available examples:
 - [Golang action with a package](package-main) main is `main.Main` invoking a `hello.Hello` and a test
 - [Golang action with a module](module-main) main is `main.Main` using a dependency `github.com/rs/zerolog`
 - [Standalone Golang Action](standalone) implements the ActionLoop directly in go
-- [Test Golang Action Localy](standalone-simple) execute Golang Action localy
+- [Test Golang Action Localy](standalone-simple) execute Golang Action locally
 - [Simple Bash action](bash) action implementing the ActionLoop directly
