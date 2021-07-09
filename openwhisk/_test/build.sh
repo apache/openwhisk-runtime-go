@@ -60,4 +60,4 @@ zip -q -r exec.zip exec etc dir
 echo exec/env >helloack/exec.env
 zip -j helloack.zip helloack/*
 
-
+python -m venv venv
