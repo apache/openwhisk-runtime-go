@@ -64,16 +64,14 @@ func Example_venv() {
 	err = ioutil.WriteFile("/tmp/appo.zip", buf, 0644)
 	fmt.Println(2, err)
 	err = UnzipOrSaveJar(buf, "./action/unzip", "./action/unzip/exec.jar")
-	sys("bash", "-c", "cd action/unzip/bin && find . -type l && rm ./python")
-	sys2("bash", "-c", "diff -qr _test/venv action/unzip 2>&1")
+	sys("bash", "-c", "cd action/unzip/bin && find . -type l -name python && rm ./python")
+	sys2("bash", "-c", "diff -qr _test/venv action/unzip 2>/dev/null")
 	fmt.Println(3, err)
 	// Output:
 	// 1 <nil>
 	// 2 <nil>
-	// ./python3
 	// ./python
 	// Only in _test/venv/bin: python
-	// diff: action/unzip/bin/python3: No such file or directory
 	// 3 <nil>
 
 }

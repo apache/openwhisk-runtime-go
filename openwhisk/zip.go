@@ -159,6 +159,7 @@ func Zip(dir string) ([]byte, error) {
 			if err != nil {
 				return err
 			}
+			defer fsFile.Close()
 			_, err = io.Copy(w, fsFile)
 			if err != nil {
 				return err
