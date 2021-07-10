@@ -138,6 +138,7 @@ func dump(file *os.File) {
 	os.Remove(file.Name())
 }
 
+// printing output only if no errors
 func sys(cli string, args ...string) {
 	os.Chmod(cli, 0755)
 	cmd := exec.Command(cli, args...)
@@ -146,6 +147,17 @@ func sys(cli string, args ...string) {
 		log.Print(err)
 	} else {
 		fmt.Print(string(out))
+	}
+}
+
+// version printing output also when errors
+func sys2(cli string, args ...string) {
+	os.Chmod(cli, 0755)
+	cmd := exec.Command(cli, args...)
+	out, err := cmd.CombinedOutput()
+	fmt.Print(string(out))
+	if err != nil {
+		log.Print(err)
 	}
 }
 

@@ -17,7 +17,8 @@
 #
 -->
 
-# next release
+# 1.17.1
+- support for zipping and unzipping symbolic links (required to support virtualenvs)
 - go 1.15 runtime upgraded to 1.15.13
 
 # 1.17.0

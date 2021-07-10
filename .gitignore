@@ -1,6 +1,9 @@
 # Mac
 .DS_Store
 
+# goenv
+.go-version
+
 # Gradle
 .gradle/
 .gogradle/
@@ -27,10 +30,12 @@ openwhisk/_test/*.zip
 openwhisk/_test/*.jar
 openwhisk/_test/compile/
 openwhisk/_test/output/
+openwhisk/_test/venv/
 openwhisk/action/
 openwhisk/compile/
 openwhisk/debug.test
 *.pyc
+*.env
 
 # Eclipse
 tests/bin/

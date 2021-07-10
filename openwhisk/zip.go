@@ -60,24 +60,42 @@ func Unzip(src []byte, dest string) error {
 	os.MkdirAll(dest, 0755)
 	// Closure to address file descriptors issue with all the deferred .Close() methods
 	extractAndWriteFile := func(f *zip.File) error {
+
+		path := filepath.Join(dest, f.Name)
+		isLink := f.FileInfo().Mode()&os.ModeSymlink == os.ModeSymlink
+
+		// dir
+		if f.FileInfo().IsDir() && !isLink {
+			return os.MkdirAll(path, f.Mode())
+		}
+
+		// open file
 		rc, err := f.Open()
-		defer rc.Close()
 		if err != nil {
 			return err
 		}
-		path := filepath.Join(dest, f.Name)
-		if f.FileInfo().IsDir() {
-			return os.MkdirAll(path, 0755)
+		defer rc.Close()
+
+		// link
+		if isLink {
+			buf, err := ioutil.ReadAll(rc)
+			if err != nil {
+				return err
+			}
+			return os.Symlink(string(buf), path)
 		}
+
+		// file
+		// eventually create a missing ddir
 		err = os.MkdirAll(filepath.Dir(path), 0755)
 		if err != nil {
 			return err
 		}
 		file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
-		defer file.Close()
 		if err != nil {
 			return err
 		}
+		defer file.Close()
 		_, err = io.Copy(file, rc)
 		return err
 	}
@@ -96,24 +114,56 @@ func Zip(dir string) ([]byte, error) {
 	zwr := zip.NewWriter(buf)
 	dir = filepath.Clean(dir)
 	err := filepath.Walk(dir, func(filePath string, info os.FileInfo, err error) error {
-		if info.IsDir() {
+
+		// trim the relevant part of the path
+		relPath := strings.TrimPrefix(filePath, dir)
+		if relPath == "" {
 			return nil
 		}
+		relPath = relPath[1:]
 		if err != nil {
 			return err
 		}
-		relPath := strings.TrimPrefix(filePath, dir)[1:]
-		zipFile, err := zwr.Create(relPath)
-		if err != nil {
-			return err
+
+		// create a proper entry
+		isLink := (info.Mode() & os.ModeSymlink) == os.ModeSymlink
+		header := &zip.FileHeader{
+			Name:   relPath,
+			Method: zip.Deflate,
 		}
-		fsFile, err := os.Open(filePath)
-		if err != nil {
-			return err
-		}
-		_, err = io.Copy(zipFile, fsFile)
-		if err != nil {
-			return err
+		if isLink {
+			header.SetMode(0755 | os.ModeSymlink)
+			w, err := zwr.CreateHeader(header)
+			if err != nil {
+				return err
+			}
+			ln, err := os.Readlink(filePath)
+			if err != nil {
+				return err
+			}
+			w.Write([]byte(ln))
+		} else if info.IsDir() {
+			header.Name = relPath + "/"
+			header.SetMode(0755)
+			_, err := zwr.CreateHeader(header)
+			if err != nil {
+				return err
+			}
+		} else if info.Mode().IsRegular() {
+			header.SetMode(0755)
+			w, err := zwr.CreateHeader(header)
+			if err != nil {
+				return err
+			}
+			fsFile, err := os.Open(filePath)
+			if err != nil {
+				return err
+			}
+			defer fsFile.Close()
+			_, err = io.Copy(w, fsFile)
+			if err != nil {
+				return err
+			}
 		}
 		return nil
 	})
