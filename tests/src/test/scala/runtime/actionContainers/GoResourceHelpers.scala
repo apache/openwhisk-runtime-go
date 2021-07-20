@@ -168,7 +168,7 @@ object GoResourceHelpers {
       // DO NOT CREATE IT IN ADVANCE or you will get a permission denied
       val binDir = tmpDirectoryFile("bin")
       binDir.mkdirs()
-      val zip = new File(binDir, main+".zip")
+      val zip = new File(binDir, main + ".zip")
 
       // command to compile
       val cmd = s"${dockerBin} run -i ${image} -compile ${main}"
@@ -182,7 +182,6 @@ object GoResourceHelpers {
       // result
       zip
     }
-
 
     def mkBase64Zip(image: String,
                     sources: Seq[(Seq[String], String)],

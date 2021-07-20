@@ -24,9 +24,9 @@ abstract class ActionLoopBasicGoTests
     extends BasicActionRunnerTests
     with WskActorSystem {
 
-  val goCompiler : String
-  val image : String
-  val requireAck : Boolean
+  val goCompiler: String
+  val image: String
+  val requireAck: Boolean
 
   override def withActionContainer(env: Map[String, String] = Map.empty)(
       code: ActionContainer => Unit) = {
@@ -40,8 +40,7 @@ abstract class ActionLoopBasicGoTests
 
   override val testNoSourceOrExec = TestConfig("")
 
-  override val testNotReturningJson = TestConfig(
-    s"""
+  override val testNotReturningJson = TestConfig(s"""
        |package main
        |import (
        |	"bufio"
@@ -52,7 +51,8 @@ abstract class ActionLoopBasicGoTests
        |	reader := bufio.NewReader(os.Stdin)
        |	out := os.NewFile(3, "pipe")
        |	defer out.Close()
-       |  ${if(requireAck) "fmt.Fprintf(out, `{ \"ok\": true}%s`, \"\\n\")" else ""}
+       |  ${if (requireAck) "fmt.Fprintf(out, `{ \"ok\": true}%s`, \"\\n\")"
+                                                    else ""}
        |	reader.ReadBytes('\\n')
        |	fmt.Fprintln(out, \"a string but not a map\")
        |	reader.ReadBytes('\\n')
