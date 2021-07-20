@@ -62,7 +62,7 @@ def build(parent, source_dir, target):
     if os.path.isdir("%s/main" % source_dir):
         source_dir += "/main"
     p = subprocess.Popen(
-        ["go", "build", "-i", "-ldflags=-s -w",  "-o", target],
+        ["go", "build", "-ldflags=-s -w",  "-o", target],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         cwd=source_dir,
