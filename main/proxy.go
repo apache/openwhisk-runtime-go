@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 
 	"github.com/apache/openwhisk-runtime-go/openwhisk"
 )
@@ -49,7 +50,7 @@ func main() {
 
 	// show version number
 	if *version {
-		fmt.Printf("OpenWhisk ActionLoop Proxy v%s\n", openwhisk.Version)
+		fmt.Printf("OpenWhisk ActionLoop Proxy v%s, built with %s\n", openwhisk.Version, runtime.Version())
 		return
 	}
 
