@@ -20,6 +20,7 @@
 # 1.17.1
 - support for zipping and unzipping symbolic links (required to support virtualenvs)
 - go 1.15 runtime upgraded to 1.15.13
+- extend `proxy -version` to also show the go version the proxy.go was compiled with (makes it easier to check if go security updates need to be applied)
 
 # 1.17.0
 - go 1.15 runtime upgraded to 1.15.7
