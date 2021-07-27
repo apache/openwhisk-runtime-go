@@ -16,6 +16,8 @@
 # limitations under the License.
 #
 -->
+# next release
+- go 1.15 runtime upgraded to 1.15.14
 
 # 1.17.1
 - support for zipping and unzipping symbolic links (required to support virtualenvs)
