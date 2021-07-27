@@ -29,8 +29,8 @@ abstract class ActionLoopGoContainerTests
 
   import GoResourceHelpers._
 
-  val goCompiler : String
-  val image : String
+  val goCompiler: String
+  val image: String
 
   def withActionLoopContainer(code: ActionContainer => Unit) =
     withContainer(image)(code)
@@ -56,7 +56,7 @@ abstract class ActionLoopGoContainerTests
         |""".stripMargin
   }
 
-   def helloSrc(main: String) = Seq(
+  def helloSrc(main: String) = Seq(
     Seq(s"${main}.go") -> helloGo(main)
   )
 
@@ -81,7 +81,6 @@ abstract class ActionLoopGoContainerTests
       c.run(helloMsg()) should be(okMsg("main-main", "Hello, Demo!"))
     }
   }
-
 
   it should "accept a src main action " in {
     var src = ExeBuilder.mkBase64Src(helloSrc("main"))

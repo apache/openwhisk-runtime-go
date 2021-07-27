@@ -14,18 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package runtime.actionContainers
 
 import common.WskActorSystem
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-
 @RunWith(classOf[JUnitRunner])
-class ActionLoopBasicGo13Tests
-    extends ActionLoopBasicGoTests
+class ActionLoopGo16ContainerTests
+    extends ActionLoopGoContainerTests
     with WskActorSystem {
 
-  override lazy val goCompiler = "action-golang-v1.13"
+  override lazy val goCompiler = "action-golang-v1.16"
   override lazy val image = goCompiler
-  override lazy val requireAck = true
+
 }

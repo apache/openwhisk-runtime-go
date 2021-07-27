@@ -20,6 +20,7 @@ include 'tests'
 include 'actionloop'
 include 'golang1.13'
 include 'golang1.15'
+include 'golang1.16'
 
 rootProject.name = 'runtime-golang'
 
