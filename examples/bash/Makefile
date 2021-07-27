@@ -16,7 +16,8 @@
 #
 WSK?=wsk
 OW_USER?=openwhisk
-OW_RUNTIME?=$(OW_USER)/actionloop-base:nightly
+OW_VER?=v1.16:nightly
+OW_RUNTIME?=$(OW_USER)/action-golang-$(OW_VER)
 NAME=bash
 PACKAGE=test
 SRC=hello.sh

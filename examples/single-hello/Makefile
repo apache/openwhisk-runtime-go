@@ -16,8 +16,9 @@
 #
 
 OW_USER?=openwhisk
-OW_RUNTIME?=$(OW_USER)/action-golang-v1.15:nightly
-OW_COMPILER?=$(OW_USER)/action-golang-v1.15:nightly
+OW_VER?=v1.16:nightly
+OW_RUNTIME?=$(OW_USER)/action-golang-$(OW_VER)
+OW_COMPILER?=$(OW_USER)/action-golang-$(OW_VER)
 WSK?=wsk
 MAIN=hello
 PACKAGE=test
