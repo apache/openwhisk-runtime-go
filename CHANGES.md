@@ -16,13 +16,13 @@
 # limitations under the License.
 #
 -->
-# next release
-- go 1.15 runtime upgraded to 1.15.14
-
-# 1.17.1
-- support for zipping and unzipping symbolic links (required to support virtualenvs)
-- go 1.15 runtime upgraded to 1.15.13
-- extend `proxy -version` to also show the go version the proxy.go was compiled with (makes it easier to check if go security updates need to be applied)
+# 1.18.0
+- Added support for go 1.16 (#149)
+- Updated go 1.15 runtime to 1.15.14
+- Added aws example and use actionloop-base for bash example (#152)
+- Extend `proxy -version` to also show the go runtime version. (#150)
+- Support for zipping and unzipping symbolic links (required to support virtualenvs) (#148)
+- Resolve akka versions explicitly. (#147)
 
 # 1.17.0
 - go 1.15 runtime upgraded to 1.15.7
