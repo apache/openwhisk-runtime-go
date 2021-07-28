@@ -23,7 +23,7 @@ WSK?=wsk
 MAIN=main
 PACKAGE=test
 SRCS=main.go go.mod go.sum
-NAME=module-main
+NAME=aws-main
 BINZIP=$(MAIN)-bin.zip
 SRCZIP=$(MAIN)-src.zip
 
@@ -49,7 +49,7 @@ test: test.json
 	$(WSK) action invoke test/$(NAME) -P test.json -r | tee -a test.out
 
 test.json:
-	echo '{ "name": "Mike" }' >test.json
+	echo '{}' >test.json
 
 package.done:
 	$(WSK) package update $(PACKAGE)

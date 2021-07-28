@@ -17,40 +17,48 @@
 
 # prefix
 OW_USER?=openwhisk
+OW_VER?=v1.16:nightly
 
-test: .PHONY
+.PHONY: test
+test: all
 	cat */test.out | grep 'Hello' | sort >test.out
 	diff test.out test.expected
 
-all: .PHONY
+.PHONY: all
+all: bash standalone single-main single-hello package-main module-main
 
 .PHONY: bash
 bash:
-	cd $@ && OW_USER=$(OW_USER) make clean deploy test
+	cd $@ && OW_USER=$(OW_USER) OW_VER=$(OW_VER) make clean deploy test
 
 .PHONY: standalone
 standalone:
-	cd $@ && OW_USER=$(OW_USER) make clean devel test
-	cd $@ && OW_USER=$(OW_USER) make clean deploy test
+	cd $@ && OW_USER=$(OW_USER) OW_VER=$(OW_VER) make clean devel test
+	cd $@ && OW_USER=$(OW_USER) OW_VER=$(OW_VER) make clean deploy test
 
 .PHONY: single-main
 single-main:
-	cd $@ && OW_USER=$(OW_USER) make clean devel test
-	cd $@ && OW_USER=$(OW_USER) make clean deploy test
+	cd $@ && OW_USER=$(OW_USER) OW_VER=$(OW_VER) make clean devel test
+	cd $@ && OW_USER=$(OW_USER) OW_VER=$(OW_VER) make clean deploy test
 
 .PHONY: single-hello
 single-hello:
-	cd $@ && OW_USER=$(OW_USER) make clean devel test
-	cd $@ && OW_USER=$(OW_USER) make clean deploy test
+	cd $@ && OW_USER=$(OW_USER) OW_VER=$(OW_VER) make clean devel test
+	cd $@ && OW_USER=$(OW_USER) OW_VER=$(OW_VER) make clean deploy test
 
 .PHONY: package-main
 package-main:
-	cd $@ && OW_USER=$(OW_USER) make clean devel test
-	cd $@ && OW_USER=$(OW_USER) make clean deploy test
+	cd $@ && OW_USER=$(OW_USER) OW_VER=$(OW_VER) make clean devel test
+	cd $@ && OW_USER=$(OW_USER) OW_VER=$(OW_VER) make clean deploy test
 
 .PHONY: module-main
 module-main:
 	# this exceeds 3 seconds for initialization
-	#cd $@ && OW_USER=$(OW_USER) make clean devel test
-	cd $@ && OW_USER=$(OW_USER) make clean deploy test
+	#cd $@ && OW_USER=$(OW_USER) OW_VER=$(OW_VER) make clean devel test
+	cd $@ && OW_USER=$(OW_USER) OW_VER=$(OW_VER) make clean deploy test
 
+.PHONY: aws-main
+aws-main:
+	# this exceeds 3 seconds for initialization
+	#cd $@ && OW_USER=$(OW_USER) OW_VER=$(OW_VER) make clean devel test
+	cd $@ && OW_USER=$(OW_USER) OW_VER=$(OW_VER) make clean deploy test
