@@ -14,7 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM golang:1.15.14
+
+# Do not fix the patch level for golang:1.15 to automatically get security fixes.
+FROM golang:1.15
+
 RUN echo "deb http://deb.debian.org/debian buster-backports main contrib non-free" \
      >>/etc/apt/sources.list &&\
     echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections &&\
