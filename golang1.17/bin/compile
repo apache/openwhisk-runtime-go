@@ -1,0 +1,138 @@
+#!/usr/bin/python -u
+"""Golang Action Compiler
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+"""
+from __future__ import print_function
+import os, os.path, sys, re, shutil, subprocess, traceback, codecs
+from os.path import dirname, exists
+from time import sleep
+
+# write a file creating intermediate directories
+def write_file(file, body, executable=False):
+    try: os.makedirs(dirname(file), mode=0o755)
+    except: pass
+    with open(file, mode="wb") as f:
+        f.write(body)
+    if executable:
+        os.chmod(file, 0o755)
+
+# copy a file eventually replacing a substring
+def copy_replace(src, dst, match=None, replacement=""):
+    with open(src, 'rb') as s:
+        body = s.read()
+        if match:
+            body = body.replace(match, replacement)
+        write_file(dst, body)
+
+
+def sources(launcher, source_dir, main):
+    func = main.capitalize()
+    has_main = None
+
+    # copy the exec to exec.go
+    # also check if it has a main in it
+    src = "%s/exec" % source_dir
+    dst = "%s/exec__.go" % source_dir
+    if os.path.isfile(src):
+        with codecs.open(src, 'r', 'utf-8') as s:
+            with codecs.open(dst, 'w', 'utf-8') as d:
+                body = s.read()
+                has_main = re.match(r".*package\s+main\W.*func\s+main\s*\(\s*\)", body, flags=re.DOTALL)
+                d.write(body)
+
+    # copy the launcher fixing the main
+    if not has_main:
+        dst = "%s/main__.go" % source_dir
+        if os.path.isdir("%s/main" % source_dir):
+            dst = "%s/main/main__.go" % source_dir
+        with codecs.open(dst, 'w', 'utf-8') as d:
+            with codecs.open(launcher, 'r', 'utf-8') as e:
+                code = e.read()
+                code = code.replace("Main", func)
+                d.write(code)
+
+def build(source_dir, target_dir):
+    # compile...
+    source_dir = os.path.abspath(source_dir)
+    parent = dirname(source_dir)
+    target = os.path.abspath("%s/exec" % target_dir)
+    if os.environ.get("__OW_EXECUTION_ENV"):
+      write_file("%s.env" % target, os.environ["__OW_EXECUTION_ENV"])
+
+    env = {
+      "GOROOT": "/usr/local/go",
+      "GOPATH": "/home/go",
+      "PATH": os.environ["PATH"],
+      "GOCACHE": "/tmp",
+      "GO111MODULE": "on"
+    }
+
+    gomod = "%s/go.mod" % source_dir
+    with open(os.devnull, "w") as dn:
+        if exists(gomod):
+            ret = subprocess.call(["go", "mod", "download"], cwd=source_dir, env=env, stderr=dn, stdout=dn)
+            if ret != 0:
+                print("cannot download modules")
+                return
+        else:
+            ret = subprocess.call(["go", "mod", "init", "exec"], cwd=source_dir, env=env, stdout=dn, stderr=dn)
+            if ret != 0:
+                print("cannot init modules")
+                return
+
+    ldflags = "-s -w"
+    gobuild = ["go", "build", "-o", target, "-ldflags", ldflags]
+    if os.environ.get("__OW_EXECUTION_ENV"):
+        ldflags += " -X main.OwExecutionEnv=%s" % os.environ["__OW_EXECUTION_ENV"]
+    ret = subprocess.call(gobuild, cwd=source_dir, env=env)
+    if ret != 0:
+        print("failed", " ".join(gobuild), "\nin", source_dir, "\nenv", env)
+
+def debug(source_dir, target_dir, port):
+    source_dir = os.path.abspath(source_dir)
+    target = os.path.abspath("%s/exec" % target_dir)
+    if os.environ.get("__OW_EXECUTION_ENV"):
+      write_file("%s/exec.env" % source_dir, os.environ["__OW_EXECUTION_ENV"])
+    shutil.rmtree(target_dir)
+    shutil.move(source_dir, target_dir)
+    write_file(target, """#!/bin/bash
+cd "$(dirname $0)"
+export GOCACHE=/tmp
+export PATH=%s
+exec script -q  -c '/go/bin/dlv debug --headless --listen=127.0.0.1:%s --continue --accept-multiclient --log-dest /tmp/delve.log'
+""" % (os.environ["PATH"], port) , True)   
+ 
+def main(argv):
+    if len(argv) < 4:
+        print("usage: <main-file> <source-dir> <target-dir>")
+        sys.exit(1)
+
+    main = argv[1]
+    source_dir = argv[2]
+    target_dir = argv[3]
+    launcher = dirname(dirname(argv[0]))+"/lib/launcher.go"
+    sources(launcher, source_dir, main)
+
+    # if the debug port is present and not empty build with debug
+    if os.environ.get("__OW_DEBUG_PORT"):
+        debug(source_dir, target_dir, os.environ["__OW_DEBUG_PORT"])
+    else:
+        build(source_dir, target_dir)
+
+if __name__ == '__main__':
+    main(sys.argv)
