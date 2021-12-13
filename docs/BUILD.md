@@ -46,6 +46,7 @@ This will build the images:
 * `action-golang-v1.13`: an image supporting Go 1.13 sources (does expect an ack)
 * `action-golang-v1.15`: an image supporting Go 1.15 sources (does expect an ack)
 * `action-golang-v1.16`: an image supporting Go 1.16 sources (does expect an ack)
+* `action-golang-v1.17`: an image supporting Go 1.17 sources (does expect an ack)
 * `actionloop-base`: the base image, supporting generic executables ans shell script (does not expect an ack)
 
 The `actionloop-base` image can be used for supporting other compiled programming languages as long as they implement a `compile` script and the *action loop* protocol described below. Please check [ENVVARS.md](ENVVARS.md) for configuration options

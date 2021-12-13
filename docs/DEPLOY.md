@@ -19,7 +19,7 @@
 
 # Deployment options
 
-There are a few images provided: the `actionloop-base` and the `action-golang-v1.13`, `action-golang-v1.15` and `action-golang-v1.16` are available. Each image accepts different input in the deployment.
+There are a few images provided: the `actionloop-base` and the `action-golang-v1.13`, `action-golang-v1.15`, `action-golang-v1.16` and `action-golang-v1.17` are available. Each image accepts different input in the deployment.
 
 <a name="actionloop">
 
