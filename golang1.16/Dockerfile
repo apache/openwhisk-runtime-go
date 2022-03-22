@@ -31,6 +31,7 @@ RUN echo "deb http://deb.debian.org/debian buster-backports main contrib non-fre
      curl \
      jq \
      git \
+     zip \
      vim &&\
     apt-get -y install \
      librdkafka1=0.11.6-1.1 \
