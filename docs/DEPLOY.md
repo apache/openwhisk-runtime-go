@@ -68,6 +68,7 @@ replace hello => ./hello
 Check the example: `package-main` and `module-main` and look for the format of the `go.mod` files.
 
 <a name="precompile"/>
+
 ## Precompiling Go Sources Offline
 
 Compiling sources on the image can take some time when the images is initialized. You can speed up precompiling the sources using the image `action-golang-v1.N` as an offline compiler. You need `docker` for doing that.
