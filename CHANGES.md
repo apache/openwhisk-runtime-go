@@ -16,13 +16,11 @@
 # limitations under the License.
 #
 -->
-# future release
-- Add support for go 1.18
-- Add Zip support for the runtimes [#164](https://github.com/apache/openwhisk-runtime-go/pull/164)
-- go-delve/delve/cmd/dlv Fix [#163](https://github.com/apache/openwhisk-runtime-go/pull/163)
--  Golang compilescript will now work with python 3 aswell as continue to work with Python 2 [#160](https://github.com/apache/openwhisk-runtime-go/pull/160)
-- Add support for go 1.17 [#157](https://github.com/apache/openwhisk-runtime-go/pull/157)
-- Automatically include go1.15.x and go1.16.x updates. [#154](https://github.com/apache/openwhisk-runtime-go/pull/154))
+# 1.19.0
+- Add support for go 1.18 and go 1.17
+- Drop support for go 1.13 and go 1.15
+- Add Zip support for the runtimes (#164)
+- Golang compilescript works with both Python 3 and Python 2 (#160)
 
 # 1.18.0
 - Added support for go 1.16 (#149)
