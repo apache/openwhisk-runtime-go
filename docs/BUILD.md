@@ -43,7 +43,6 @@ To build the docker images, after compiling go proxy:
 
 This will build the images:
 
-* `action-golang-v1.16`: an image supporting Go 1.16 sources (does expect an ack)
 * `action-golang-v1.17`: an image supporting Go 1.17 sources (does expect an ack)
 * `action-golang-v1.18`: an image supporting Go 1.18 sources (does expect an ack)
 * `actionloop-base`: the base image, supporting generic executables ans shell script (does not expect an ack)
