@@ -82,10 +82,14 @@ func (ap *ActionProxy) runHandler(w http.ResponseWriter, r *http.Request) {
 
 	// check if the answer is an object map
 	var objmap map[string]*json.RawMessage
+	var objarray []interface{}
 	err = json.Unmarshal(response, &objmap)
 	if err != nil {
-		sendError(w, http.StatusBadGateway, "The action did not return a dictionary or array.")
-		return
+		err = json.Unmarshal(response, &objarray)
+		if err != nil {
+			sendError(w, http.StatusBadGateway, "The action did not return a dictionary or array.")
+			return
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")
