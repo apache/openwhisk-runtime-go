@@ -135,4 +135,27 @@ abstract class ActionLoopGoContainerTests
       c.run(helloMsg()) should be(okMsg("hello-Hello", "Hello, Demo!"))
     }
   }
+
+  it should "support return array result" in {
+    val helloArrayGo = {
+      s"""
+         |package main
+         |
+         |func Main(obj map[string]interface{}) []interface{} {
+         |    result := []interface{}{"a", "b"}
+         |    return result
+         |}
+         |
+       """.stripMargin
+    }
+    val src = ExeBuilder.mkBase64SrcZip(
+      Seq(
+        Seq(s"main.go") -> helloArrayGo
+      ))
+    withActionLoopContainer { c =>
+      c.init(initPayload(src))._1 shouldBe (200)
+      val result = c.run(JsObject())
+      result._1 shouldBe (200)
+    }
+  }
 }
