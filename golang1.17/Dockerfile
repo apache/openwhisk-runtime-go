@@ -38,7 +38,7 @@ RUN echo "deb http://deb.debian.org/debian buster-backports main contrib non-fre
      librdkafka-dev=0.11.6-1.1 &&\
     # Cleanup apt data, we do not need them later on.
     apt-get clean && rm -rf /var/lib/apt/lists/* &&\
-    go get -u github.com/go-delve/delve/cmd/dlv@v1.8.1 &&\
+    go install github.com/go-delve/delve/cmd/dlv@v1.8.1 &&\
     mkdir /action
 
 WORKDIR /action
