@@ -84,7 +84,7 @@ func (ap *ActionProxy) runHandler(w http.ResponseWriter, r *http.Request) {
 	var objmap map[string]*json.RawMessage
 	err = json.Unmarshal(response, &objmap)
 	if err != nil {
-		sendError(w, http.StatusBadGateway, "The action did not return a dictionary.")
+		sendError(w, http.StatusBadGateway, "The action did not return a dictionary or array.")
 		return
 	}
 
