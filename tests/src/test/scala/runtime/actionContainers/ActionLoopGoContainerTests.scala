@@ -159,4 +159,27 @@ abstract class ActionLoopGoContainerTests
       result._2 shouldBe Some(JsArray(JsString("a"), JsString("b")))
     }
   }
+
+  it should "support array as input param" in {
+    val helloArrayGo = {
+      s"""
+         |package main
+         |
+         |func Main(obj []interface{}) []interface{} {
+         |    return obj
+         |}
+         |
+       """.stripMargin
+    }
+    val src = ExeBuilder.mkBase64SrcZip(
+      Seq(
+        Seq(s"main.go") -> helloArrayGo
+      ))
+    withActionLoopContainer { c =>
+      c.init(initPayload(src))._1 shouldBe (200)
+      val result = c.runForJsArray(runPayload(JsArray(JsString("a"), JsString("b"))))
+      result._1 shouldBe (200)
+      result._2 shouldBe Some(JsArray(JsString("a"), JsString("b")))
+    }
+  }
 }
