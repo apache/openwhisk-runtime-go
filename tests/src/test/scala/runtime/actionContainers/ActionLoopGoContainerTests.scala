@@ -21,7 +21,7 @@ import actionContainers.{ActionContainer, ActionProxyContainerTestUtils}
 import actionContainers.ActionContainer.withContainer
 import common.WskActorSystem
 
-import spray.json.{JsObject, JsString}
+import spray.json.{JsArray, JsObject, JsString}
 
 abstract class ActionLoopGoContainerTests
     extends ActionProxyContainerTestUtils
@@ -133,6 +133,53 @@ abstract class ActionLoopGoContainerTests
     withActionLoopContainer { c =>
       c.init(initPayload(src))._1 shouldBe (200)
       c.run(helloMsg()) should be(okMsg("hello-Hello", "Hello, Demo!"))
+    }
+  }
+
+  it should "support return array result" in {
+    val helloArrayGo = {
+      s"""
+         |package main
+         |
+         |func Main(obj map[string]interface{}) []interface{} {
+         |    result := []interface{}{"a", "b"}
+         |    return result
+         |}
+         |
+       """.stripMargin
+    }
+    val src = ExeBuilder.mkBase64SrcZip(
+      Seq(
+        Seq(s"main.go") -> helloArrayGo
+      ))
+    withActionLoopContainer { c =>
+      c.init(initPayload(src))._1 shouldBe (200)
+      val result = c.runForJsArray(JsObject())
+      result._1 shouldBe (200)
+      result._2 shouldBe Some(JsArray(JsString("a"), JsString("b")))
+    }
+  }
+
+  it should "support array as input param" in {
+    val helloArrayGo = {
+      s"""
+         |package main
+         |
+         |func Main(obj []interface{}) []interface{} {
+         |    return obj
+         |}
+         |
+       """.stripMargin
+    }
+    val src = ExeBuilder.mkBase64SrcZip(
+      Seq(
+        Seq(s"main.go") -> helloArrayGo
+      ))
+    withActionLoopContainer { c =>
+      c.init(initPayload(src))._1 shouldBe (200)
+      val result = c.runForJsArray(runPayload(JsArray(JsString("a"), JsString("b"))))
+      result._1 shouldBe (200)
+      result._2 shouldBe Some(JsArray(JsString("a"), JsString("b")))
     }
   }
 }

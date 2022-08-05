@@ -25,6 +25,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"reflect"
 	"strings"
 )
 
@@ -50,10 +51,11 @@ func main() {
 		log.Printf("Environment: %v", os.Environ())
 	}
 
-	// assign the main function
-	type Action func(event map[string]interface{}) map[string]interface{}
-	var action Action
-	action = Main
+	resultKind := reflect.TypeOf(Main).Out(0).Kind()
+	if resultKind != reflect.Map && resultKind != reflect.Slice && resultKind != reflect.Array {
+		fmt.Println("Support map and slice and array only")
+		os.Exit(1)
+	}
 
 	// input
 	out := os.NewFile(3, "pipe")
@@ -100,12 +102,29 @@ func main() {
 			}
 		}
 		// get payload if not empty
-		var payload map[string]interface{}
+		isJsonObjectParam := true
+		var payloadForJsonObject map[string]interface{}
+		var payloadForJsonArray []interface{}
 		if value, ok := input["value"].(map[string]interface{}); ok {
-			payload = value
+			payloadForJsonObject = value
+		} else {
+			if value, ok := input["value"].([]interface{}); ok {
+				payloadForJsonArray = value
+				isJsonObjectParam = false
+			}
 		}
 		// process the request
-		result := action(payload)
+		var result interface{}
+		funcMain := reflect.ValueOf(Main)
+		if isJsonObjectParam {
+			param := []reflect.Value{reflect.ValueOf(payloadForJsonObject)}
+			reflectResult := funcMain.Call(param)
+			result = reflectResult[0].Interface()
+		} else {
+			param := []reflect.Value{reflect.ValueOf(payloadForJsonArray)}
+			reflectResult := funcMain.Call(param)
+			result = reflectResult[0].Interface()
+		}
 		// encode the answer
 		output, err := json.Marshal(&result)
 		if err != nil {
