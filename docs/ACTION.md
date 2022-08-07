@@ -72,8 +72,8 @@ package main
 
 // Main is the function implementing the action
 func Main(event map[string]interface{}) []interface{} {
-	result := []interface{}{"a", "b"}
-	return result
+        result := []interface{}{"a", "b"}
+        return result
 }
 ```
 
@@ -86,7 +86,7 @@ package main
 
 // Main is the function implementing the action
 func Main(obj []interface{}) []interface{} {
-	return obj
+        return obj
 }
 ```
 
