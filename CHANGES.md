@@ -16,6 +16,9 @@
 # limitations under the License.
 #
 -->
+# latest
+- Add support for go 1.19
+
 # 1.20.0
 - Support array result include sequence action (#170)
 - Upgrade to Gradle 6 (#172)
