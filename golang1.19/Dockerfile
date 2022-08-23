@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-# Do not fix the patch level for golang:1.18 to automatically get security fixes.
+# Do not fix the patch level for golang:1.19 to automatically get security fixes.
 FROM golang:1.19-bullseye
 
 RUN echo "deb http://deb.debian.org/debian buster-backports main contrib non-free" \
