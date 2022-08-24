@@ -14,30 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package runtime.actionContainers
 
-include 'tests'
+import common.WskActorSystem
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
-include 'actionloop'
-include 'golang1.17'
-include 'golang1.18'
-include 'golang1.19'
+@RunWith(classOf[JUnitRunner])
+class ActionLoopBasicGo19Tests
+    extends ActionLoopBasicGoTests
+    with WskActorSystem {
 
-rootProject.name = 'runtime-golang'
-
-gradle.ext.openwhisk = [
-        version: '1.0.0-SNAPSHOT'
-]
-
-gradle.ext.scala = [
-    version: '2.12.7',
-    depVersion  : '2.12',
-    compileFlags: ['-feature', '-unchecked', '-deprecation', '-Xfatal-warnings', '-Ywarn-unused-import']
-]
-
-gradle.ext.scalafmt = [
-    version: '1.5.0',
-    config: new File(rootProject.projectDir, '.scalafmt.conf')
-]
-
-gradle.ext.akka = [version : '2.6.12']
-gradle.ext.akka_http = [version : '10.2.4']
+  override lazy val goCompiler = "action-golang-v1.19"
+  override lazy val image = goCompiler
+  override lazy val requireAck = true
+}
