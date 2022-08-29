@@ -25,6 +25,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"sync"
 	"time"
 )
 
@@ -41,6 +42,7 @@ type Executor struct {
 	input  io.WriteCloser
 	output *bufio.Reader
 	exited chan bool
+	mutex  sync.Mutex
 }
 
 // NewExecutor creates a child subprocess using the provided command line,
@@ -69,10 +71,10 @@ func NewExecutor(logout *os.File, logerr *os.File, command string, env map[strin
 	cmd.ExtraFiles = []*os.File{pipeIn}
 	output := bufio.NewReader(pipeOut)
 	return &Executor{
-		cmd,
-		input,
-		output,
-		make(chan bool),
+		cmd:    cmd,
+		input:  input,
+		output: output,
+		exited: make(chan bool),
 	}
 }
 
@@ -84,7 +86,9 @@ func (proc *Executor) Interact(in []byte) ([]byte, error) {
 
 	chout := make(chan []byte)
 	go func() {
+		proc.mutex.Lock()
 		out, err := proc.output.ReadBytes('\n')
+		proc.mutex.Unlock()
 		if err == nil {
 			chout <- out
 		} else {
