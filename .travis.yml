@@ -16,9 +16,10 @@
 #
 
 sudo: required
+dist: focal
 language: go
 go:
-  - "1.16.x"   # Do not fix the patch level to automatically get security fixes.
+  - "1.19.x"   # Do not fix the patch level to automatically get security fixes.
 services:
   - docker
 
