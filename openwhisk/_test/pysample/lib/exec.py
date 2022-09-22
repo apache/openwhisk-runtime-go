@@ -33,5 +33,5 @@ while True:
             payload = args["value"]
         res = main(payload)
         out.write(json.dumps(res, ensure_ascii=False).encode('utf-8'))
-        out.write("\n")
+        out.write(b"\n")
         out.flush()
