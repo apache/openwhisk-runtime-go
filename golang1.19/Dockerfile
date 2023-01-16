@@ -39,6 +39,8 @@ RUN echo "deb http://deb.debian.org/debian buster-backports main contrib non-fre
     # Cleanup apt data, we do not need them later on.
     apt-get clean && rm -rf /var/lib/apt/lists/* &&\
     go install github.com/go-delve/delve/cmd/dlv@latest &&\
+    # Workaround to fix CVE-2022-41717 (Can be removed when update is provided in base image)
+    cd /usr/local/go/src/ && go install golang.org/x/net@latest &&\
     mkdir /action
 #make python 3 react as python
 RUN ln -s /usr/bin/python3 /usr/bin/python
