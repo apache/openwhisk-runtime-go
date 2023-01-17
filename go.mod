@@ -3,8 +3,6 @@ module github.com/apache/openwhisk-runtime-go
 go 1.12
 
 require (
-	github.com/rs/zerolog v1.19.0
-	github.com/sirupsen/logrus v1.6.0
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/stretchr/testify v1.3.0
-	golang.org/x/net v0.5.0 // indirect
 )
