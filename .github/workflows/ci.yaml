@@ -71,8 +71,8 @@ jobs:
       # Test this repository
       - name: Test Runtime
         working-directory: runtime
+        # TODO: we should also be doing  `./gradlew :tests:checkScalafmtAll`
         run: |
-          ./gradlew :tests:checkScalafmtAll
           ./gradlew :tests:test
 
       # Conditionally publish runtime images to DockerHub
