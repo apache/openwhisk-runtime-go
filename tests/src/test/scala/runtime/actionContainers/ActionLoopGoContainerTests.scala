@@ -177,7 +177,8 @@ abstract class ActionLoopGoContainerTests
       ))
     withActionLoopContainer { c =>
       c.init(initPayload(src))._1 shouldBe (200)
-      val result = c.runForJsArray(runPayload(JsArray(JsString("a"), JsString("b"))))
+      val result =
+        c.runForJsArray(runPayload(JsArray(JsString("a"), JsString("b"))))
       result._1 shouldBe (200)
       result._2 shouldBe Some(JsArray(JsString("a"), JsString("b")))
     }
