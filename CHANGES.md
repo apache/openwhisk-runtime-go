@@ -17,6 +17,7 @@
 #
 -->
 # latest
+- Add support for go 1.20
 - Add support for go 1.19
 
 # 1.20.0
