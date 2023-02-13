@@ -77,9 +77,6 @@ jobs:
 
       # Conditionally publish runtime images to DockerHub
       # Important: naming convention for release tags is runtime@version
-      # For this repo expected tags:
-      #   actionloop@X.Y.Z
-      #   golang1.N@X.Y.Z
       - name: Docker Login
         if: ${{ env.PUSH_NIGHTLY  == 'true' || env.PUSH_RELEASE == 'true' }}
         uses: docker/login-action@v2
@@ -105,6 +102,11 @@ jobs:
         if: ${{ env.PUSH_RELEASE == 'true' }}
         working-directory: runtime
         run: |
-          RUNTIME_NAME=${GITHUB_REF_NAME%@*}
+          RUNTIME_VERSION=${GITHUB_REF_NAME%@*}
           IMAGE_TAG=${GITHUB_REF_NAME##*@}
-          ./gradlew :core:$RUNTIME_NAME:distDocker -PdockerRegistry=docker.io -PdockerImagePrefix=openwhisk -PdockerImageTag=$IMAGE_TAG
+          if [[ ${RUNTIME_VERSION} =~ 1\.[0-9]+ ]]; then
+            RUNTIME="golang$RUNTIME_VERSION"
+          elif [ ${RUNTIME_VERSION} == "actionloop" ]; then
+            RUNTIME="actionloop"
+          fi
+          ./gradlew :core:$RUNTIME:distDocker -PdockerRegistry=docker.io -PdockerImagePrefix=openwhisk -PdockerImageTag=$IMAGE_TAG
