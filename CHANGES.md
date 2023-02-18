@@ -16,9 +16,10 @@
 # limitations under the License.
 #
 -->
-# latest
-- Add support for go 1.20
-- Add support for go 1.19
+# 1.21.0
+- Add support for go 1.20 (#184)
+- Add support for go 1.19 (#175)
+- Drop support for go 1.17 and 1.18 (#186)
 
 # 1.20.0
 - Support array result include sequence action (#170)
