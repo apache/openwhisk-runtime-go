@@ -105,4 +105,4 @@ jobs:
           elif [ ${RUNTIME_VERSION} == "actionloop" ]; then
             RUNTIME="actionloop"
           fi
-          ./gradlew :core:$RUNTIME:distDocker -PdockerRegistry=docker.io -PdockerImagePrefix=openwhisk -PdockerImageTag=$IMAGE_TAG
+          ./gradlew $RUNTIME:distDocker -PdockerRegistry=docker.io -PdockerImagePrefix=openwhisk -PdockerImageTag=$IMAGE_TAG
