@@ -39,6 +39,9 @@ RUN echo "deb http://deb.debian.org/debian buster-backports main contrib non-fre
     # Cleanup apt data, we do not need them later on.
     apt-get clean && rm -rf /var/lib/apt/lists/* &&\
     go install github.com/go-delve/delve/cmd/dlv@latest &&\
+    #Update net Package as temporary vulnerability fix
+    cd /usr/local/go/src/ &&\
+    go get -u golang.org/x/net@v0.8.0 &&\
     mkdir /action
 #make python 3 react as python
 RUN ln -s /usr/bin/python3 /usr/bin/python
