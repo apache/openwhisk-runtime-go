@@ -64,6 +64,17 @@ func (ap *ActionProxy) ExtractAction(buf *[]byte, suffix string) (string, error)
 		}
 		Debug("Extract Action, assuming a zip")
 		return file, Unzip(*buf, newDir)
+
+	} else if IsTarGz(*buf) {
+		jar := os.Getenv("OW_SAVE_JAR")
+		if jar != "" {
+			jarFile := newDir + "/" + jar
+			Debug("Extract Action, checking if it is a jar first")
+			return jarFile, UnzipOrSaveJar(*buf, newDir, jarFile)
+		}
+
+		Debug("Extract Action, assuming a zip")
+		return file, UnTar(*buf, newDir)
 	}
 	return file, ioutil.WriteFile(file, *buf, 0755)
 }
