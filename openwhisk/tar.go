@@ -52,7 +52,6 @@ func UnTar(src []byte, dest string) error {
 	os.MkdirAll(dest, 0755)
 	for {
 		header, err := r.Next()
-		fmt.Println("Err", err)
 		switch {
 
 		// if no more files are found return
