@@ -65,3 +65,13 @@ func IsZip(buf []byte) bool {
 		(buf[2] == 0x3 || buf[2] == 0x5 || buf[2] == 0x7) &&
 		(buf[3] == 0x4 || buf[3] == 0x6 || buf[3] == 0x8)
 }
+
+// IsGz checks if the given file is a valid tar.gz file
+func IsGz(buf []byte) bool {
+	// Magic number: The first two bytes are fixed (0x1f and 0x8b), which represent the magic number of a gzip file.
+	// Compression method: The third byte indicates the compression method used. For gzip files, this is always  (deflate).
+	return len(buf) > 3 &&
+		buf[0] == 0x1f &&
+		buf[1] == 0x8b &&
+		buf[2] == 0x08
+}

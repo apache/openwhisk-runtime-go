@@ -64,6 +64,10 @@ func (ap *ActionProxy) ExtractAction(buf *[]byte, suffix string) (string, error)
 		}
 		Debug("Extract Action, assuming a zip")
 		return file, Unzip(*buf, newDir)
+
+	} else if IsGz(*buf) {
+		Debug("Extract Action, assuming a tar.gz")
+		return file, UnTar(*buf, newDir)
 	}
 	return file, ioutil.WriteFile(file, *buf, 0755)
 }
