@@ -16,6 +16,11 @@
 # limitations under the License.
 #
 -->
+# 1.22.0
+- Add tar.gz support to the go Proxy (#191)
+- Update net Package as temporary vulnerability fix (#190)
+- Update minimum version to 1.19; go mod tidy (#188)
+
 # 1.21.0
 - Add support for go 1.20 (#184)
 - Add support for go 1.19 (#175)
