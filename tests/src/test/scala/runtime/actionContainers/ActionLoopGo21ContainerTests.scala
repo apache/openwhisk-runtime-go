@@ -21,7 +21,7 @@ import common.WskActorSystem
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
-class ActionLoopGo20ContainerTests
+class ActionLoopGo21ContainerTests
     extends ActionLoopGoContainerTests
     with WskActorSystem {
 
