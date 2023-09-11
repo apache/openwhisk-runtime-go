@@ -16,8 +16,8 @@
 # limitations under the License.
 #
 -->
-# Latest
-- Add support for golang 1.21
+# 1.23.0
+- Add support for golang 1.21 (#193)
 
 # 1.22.0
 - Add tar.gz support to the go Proxy (#191)
