@@ -16,6 +16,9 @@
 # limitations under the License.
 #
 -->
+# Latest
+- Add support for golang 1.22
+
 # 1.23.0
 - Add support for golang 1.21 (#193)
 
