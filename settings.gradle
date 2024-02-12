@@ -18,7 +18,6 @@
 include 'tests'
 
 include 'actionloop'
-include 'golang1.19'
 include 'golang1.20'
 include 'golang1.21'
 include 'golang1.22'

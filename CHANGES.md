@@ -18,6 +18,7 @@
 -->
 # Latest
 - Add support for golang 1.22
+- Drop support for golang 1.19
 
 # 1.23.0
 - Add support for golang 1.21 (#193)
