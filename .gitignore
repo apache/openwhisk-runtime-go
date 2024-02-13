@@ -17,7 +17,6 @@ vendor/
 # Go binary proxy
 common/proxy
 actionloop/proxy
-golang1.19/proxy
 golang1.20/proxy
 golang1.21/proxy
 golang1.22/proxy
