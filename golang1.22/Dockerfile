@@ -18,9 +18,7 @@
 # Do not fix the patch level for golang:1.22 to automatically get security fixes.
 FROM golang:1.22-bookworm
 
-RUN echo "deb http://deb.debian.org/debian buster-backports main contrib non-free" \
-     >>/etc/apt/sources.list &&\
-    echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections &&\
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections &&\
     apt-get update &&\
     # Upgrade installed packages to get latest security fixes if the base image does not contain them already.
     apt-get upgrade -y --no-install-recommends &&\
