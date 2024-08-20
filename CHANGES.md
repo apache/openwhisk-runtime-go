@@ -18,6 +18,7 @@
 -->
 # Next Release
 - Remove obsolete buster-backports repository from build.
+- Add support for golang 1.23
 
 # 1.24.0
 - Add support for golang 1.22 (#195)

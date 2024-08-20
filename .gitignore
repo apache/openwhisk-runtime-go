@@ -20,6 +20,7 @@ actionloop/proxy
 golang1.20/proxy
 golang1.21/proxy
 golang1.22/proxy
+golang1.22/proxy
 
 # Go test transient files
 openwhisk/_test/exec
