@@ -15,19 +15,17 @@
  * limitations under the License.
  */
 
-buildscript {
-    repositories {
-        jcenter()
-        mavenCentral()
-        gradlePluginPortal()
-    }
-    dependencies {
-        classpath "gradle.plugin.cz.alenkacz:gradle-scalafmt:${gradle.scalafmt.version}"
-    }
-}
+package runtime.actionContainers
 
-subprojects {
-    apply plugin: 'scalafmt'
-    scalafmt.configFilePath = gradle.scalafmt.config
-}
+import common.WskActorSystem
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+@RunWith(classOf[JUnitRunner])
+class ActionLoopGo23ContainerTests
+    extends ActionLoopGoContainerTests
+    with WskActorSystem {
 
+  override lazy val goCompiler = "action-golang-v1.23"
+  override lazy val image = goCompiler
+
+}

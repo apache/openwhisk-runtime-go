@@ -15,19 +15,24 @@
  * limitations under the License.
  */
 
-buildscript {
-    repositories {
-        jcenter()
-        mavenCentral()
-        gradlePluginPortal()
-    }
-    dependencies {
-        classpath "gradle.plugin.cz.alenkacz:gradle-scalafmt:${gradle.scalafmt.version}"
-    }
+ext.dockerImageName = 'action-golang-v1.23'
+apply from: '../gradle/docker.gradle'
+
+distDocker.dependsOn 'staticBuildProxy'
+distDocker.finalizedBy('cleanup')
+
+task staticBuildProxy(type: Exec) {
+	environment CGO_ENABLED: "0"
+	environment GOOS: "linux"
+	environment GOARCH: "amd64"
+    environment GO111MODULE: "on"
+
+	commandLine 'go', 'build',
+		'-o',  'proxy', '-a',
+		'-ldflags', '-extldflags "-static"',
+		'../main/proxy.go'
 }
 
-subprojects {
-    apply plugin: 'scalafmt'
-    scalafmt.configFilePath = gradle.scalafmt.config
+task cleanup(type: Delete) {
+    delete 'proxy'
 }
-
