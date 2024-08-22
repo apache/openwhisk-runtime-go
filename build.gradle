@@ -19,6 +19,7 @@ buildscript {
     repositories {
         jcenter()
         mavenCentral()
+        gradlePluginPortal()
     }
     dependencies {
         classpath "gradle.plugin.cz.alenkacz:gradle-scalafmt:${gradle.scalafmt.version}"
