@@ -22,7 +22,7 @@
 
 ## How to write Go Actions
 
-The `action-golang-v1.14` runtime can execute actions written in the Go programming language in OpenWhisk, either precompiled binary or compiling sources on the fly.
+The `action-golang` runtimes can execute actions written in the Go programming language in OpenWhisk, either precompiled binary or compiling sources on the fly.
 
 ### Entry Point
 
@@ -123,7 +123,7 @@ The protocol can be specified informally as follows.
 Note however that more values could be provided in future.
 Usually this JSON is read and the values are stored in environment variables, converted to upper case the key and  and adding the prefix `__OW_`.
 
-- The payload of the request is stored in the key `value`. The action should read the field `value` assuming it is a JSON object (note, not an array, nor a string or number) and parse it.
+- The payload of the request is stored in the key `value`. The action should read the field `value` assuming it is either a JSON object or array and parse it.
 - The action can now perform its tasks as appropriate. The action can produce log writing  in standard output (file descriptor 1) and standard error (file descriptor 3) . Note that those corresponds to file descriptors 1 and 2.
 - The action will receive also file descriptor 3 for returning results. The result of the action must be a single line (without embedding newlines - newlines in strings must be quoted) written in file descriptor 3.
 - The action should not exit now, but continue the loop, reading the next line and processing as described before, continuing forever.
