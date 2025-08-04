@@ -21,11 +21,11 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ActionLoopBasicGo21Tests
+class ActionLoopBasicGo24Tests
     extends ActionLoopBasicGoTests
     with WskActorSystem {
 
-  override lazy val goCompiler = "action-golang-v1.21"
+  override lazy val goCompiler = "action-golang-v1.24"
   override lazy val image = goCompiler
   override lazy val requireAck = true
 }

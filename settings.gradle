@@ -18,9 +18,9 @@
 include 'tests'
 
 include 'actionloop'
-include 'golang1.21'
 include 'golang1.22'
 include 'golang1.23'
+include 'golang1.24'
 
 rootProject.name = 'runtime-golang'
 
