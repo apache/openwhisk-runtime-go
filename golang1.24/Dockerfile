@@ -15,8 +15,8 @@
 # limitations under the License.
 #
 
-# Do not fix the patch level for golang:1.21 to automatically get security fixes.
-FROM golang:1.21-bookworm
+# Do not fix the patch level for golang:1.24 to automatically get security fixes.
+FROM golang:1.24-bookworm
 
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections &&\
     apt-get update &&\
@@ -48,5 +48,5 @@ ADD lib/launcher.go /lib/launcher.go
 ENV OW_COMPILER=/bin/compile
 ENV OW_LOG_INIT_ERROR=1
 ENV OW_WAIT_FOR_ACK=1
-ENV OW_EXECUTION_ENV=openwhisk/action-golang-v1.21
+ENV OW_EXECUTION_ENV=openwhisk/action-golang-v1.24
 ENTRYPOINT [ "/bin/proxy" ]

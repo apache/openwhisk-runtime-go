@@ -18,7 +18,7 @@ vendor/
 common/proxy
 actionloop/proxy
 golang1.20/proxy
-golang1.21/proxy
+golang1.24/proxy
 golang1.22/proxy
 golang1.23/proxy
 
